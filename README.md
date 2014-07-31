@@ -63,7 +63,7 @@ IPGLDevice* device = ....;
 IPGLDeviceContext* context = device->CreateDeviceContext();
 
 std::thread t([context] {
-
+  context->DoStuff();
 });
 t.join();
 
@@ -74,7 +74,7 @@ context->Release();
 device->Release();
 ```
 
-Resources are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
+The DeviceContext will notice that you are inside another thread and any resources you are changing and using are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
 
 ### Effects ###
 
