@@ -120,9 +120,7 @@ IPGLDeviceContext* context = ...;
 // Load the effect with a given filename
 IPGLShaderProgram* vertexShader = context->CreateShaderProgramFromFile("myfile.vs", ShaderProgramType::VERTEX_SHADER);
 IPGLShaderProgram* fragmentShader = context->CreateShaderProgramFromFile("myfile.fs", ShaderProgramType::FRAGMENT_SHADER);
-PGL_EFFECT_PROGRAMS programs[2] = {
-  { vertexShader, ShaderProgramType::VERTEX_SHADER },
-  { fragmentShader, ShaderProgramType::FRAGMENT_SHADER }
+IPGLShaderProgram* programs[2] = { vertexShader, fragmentShader }
 };
 IPGLEffect* effect = context->CreateEffectFromPrograms(programs, 2);
 
