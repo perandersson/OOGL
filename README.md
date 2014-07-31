@@ -1,10 +1,8 @@
-OOGL
-====
+# OOGL #
 
 OOGL is an object-oriented multithread friendly approach to the OpenGL interface.
 
 Start with creating a device containing the Application -> OpenGL connection. The device is thread-safe and can be used by any thread you want:
-
 ```cpp
 OGL_HANDLE windowHandle = ...;
 OGL_DEVICE_INFO deviceInfo;
@@ -17,7 +15,6 @@ device->Release();
 ```
 
 You then retrieve a device context for the thread you are using;
-
 ```cpp
 IOGLDevice* device = ....;
 
@@ -29,8 +26,6 @@ context->Release();
 ```
 
 You use the IOGLDeviceContext to manage and create OpenGL resources, such as vertex buffers and textures:
-
-
 ```cpp
 IOGLDevice* device = ....;
 
@@ -45,8 +40,9 @@ IOOGLBuffer* buffer = context->CreateBuffer(BufferType::VERTEXBUFFER, &data, siz
 context->Release();
 ```
 
-Using OOGL in a multithreaded environment is easy. Example:
+### Multithreading ###
 
+Using OOGL in a multithreaded environment is easy. Example:
 ```cpp
 IOGLDevice* device = ....;
 
