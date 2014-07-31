@@ -89,3 +89,45 @@ device->Release();
 
 Resources are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
 
+### Effects ###
+
+You can load effects in one of two ways. Those are:
+
+1. Load an effect file containing the different shaders
+2. Load the individual shader programs and link them together manually.
+
+This is how you load an effect file:
+
+```cpp
+IPGLDeviceContext* context = ...;
+
+// Load the effect with a given filename
+IPGLEffect* effect = context->CreateEffectFromFile("myfile.effect");
+
+// You can also load the effect from memory
+const char* memory = ...;
+size_t memorySize = ...;
+IPGLEffect* effect = context->CreateEffectFromMemory(memory, memoeySize);
+
+context->Release();
+```
+
+This is how you load the individual shader programs and link them together manually:
+
+```cpp
+IPGLDeviceContext* context = ...;
+
+// Load the effect with a given filename
+IPGLShaderProgram* vertexShader = context->CreateShaderProgramFromFile("myfile.vs", ShaderProgramType::VERTEX_SHADER);
+IPGLShaderProgram* fragmentShader = context->CreateShaderProgramFromFile("myfile.fs", ShaderProgramType::FRAGMENT_SHADER);
+PGL_EFFECT_PROGRAMS programs[2] = {
+  { vertexShader, ShaderProgramType::VERTEX_SHADER },
+  { fragmentShader, ShaderProgramType::FRAGMENT_SHADER }
+};
+IPGLEffect* effect = context->CreateEffectFromPrograms(programs, 2);
+
+// You can also load from memory
+// .....
+
+context->Release();
+```
