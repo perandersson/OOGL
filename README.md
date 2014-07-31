@@ -108,8 +108,6 @@ IPGLEffect* effect = context->CreateEffectFromFile("myfile.effect");
 const char* memory = ...;
 size_t memorySize = ...;
 IPGLEffect* effect = context->CreateEffectFromMemory(memory, memoeySize);
-
-context->Release();
 ```
 
 This is how you load the individual shader programs and link them together manually:
@@ -120,12 +118,28 @@ IPGLDeviceContext* context = ...;
 // Load the effect with a given filename
 IPGLShaderProgram* vertexShader = context->CreateShaderProgramFromFile("myfile.vs", ShaderProgramType::VERTEX_SHADER);
 IPGLShaderProgram* fragmentShader = context->CreateShaderProgramFromFile("myfile.fs", ShaderProgramType::FRAGMENT_SHADER);
-IPGLShaderProgram* programs[2] = { vertexShader, fragmentShader }
-};
+IPGLShaderProgram* programs[2] = { vertexShader, fragmentShader };
 IPGLEffect* effect = context->CreateEffectFromPrograms(programs, 2);
 
 // You can also load from memory
-// .....
+IPGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(memoryPtr, memorySize, ShaderProgramType::VERTEX_SHADER);
+IPGLShaderProgram* fragmentShader = context->CreateShaderProgramFromFile(fragMemoryPtr, fragMemorySize, ShaderProgramType::FRAGMENT_SHADER);
+IPGLShaderProgram* programs[2] = { vertexShader, fragmentShader };
+IPGLEffect* effect = context->CreateEffectFromPrograms(programs, 2);
+```
 
-context->Release();
+You use an effect by binding the effect to the IPGLDeviceContext:
+
+```cpp
+IPGLDeviceContext* context = ...;
+IPGLEffect* effect = ...;
+
+// Apply the effect
+IPGLRenderState* state = context->Apply(effect);
+
+// Draw some vertex- and index buffer
+state->Draw(vertexBuffer, indexBuffer);
+
+// When the drawing is complete then end the frame
+state->EndFrame();
 ```
