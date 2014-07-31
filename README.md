@@ -8,7 +8,7 @@ PGL_HANDLE windowHandle = ...;
 PGL_DEVICE_INFO deviceInfo;
 deviceInfo.window = windowHandle;
 deviceInfo.format = DeviceInfoFormat::R8G8B8A8;
-IPGLDevice* device = POGLCreateDevice(&deviceInfo);
+IPGLDevice* device = PGLCreateDevice(&deviceInfo);
 
 // Release the device and delete the devices internal memory
 device->Release();
@@ -18,19 +18,22 @@ You then retrieve a device context for the thread you are using;
 ```cpp
 IPGLDevice* device = ....;
 
-// Create and bind a device context to the current thread and then return it to the program
-IPGLDeviceContext context = device->GetContext();
+// Create a device context
+IPGLDeviceContext* context = device->CreateDeviceContext();
 
 // Return the context to the device and unbind it from the current thread
 context->Release();
+
+// Release the device and delete the devices internal memory
+device->Release();
 ```
 
 You use the IPGLDeviceContext to manage and create OpenGL resources, such as vertex buffers and textures:
 ```cpp
 IPGLDevice* device = ....;
 
-// Create and bind a device context to the current thread and then return it to the program
-IPGLDeviceContext context = device->GetContext();
+// Create a device context
+IPGLDeviceContext* context = device->CreateDeviceContext();
 
 // Create a static buffer and fill it with data
 PositionVertex data[6] = {...};
@@ -38,6 +41,9 @@ IPGLBuffer* buffer = context->CreateBuffer(BufferType::VERTEXBUFFER, &data, size
 
 // Return the context to the device and unbind it from the current thread
 context->Release();
+
+// Release the device and delete the devices internal memory
+device->Release();
 ```
 
 ### Multithreading ###
@@ -46,15 +52,15 @@ Using PlayGL in a multithreaded environment is easy. Example:
 ```cpp
 IPGLDevice* device = ....;
 
-// Create and bind a device context to the current thread and then return it to the program
-IPGLDeviceContext context = device->GetContext();
+// Create a device context
+IPGLDeviceContext* context = device->CreateDeviceContext();
 
-std::thread t([device] {
-  // Create and bind a new device context to the current thread.
-  IPGLDeviceContext* threadContext = device->GetContext();
-
+std::thread t([context] {
+  // Save a reference just in case
+  context->AddRef();
+  
   // Unbind the context and release it from the current thread
-  threadContext->Release();
+  context->Release();
 });
 
   // Unbind the context and release it from the current thread
@@ -65,5 +71,3 @@ device->Release();
 ```
 
 Resources are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
-
-IPGLDevice keeps track on which thread you are inside at the moment and returns a unqiue IPGLDeviceContext for each thread. This also means that you are not allowed to save a pointer to the context unless you are sure that you're always inside the same thread.
