@@ -1,31 +1,72 @@
 OOGL
 ====
 
-OOGL is an object-oriented multithread friendly approach to the OpenGL interface. Example (psuedo-ish code at the moment):
+OOGL is an object-oriented multithread friendly approach to the OpenGL interface.
+
+Start with creating a device containing the Application -> OpenGL connection. The device is thread-safe and can be used by any thread you want:
 
 ```cpp
-//
-IOOGLDevice* device = OOGLCreateDevice(...);
+OGL_HANDLE windowHandle = ...;
+OGL_DEVICE_INFO deviceInfo;
+deviceInfo.window = windowHandle;
+deviceInfo.format = DeviceInfoFormat::R8G8B8A8;
+IOOGLDevice* device = OOGLCreateDevice(&deviceInfo);
+
+// Release the device and delete the devices internal memory
+device->Release();
+```
+
+You then retrieve a device context for the thread you are using;
+
+```cpp
+IOGLDevice* device = ....;
+
+// Create and bind a device context to the current thread and then return it to the program
+IOGLDeviceContext context = device->Bind();
+
+// Return the context to the device and unbind it from the current thread
+context->Release();
+```
+
+You use the IOGLDeviceContext to manage and create OpenGL resources, such as vertex buffers and textures:
+
+
+```cpp
+IOGLDevice* device = ....;
+
+// Create and bind a device context to the current thread and then return it to the program
+IOGLDeviceContext context = device->Bind();
+
+// Create a static buffer and fill it with data
+PositionVertex data[6] = {...};
+IOOGLBuffer* buffer = context->CreateBuffer(BufferType::VERTEXBUFFER, &data, sizeof(data), BufferMode::STATIC);
+
+// Return the context to the device and unbind it from the current thread
+context->Release();
+```
+
+Using OOGL in a multithreaded environment is easy. Example:
+
+```cpp
+IOGLDevice* device = ....;
+
+// Create and bind a device context to the current thread and then return it to the program
+IOGLDeviceContext context = device->Bind();
+
 std::thread t([device] {
-  // Bind the device to the current thread and return a thread-local context used 
-  // to do the actual graphics related programming 
-  IOOGLDeviceContext* context = device->Bind();
+  // Create and bind a new device context to the current thread.
+  IOOGLDeviceContext* threadContext = device->Bind();
 
-  // Fill a struct with data and create a buffer that we want to be static.
-  // This might, depenending on your computers resources, put the data into a larger "static" buffer containing 
-  // more than one buffer.
-  PositionVertex data[6] = {...};
-  IOOGLBuffer* buffer = context->CreateBuffer(BufferType::VERTEXBUFFER, &data, sizeof(data), BufferMode::STATIC);
-
-  // Do stuff
-  
-  buffer->Release();
-  
   // Unbind the context and release it from the current thread
-  context->Release();
+  threadContext->Release();
 });
+
+  // Unbind the context and release it from the current thread
+context->Release();
 
 // Release OOGL
 device->Release();
 
 ```
+
+IOGLDevice keeps track on which thread you are inside at the moment and returns a unqiue IOGLDeviceContext for each thread. This also means that you are not allowed to save a pointer to the context unless you are sure that you're always inside the same thread.
