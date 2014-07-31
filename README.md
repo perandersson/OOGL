@@ -56,7 +56,7 @@ IPGLFrameBuffer* frameBuffer = context->CreateFrameBuffer();
 frameBuffer->SetRenderTarget(0, texture);
 texture->Release(); // The framebuffer not owns the reference
 
-ontext to the device and unbind it from the current thread
+// Release the context and delete it's internal resources
 context->Release();
 
 // Release the device and delete the devices internal memory
