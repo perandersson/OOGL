@@ -62,7 +62,8 @@ context->Release();
 
 // Release OOGL
 device->Release();
-
 ```
+
+Resources are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
 
 IPGLDevice keeps track on which thread you are inside at the moment and returns a unqiue IPGLDeviceContext for each thread. This also means that you are not allowed to save a pointer to the context unless you are sure that you're always inside the same thread.
