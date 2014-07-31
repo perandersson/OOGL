@@ -63,12 +63,9 @@ IPGLDevice* device = ....;
 IPGLDeviceContext* context = device->CreateDeviceContext();
 
 std::thread t([context] {
-  // Save a reference just in case
-  context->AddRef();
-  
-  // Unbind the context and release it from the current thread
-  context->Release();
+
 });
+t.join();
 
   // Unbind the context and release it from the current thread
 context->Release();
