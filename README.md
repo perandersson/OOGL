@@ -74,7 +74,7 @@ context->Release();
 device->Release();
 ```
 
-The DeviceContext will notice that you are inside another thread and any resources you are changing and using are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
+The DeviceContext will know when the code is inside another thread. Any resources you are changing and using are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
 
 ### Effects ###
 
