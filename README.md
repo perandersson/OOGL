@@ -1,6 +1,6 @@
-# OOGL #
+# OOGL (Work in progress) #
 
-OOGL is an object-oriented multithread friendly approach to the OpenGL interface.
+OOGL is an object-oriented multithread friendly interface for OpenGL.
 
 Start with creating a device containing the Application -> OpenGL connection. The device is thread-safe and can be used by any thread you want:
 ```cpp
