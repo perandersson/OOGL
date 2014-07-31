@@ -37,9 +37,26 @@ IPGLDeviceContext* context = device->CreateDeviceContext();
 
 // Create a static buffer and fill it with data
 PositionVertex data[6] = {...};
-IPGLBuffer* buffer = context->CreateBuffer(BufferType::VERTEXBUFFER, &data, sizeof(data), BufferMode::STATIC);
+PGL_BUFFER_INFO bufferInfo;
+bufferInfo.data = data;
+bufferInfo.size = sizeof(data);
+bufferInfo.mode = BufferMode::STATIC;
+bufferInfo.type = BufferType::VERTEX_BUFFER;
+IPGLBuffer* buffer = context->CreateBuffer(&bufferInfo);
 
-// Return the context to the device and unbind it from the current thread
+PGL_TEXTURE2D_INFO textureInfo;
+textureInfo.width = 128;
+textureInfo.height = 128;
+textureInfo.format = TextureFormat::RGBA16F;
+textureInfo.data = nullptr;
+textureInfo.size = 0;
+IPGLTexture2D* texture = context->CreateTexture2D(&textureInfo);
+
+IPGLFrameBuffer* frameBuffer = context->CreateFrameBuffer();
+frameBuffer->SetRenderTarget(0, texture);
+texture->Release(); // The framebuffer not owns the reference
+
+ontext to the device and unbind it from the current thread
 context->Release();
 
 // Release the device and delete the devices internal memory
@@ -71,3 +88,4 @@ device->Release();
 ```
 
 Resources are automatically shared between contexts. Client locks and fences are used internally to verify the data integrity for the shared resources.
+
