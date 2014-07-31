@@ -37,20 +37,10 @@ IPGLDeviceContext* context = device->CreateDeviceContext();
 
 // Create a static buffer and fill it with data
 PositionVertex data[6] = {...};
-PGL_BUFFER_INFO bufferInfo;
-bufferInfo.data = data;
-bufferInfo.size = sizeof(data);
-bufferInfo.mode = BufferMode::STATIC;
-bufferInfo.type = BufferType::VERTEX_BUFFER;
-IPGLBuffer* buffer = context->CreateBuffer(&bufferInfo);
+IPGLBuffer* buffer = context->CreateBuffer(BufferType::VERTEX_BUFFER, data, sizeof(data), BufferUsage::STATIC);
 
-PGL_TEXTURE2D_INFO textureInfo;
-textureInfo.width = 128;
-textureInfo.height = 128;
-textureInfo.format = TextureFormat::RGBA16F;
-textureInfo.data = nullptr;
-textureInfo.size = 0;
-IPGLTexture2D* texture = context->CreateTexture2D(&textureInfo);
+// Create a texture
+IPGLTexture2D* texture = context->CreateTexture2D(width, height, TextureFormat::RGBA16F, nullptr, 0);
 
 IPGLFrameBuffer* frameBuffer = context->CreateFrameBuffer();
 frameBuffer->SetRenderTarget(0, texture);
