@@ -33,3 +33,19 @@ namespace std { using namespace __gnu_cxx; }
 #define CHECK_GL(message)
 #endif
 #endif
+
+#ifndef FLT_EQ
+#define FLT_EQ(val1, val2) (abs(val2 - val1) <= FLT_EPSILON)
+#endif
+
+#ifndef FLT_NEQ
+#define FLT_NEQ(val1, val2) (abs(val2 - val1) > FLT_EPSILON)
+#endif
+
+#ifndef DBL_EQ
+#define DBL_EQ(val1, val2) (abs(val2 - val1) <= DBL_EPSILON)
+#endif
+
+#ifndef DBL_NEQ
+#define DBL_NEQ(val1, val2) (abs(val2 - val1) > DBL_EPSILON)
+#endif

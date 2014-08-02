@@ -2,12 +2,15 @@
 #include "POGLEffect.hxx"
 
 class POGLDefaultUniform;
+class POGLRenderState;
+class POGLDeviceContext;
+
 class POGLEffectState
 {
 	typedef std::hash_map<POGL_STRING, POGLDefaultUniform*> Uniforms;
 
 public:
-	POGLEffectState(POGLEffect* effect, IPOGLDeviceContext* context);
+	POGLEffectState(POGLEffect* effect, POGLRenderState* renderState, POGLDeviceContext* context);
 	~POGLEffectState();
 	
 	/*!
@@ -33,6 +36,6 @@ public:
 
 private:
 	POGLEffect* mEffect;
-	IPOGLDeviceContext* mDeviceContext;
+	POGLDeviceContext* mDeviceContext;
 	Uniforms mUniforms;
 };

@@ -242,6 +242,111 @@ struct POGLDepthFunc
 	static const Enum DEFAULT = LEQUAL;
 };
 
+struct POGLTextureWrap
+{
+	enum Enum {
+		CLAMP_TO_EDGE = 0,
+		CLAMP_TO_BORDER,
+		MIRRORED_REPEAT,
+		REPEAT,
+
+		/* Number of enums available */
+		COUNT
+	};
+
+	/* Default texture wrap used by the rendering engine */
+	static const Enum DEFAULT = REPEAT;
+};
+
+struct POGLMinFilter
+{
+	enum Enum {
+		NEAREST = 0,
+		LINEAR,
+		NEAREST_MIPMAP_NEAREST,
+		LINEAR_MIPMAP_NEAREST,
+		NEAREST_MIPMAP_LINEAR,
+		LINEAR_MIPMAP_LINEAR,
+
+		/* Number of enums available */
+		COUNT
+	};
+
+	/* Default min filter used by the rendering engine */
+	static const Enum DEFAULT = LINEAR;
+};
+
+struct POGLMagFilter
+{
+	enum Enum {
+		NEAREST = 0,
+		LINEAR,
+
+		/* Number of enums available */
+		COUNT
+	};
+
+	/* Default mag filter used by the rendering engine */
+	static const Enum DEFAULT = LINEAR;
+};
+
+/*!
+	\brief
+*/
+struct POGLCompareFunc
+{
+	enum Enum {
+		NEVER = 0,
+		LESS,
+		EQUAL,
+		LEQUAL,
+		GREATER,
+		NOTEQUAL,
+		GEQUAL,
+		ALWAYS,
+
+		/* Number of enums available */
+		COUNT
+	};
+
+	/* Default compare function used by the rendering engine */
+	static const Enum DEFAULT = LEQUAL;
+};
+
+/*!
+	\brief
+*/
+struct POGLCompareMode
+{
+	enum Enum {
+		COMPARE_R_TO_TEXTURE,
+		NONE,
+
+		/* Number of enums available */
+		COUNT
+	};
+
+	/* Default compare mode used by the rendering engine */
+	static const Enum DEFAULT = NONE;
+};
+
+/*!
+
+*/
+struct POGLPolygonMode
+{
+	enum Enum {
+		POINT = 0,
+		LINE,
+		FILL,
+
+		COUNT
+	};
+
+	/* Default polygon mode used by the rendering engine */
+	static const Enum DEFAULT = FILL;
+};
+
 struct POGLColorMask
 {
 	enum Enum {
@@ -1099,6 +1204,15 @@ class POGLResourceException : public POGLException {
 public:
 	POGLResourceException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLResourceException();
+};
+
+/*!
+	\brief Exception thrown if a fatal fault happened when initializing or using an effect
+*/
+class POGLEffectException : public POGLException {
+public:
+	POGLEffectException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLEffectException();
 };
 
 #include <cstdarg>

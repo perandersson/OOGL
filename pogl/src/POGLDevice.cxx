@@ -56,6 +56,19 @@ POGLResourceException::~POGLResourceException()
 {
 }
 
+POGLEffectException::POGLEffectException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...)
+: POGLException(function, line, file)
+{
+	va_list arglist;
+	va_start(arglist, message);
+	strcpy_s(mMessage, sizeof(mMessage), GenExceptionMessage(message, arglist).c_str());
+	va_end(arglist);
+}
+
+POGLEffectException::~POGLEffectException()
+{
+}
+
 //
 //
 //

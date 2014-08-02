@@ -109,6 +109,56 @@ public:
 		\brief Set the uniform
 	*/
 	void Uniform4uiv(GLint location, GLsizei count, const GLuint *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform1fv(GLint location, GLsizei count, const GLfloat *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform2fv(GLint location, GLsizei count, const GLfloat *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform3fv(GLint location, GLsizei count, const GLfloat *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform4fv(GLint location, GLsizei count, const GLfloat *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform1dv(GLint location, GLsizei count, const GLdouble *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform2dv(GLint location, GLsizei count, const GLdouble *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform3dv(GLint location, GLsizei count, const GLdouble *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform4dv(GLint location, GLsizei count, const GLdouble *value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value);
+	
+	/*!
+		\brief Set the uniform
+	*/
+	void UniformMatrix4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble* value);
 
 	/*!
 	
@@ -181,6 +231,19 @@ protected:
 	PFNGLUNIFORM2UIVPROC glUniform2uiv;
 	PFNGLUNIFORM3UIVPROC glUniform3uiv;
 	PFNGLUNIFORM4UIVPROC glUniform4uiv;
+
+	PFNGLUNIFORM1FVPROC glUniform1fv;
+	PFNGLUNIFORM2FVPROC glUniform2fv;
+	PFNGLUNIFORM3FVPROC glUniform3fv;
+	PFNGLUNIFORM4FVPROC glUniform4fv;
+
+	PFNGLUNIFORM1DVPROC glUniform1dv;
+	PFNGLUNIFORM2DVPROC glUniform2dv;
+	PFNGLUNIFORM3DVPROC glUniform3dv;
+	PFNGLUNIFORM4DVPROC glUniform4dv;
+
+	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
+	PFNGLUNIFORMMATRIX4DVPROC glUniformMatrix4dv;
 
 	PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC glBindVertexArray;

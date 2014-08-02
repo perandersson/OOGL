@@ -17,6 +17,9 @@ POGLEffect::POGLEffect(POGLEffectData* data, IPOGLDevice* device)
 
 POGLEffect::~POGLEffect()
 {
+	if (mData != nullptr)
+		delete mData;
+	mData = nullptr;
 }
 
 void POGLEffect::AddRef()
@@ -110,4 +113,9 @@ POGL_UINT32 POGLEffect::GetUID() const
 GLuint POGLEffect::GetProgramID() const
 {
 	return mData->programID;
+}
+
+const POGLEffectData* POGLEffect::GetData() const
+{
+	return mData;
 }

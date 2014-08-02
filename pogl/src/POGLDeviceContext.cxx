@@ -179,6 +179,19 @@ void POGLDeviceContext::LoadExtensions()
 	SET_EXTENSION_FUNC(PFNGLUNIFORM3UIVPROC, glUniform3uiv);
 	SET_EXTENSION_FUNC(PFNGLUNIFORM4UIVPROC, glUniform4uiv);
 
+	SET_EXTENSION_FUNC(PFNGLUNIFORM1FVPROC, glUniform1fv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORM2FVPROC, glUniform2fv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORM3FVPROC, glUniform3fv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORM4FVPROC, glUniform4fv);
+
+	SET_EXTENSION_FUNC(PFNGLUNIFORM1DVPROC, glUniform1dv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORM2DVPROC, glUniform2dv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORM3DVPROC, glUniform3dv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORM4DVPROC, glUniform4dv);
+
+	SET_EXTENSION_FUNC(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv);
+	SET_EXTENSION_FUNC(PFNGLUNIFORMMATRIX4DVPROC, glUniformMatrix4dv);
+
 	SET_EXTENSION_FUNC(PFNGLGENVERTEXARRAYSPROC, glGenVertexArrays);
 	SET_EXTENSION_FUNC(PFNGLBINDVERTEXARRAYPROC, glBindVertexArray);
 	SET_EXTENSION_FUNC(PFNGLDELETEVERTEXARRAYSPROC, glDeleteVertexArrays);
@@ -247,6 +260,56 @@ void POGLDeviceContext::Uniform3uiv(GLint location, GLsizei count, const GLuint 
 void POGLDeviceContext::Uniform4uiv(GLint location, GLsizei count, const GLuint *value)
 {
 	glUniform4uiv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
+{
+	glUniform1fv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
+{
+	glUniform2fv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
+{
+	glUniform3fv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
+{
+	glUniform4fv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform1dv(GLint location, GLsizei count, const GLdouble *value)
+{
+	glUniform1dv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform2dv(GLint location, GLsizei count, const GLdouble *value)
+{
+	glUniform2dv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform3dv(GLint location, GLsizei count, const GLdouble *value)
+{
+	glUniform3dv(location, count, value);
+}
+
+void POGLDeviceContext::Uniform4dv(GLint location, GLsizei count, const GLdouble *value)
+{
+	glUniform4dv(location, count, value);
+}
+
+void POGLDeviceContext::UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
+{
+	glUniformMatrix4fv(location, count, transpose, value);
+}
+
+void POGLDeviceContext::UniformMatrix4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble* value)
+{
+	glUniformMatrix4dv(location, count, transpose, value);
 }
 
 void POGLDeviceContext::EnableVertexAttribArray(GLuint index)

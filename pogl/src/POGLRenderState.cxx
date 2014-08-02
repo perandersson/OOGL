@@ -217,7 +217,7 @@ POGLEffectState* POGLRenderState::GetEffectState(POGLEffect* effect)
 	const POGL_UINT32 uid = effect->GetUID();
 	auto it = mEffectStates.find(uid);
 	if (it == mEffectStates.end()) {
-		POGLEffectState* state = new POGLEffectState(effect, mDeviceContext);
+		POGLEffectState* state = new POGLEffectState(effect, this, mDeviceContext);
 		mEffectStates.insert(std::make_pair(uid, std::shared_ptr<POGLEffectState>(state)));
 		return state;
 	}
