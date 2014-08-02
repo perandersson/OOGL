@@ -3,7 +3,9 @@
 
 Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext)
 : POGLDeviceContext(device), mDeviceContext(deviceContext),
-mRenderContext(nullptr), mBoundToThread(false)
+mRenderContext(nullptr), mBoundToThread(false),
+// Extensions
+wglCreateContextAttribsARB(nullptr)
 {
 
 }
@@ -73,6 +75,12 @@ Win32POGLDeviceContext* Win32POGLDeviceContext::BindContextIfNeccessary()
 
 void Win32POGLDeviceContext::LoadExtensions()
 {
-	wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+	SET_EXTENSION_FUNC(PFNWGLCREATECONTEXTATTRIBSARBPROC, wglCreateContextAttribsARB);
+
 	POGLDeviceContext::LoadExtensions();
+}
+
+void* Win32POGLDeviceContext::GetProcAddress(const char* functionName)
+{
+	return wglGetProcAddress(functionName);
 }

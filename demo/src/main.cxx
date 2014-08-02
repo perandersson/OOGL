@@ -56,35 +56,63 @@ int main()
 	IPOGLEffect* simpleEffect = context->CreateEffectFromMemory(SIMPLE_EFFECT, sizeof(SIMPLE_EFFECT));
 
 	// Create vertex buffer
-	IPOGLBuffer* vertexBuffer = context->CreateBuffer();
+	POGL_POSITION_COLOR_VERTEX vertices[] = {
+		POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(-0.5f, -0.5f, 0.0f), POGL_COLOR4F(1.0f, 0.0f, 0.0f, 1.0f)),
+		POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(-0.5f, 0.5f, 0.0f), POGL_COLOR4F(1.0f, 1.0f, 0.0f, 1.0f)),
+		POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.5f, 0.5f, 0.0f), POGL_COLOR4F(1.0f, 1.0f, 1.0f, 1.0f)),
+		POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.5f, -0.5f, 0.0f), POGL_COLOR4F(0.0f, 0.0f, 1.0f, 1.0f))
+	};
+	IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(vertices, sizeof(vertices), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
 
-	std::thread t([device, simpleEffect, vertexBuffer] {
+	// Create index buffer
+	POGL_UINT32 indices[] = {
+		0, 1, 2,
+		1, 2, 3
+	};
+	IPOGLIndexBuffer* indexBuffer = context->CreateIndexBuffer(indices, sizeof(indices), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::STATIC);
+
+	// Increase reference counter
+	simpleEffect->AddRef();
+	vertexBuffer->AddRef();
+	indexBuffer->AddRef();
+
+	// New thread
+	std::thread t([device, simpleEffect, vertexBuffer, indexBuffer] {
 		// Retrieves a device context for this thread
 		IPOGLDeviceContext* context = device->GetContext();
+
+		// Apply the simple effect and draw some geometry to to the screen
+		IPOGLRenderState* state = context->Apply(simpleEffect);
+		state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 		POGL_MAT4F projectionMatrix;
 		POGL_MAT4F viewMatrix;
 		POGL_MAT4F modelMatrix;
-		
-		// Apply the simple effect and draw some geometry to to the screen
-		IPOGLRenderState* state = context->Apply(simpleEffect);
-		state->Clear(POGLClearType::COLOR_AND_DEPTH);
 
 		// Set uniforms
-		state->FindUniformByName("ProjectionMatrix")->SetMatrix(&projectionMatrix);
-		state->FindUniformByName("ViewMatrix")->SetMatrix(&viewMatrix);
-		state->FindUniformByName("ModelMatrix")->SetMatrix(&modelMatrix);
+		state->FindUniformByName("ProjectionMatrix")->SetMatrix(projectionMatrix);
+		state->FindUniformByName("ViewMatrix")->SetMatrix(viewMatrix);
+		state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
 
 		// Draw the vertex buffer
-		state->Draw(vertexBuffer);
+		state->Draw(vertexBuffer, indexBuffer);
 
 		// End the frame
 		state->EndFrame();
 
 		// Release the context resource when you are done with it
 		context->Release();
+
+		// Release buffers
+		indexBuffer->Release();
+		vertexBuffer->Release();
+		simpleEffect->Release();
 	});
 	t.join();
+
+	// Release the index- and vertex buffers
+	indexBuffer->Release();
+	vertexBuffer->Release();
 
 	// Release the simple effect resources
 	simpleEffect->Release();

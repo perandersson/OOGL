@@ -36,7 +36,7 @@ IPOGLDeviceContext* Win32POGLDevice::GetContext()
 		Win32POGLDeviceContext* context = new Win32POGLDeviceContext(this, mDeviceContext);
 		if (!context->Initialize(mMainThreadDeviceContext)) {
 			delete context;
-			return nullptr;
+			THROW_EXCEPTION(POGLException, "Could not create a new Device context");
 		}
 		tDeviceContext = context;
 		std::lock_guard<std::recursive_mutex> lock(mDeviceContextsMutex);
@@ -51,12 +51,13 @@ void Win32POGLDevice::SwapBuffers()
 	::SwapBuffers(mDeviceContext);
 
 	const GLenum error = glGetError();
-	assert_with_message(error == GL_NO_ERROR, "Could not swap buffers");
+	if (error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLException, "Could not swap buffers");
 }
 
 bool Win32POGLDevice::Initialize(POGL_DEVICE_INFO* info)
 {
-	static const BYTE PIXELTYPES[POGLPixelFormat::SIZE] = {
+	static const BYTE PIXELTYPES[POGLPixelFormat::COUNT] = {
 		PFD_TYPE_RGBA
 	};
 

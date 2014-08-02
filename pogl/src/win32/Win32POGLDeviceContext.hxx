@@ -18,8 +18,10 @@ public:
 		return mRenderContext;
 	}
 
-private:
 	void LoadExtensions();
+	void* GetProcAddress(const char* functionName);
+
+private:
 
 private:
 	HDC mDeviceContext;
