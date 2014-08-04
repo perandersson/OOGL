@@ -117,7 +117,7 @@ void Alert(POGL_HANDLE windowHandle, const POGL_STRING& message)
 int main()
 {
 	// Create a window
-	POGL_HANDLE windowHandle = CreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example2: Create Triangle"));
+	POGL_HANDLE windowHandle = CreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 2: Create Triangle"));
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo;

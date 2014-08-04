@@ -7,6 +7,7 @@ public:
 	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext);
 	~Win32POGLDeviceContext();
 	
+	void AddRef();
 	void Release();
 	bool Initialize(Win32POGLDeviceContext* parentContext);
 	Win32POGLDeviceContext* BindContextIfNeccessary();
@@ -22,8 +23,7 @@ public:
 	void* GetProcAddress(const char* functionName);
 
 private:
-
-private:
+	POGL_UINT32 mRefCount;
 	HDC mDeviceContext;
 	HGLRC mRenderContext;
 	bool mBoundToThread;

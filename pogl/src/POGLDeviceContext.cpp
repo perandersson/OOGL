@@ -11,27 +11,15 @@
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRenderState(nullptr), mRefCount(1), mDevice(device)
+: mRenderState(nullptr), mDevice(device)
 {
 }
 
 POGLDeviceContext::~POGLDeviceContext()
 {
-}
-
-void POGLDeviceContext::AddRef()
-{
-	mRefCount++;
-}
-
-void POGLDeviceContext::Release()
-{
-	if (--mRefCount == 0) {
-		if (mRenderState != nullptr) {
-			mRenderState->Release();
-			mRenderState = nullptr;
-		}
-		delete this;
+	if (mRenderState != nullptr) {
+		delete mRenderState;
+		mRenderState = nullptr;
 	}
 }
 

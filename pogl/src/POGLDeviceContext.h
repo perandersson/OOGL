@@ -9,9 +9,6 @@ public:
 	POGLDeviceContext(IPOGLDevice* device);
 	~POGLDeviceContext();
 
-	void AddRef();
-	void Release();
-
 	IPOGLDevice* GetDevice();
 	IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type);
 	IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);
@@ -245,7 +242,6 @@ private:
 	GLuint GenBufferID();
 
 protected:
-	POGL_UINT32 mRefCount;
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;
 

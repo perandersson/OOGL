@@ -8,6 +8,23 @@ THREAD_LOCAL Win32POGLDeviceContext* tDeviceContext = nullptr;
 /* Memory Leak Detection */
 int gPOGDebugFlag;
 
+void POGLEnableMemoryLeakDetection()
+{
+#ifdef _DEBUG
+	gPOGDebugFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
+	_CrtSetDbgFlag(gPOGDebugFlag | _CRTDBG_LEAK_CHECK_DF);
+#endif
+}
+
+void POGLDisableMemoryLeakDetection()
+{
+#ifdef _DEBUG
+	_CrtSetDbgFlag(gPOGDebugFlag);
+#endif
+}
+
+/////////////////////////////////////
+
 Win32POGLDevice::Win32POGLDevice()
 : POGLDevice(), mRefCount(1),
 mWindowHandle(nullptr), mDeviceContext(nullptr), mMainThreadDeviceContext(nullptr)
@@ -17,6 +34,17 @@ mWindowHandle(nullptr), mDeviceContext(nullptr), mMainThreadDeviceContext(nullpt
 
 Win32POGLDevice::~Win32POGLDevice()
 {
+	size_t size = mDeviceContexts.size();
+	for (size_t i = 0; i < size; ++i) {
+		delete mDeviceContexts[i];
+	}
+	mDeviceContexts.clear();
+
+	if (mMainThreadDeviceContext != nullptr) {
+		delete mMainThreadDeviceContext;
+		mMainThreadDeviceContext = nullptr;
+	}
+
 	if (mDeviceContext != nullptr) {
 		ReleaseDC(mWindowHandle, mDeviceContext);
 		mDeviceContext = nullptr;
@@ -32,18 +60,8 @@ void Win32POGLDevice::AddRef()
 void Win32POGLDevice::Release()
 {
 	if (--mRefCount == 0) {
-		// Release the rest of the device contexts
-		size_t size = mDeviceContexts.size();
-		for (size_t i = 0; i < size; ++i) {
-			mDeviceContexts[i]->Release();
-		}
-		mDeviceContexts.clear();
-
-		// Release the main thread device
-		mMainThreadDeviceContext->Release();
-
 		delete this;
-		_CrtSetDbgFlag(gPOGDebugFlag);
+		POGLDisableMemoryLeakDetection();
 	}
 }
 
@@ -67,9 +85,7 @@ void Win32POGLDevice::SwapBuffers()
 {
 	::SwapBuffers(mDeviceContext);
 
-	const GLenum error = glGetError();
-	if (error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLException, "Could not swap buffers");
+	CHECK_GL("Could not swap buffers");
 }
 
 bool Win32POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
@@ -106,7 +122,6 @@ bool Win32POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
 		return false;
 	}
 	tDeviceContext = mMainThreadDeviceContext;
-
 	return POGLDevice::Initialize(info);
 }
 
@@ -116,11 +131,8 @@ bool Win32POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
 
 IPOGLDevice* POGLCreateDevice(const POGL_DEVICE_INFO* info)
 {
-#ifdef _DEBUG
-	// Enable memory leak detection
-	gPOGDebugFlag = _CrtSetDbgFlag(_CRTDBG_REPORT_FLAG);
-	_CrtSetDbgFlag(gPOGDebugFlag | _CRTDBG_LEAK_CHECK_DF);
-#endif
+	POGLEnableMemoryLeakDetection();
+
 	Win32POGLDevice* device = new Win32POGLDevice();
 	device->Initialize(info);
 	return device;

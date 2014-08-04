@@ -777,8 +777,12 @@ public:
 		\brief Creates an effect based on the supplied programs
 
 		\param programs
+				The programs to be bound to the effect
 		\param numPrograms
-		\return
+				The number of programs to be bound to the effect
+		\throwd POGLResourceException 
+				Exception is thrown if the exception failed to be loaded by some reason.
+		\return An effect instance
 	*/
 	virtual IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms) = 0;
 

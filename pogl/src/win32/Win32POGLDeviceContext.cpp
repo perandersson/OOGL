@@ -3,7 +3,7 @@
 #include <vector>
 
 Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext)
-: POGLDeviceContext(device), mDeviceContext(deviceContext),
+: POGLDeviceContext(device), mRefCount(0), mDeviceContext(deviceContext),
 mRenderContext(nullptr), mBoundToThread(false),
 // Extensions
 wglCreateContextAttribsARB(nullptr)
@@ -52,15 +52,18 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	return POGLDeviceContext::Initialize();
 }
 
+void Win32POGLDeviceContext::AddRef()
+{
+	mRefCount++;
+}
+
 void Win32POGLDeviceContext::Release()
 {
-	if (mRefCount == 2) {
+	if (--mRefCount == 0) {
 		assert_with_message(mBoundToThread, "Why is this not bound to the current thread?");
 		wglMakeCurrent(0, 0);
 		mBoundToThread = false;
 	}
-
-	POGLDeviceContext::Release();
 }
 
 Win32POGLDeviceContext* Win32POGLDeviceContext::BindContextIfNeccessary()

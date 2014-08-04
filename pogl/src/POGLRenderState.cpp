@@ -9,7 +9,7 @@
 #include "POGLSamplerObject.h"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
-: mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
+: mRefCount(0), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0), mVertexArrayID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false),
@@ -29,6 +29,12 @@ mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
 
 POGLRenderState::~POGLRenderState()
 {
+	if (mVertexArrayID != 0) {
+		mDeviceContext->BindVertexArray(0);
+		mDeviceContext->DeleteVertexArray(mVertexArrayID);
+		mVertexArrayID = 0;
+	}
+	mDeviceContext = nullptr;
 }
 
 void POGLRenderState::AddRef()
@@ -53,13 +59,6 @@ void POGLRenderState::Release()
 			mEffect->Release();
 			mEffect = nullptr;
 		}
-
-		if (mVertexArrayID != 0) {
-			mDeviceContext->BindVertexArray(0);
-			mDeviceContext->DeleteVertexArray(mVertexArrayID);
-			mVertexArrayID = 0;
-		}
-		delete this;
 	}
 }
 
@@ -141,7 +140,7 @@ void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* in
 
 void POGLRenderState::EndFrame()
 {
-	// TODO: Unlock potentially locked resources here
+	mApplyCurrentEffectState = true;
 	Release();
 }
 
@@ -274,7 +273,10 @@ void POGLRenderState::BindEffect(POGLEffect* effect)
 {
 	const POGL_UINT32 uid = effect->GetUID();
 	if (uid == mEffectUID) {
-		// TODO: Reset properties???
+		if (mEffect == nullptr && effect != nullptr) {
+			mEffect = effect;
+			mEffect->AddRef();
+		}
 		return;
 	}
 
@@ -308,8 +310,13 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 {
 	assert_not_null(buffer);
 	const POGL_UINT32 uid = buffer->GetUID();
-	if (mVertexBufferUID == uid)
+	if (mVertexBufferUID == uid && buffer != nullptr) {
+		if (mVertexBuffer != nullptr) {
+			mVertexBuffer = buffer;
+			mVertexBuffer->AddRef();
+		}
 		return;
+	}
 
 	if (mVertexBuffer != nullptr) {
 		mVertexBuffer->Release();
@@ -380,8 +387,13 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 {
 	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
-	if (mIndexBufferUID == uid)
+	if (mIndexBufferUID == uid) {
+		if (mIndexBuffer == nullptr && buffer != nullptr) {
+			mIndexBuffer = buffer;
+			mIndexBuffer->AddRef();
+		}
 		return;
+	}
 
 	if (mIndexBuffer != nullptr) {
 		mIndexBuffer->Release();
@@ -400,7 +412,7 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 void POGLRenderState::BindTextureHandle(POGLTextureHandle* textureHandle, POGL_UINT32 idx)
 {
 	if (idx >= mMaxActiveTextures) {
-		THROW_EXCEPTION(POGLStateException, 
+		THROW_EXCEPTION(POGLStateException,
 			"This computer does not support %d consecutive textures. The maximum amount of texture bindable at the same time is %d", idx, mMaxActiveTextures);
 	}
 
