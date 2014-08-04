@@ -8,21 +8,20 @@
 #include "uniforms/POGLUniformMat4.hxx"
 #include "uniforms/POGLUniformSampler2D.hxx"
 #include "POGLRenderState.hxx"
-#include "POGLEffectData.hxx"
 #include "POGLDeviceContext.hxx"
 #include "POGLSamplerObject.hxx"
+#include "POGLEffectData.hxx"
 #include "POGLEnum.hxx"
 
 POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderState, POGLDeviceContext* context)
 : mEffect(effect), mDeviceContext(context)
 {
+	const GLuint programID = effect->GetProgramID();
 	const auto data = effect->GetData();
 	auto it = data->uniformProperties.begin();
 	auto end = data->uniformProperties.end();
 	for (; it != end; ++it) {
 		const auto* properties = it->second.get();
-
-		const GLuint programID = data->programID;
 		const GLint componentID = properties->componentID;
 		const GLenum uniformType = properties->uniformType;
 

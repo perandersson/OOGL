@@ -4,9 +4,6 @@
 
 struct POGLEffectData
 {
-	/* The OpenGL program ID */
-	GLuint programID;
-	
 	/* Containing all the uniform properties for this effect */
 	std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniformProperties;
 	

@@ -93,9 +93,13 @@ typedef size_t POGL_SIZE;
 #ifdef UNICODE
 typedef wchar_t POGL_CHAR;
 typedef std::wstring POGL_STRING;
+#define POGL_TOSTRING(x) L##x
+#define POGL_TOCHAR(x) L##x
 #else
 typedef char POGL_CHAR;
 typedef std::string POGL_STRING;
+#define POGL_TOSTRING(x) x
+#define POGL_TOCHAR(x) x
 #endif
 
 //

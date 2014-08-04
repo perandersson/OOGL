@@ -4,6 +4,10 @@
 #include "POGLEnum.hxx"
 #include "POGLVertexBuffer.hxx"
 #include "POGLIndexBuffer.hxx"
+#include "POGLShaderProgram.hxx"
+#include "POGLEffectData.hxx"
+#include "POGLStringUtils.hxx"
+#include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
 : mRenderState(nullptr), mRefCount(1), mDevice(device)
@@ -36,17 +40,107 @@ IPOGLDevice* POGLDeviceContext::GetDevice()
 
 IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type)
 {
-	return nullptr;
+	POGL_ISTREAM stream(path);
+	if (!stream.is_open())
+		THROW_EXCEPTION(POGLResourceException, "Effect at path: '%s' could not be found", path);
+
+	// Read the entire file into memory
+	POGL_STRING str((std::istreambuf_iterator<POGL_CHAR>(stream)), std::istreambuf_iterator<POGL_CHAR>());
+	return CreateShaderProgramFromMemory(str.c_str(), str.length(), type);
 }
 
 IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type)
 {
-	return nullptr;
+	const GLuint shaderID = glCreateShader(POGLEnum::Convert(type));
+	glShaderSource(shaderID, 1, (const GLchar**)&memory, (const GLint*)&size);
+	glCompileShader(shaderID);
+
+	GLint status = 0;
+	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &status);
+	if (!status) {
+		GLchar infoLogg[2048];
+		glGetShaderInfoLog(shaderID, 2048, NULL, infoLogg);
+		glDeleteShader(shaderID);
+		switch (type) {
+		case POGLShaderProgramType::GEOMETRY_SHADER:
+			THROW_EXCEPTION(POGLResourceException, "Could not compile geometry shader. Reason: '%s'", infoLogg);
+		case POGLShaderProgramType::VERTEX_SHADER:
+			THROW_EXCEPTION(POGLResourceException, "Could not compile vertex shader. Reason: '%s'", infoLogg);
+		case POGLShaderProgramType::FRAGMENT_SHADER:
+			THROW_EXCEPTION(POGLResourceException, "Could not compile fragment shader. Reason: '%s'", infoLogg);
+		default:
+			THROW_EXCEPTION(POGLResourceException, "Could not compile shader. Reason: '%s'", infoLogg);
+		}
+	}
+
+	return new POGLShaderProgram(shaderID, mDevice, type);
 }
 
 IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
 {
-	return nullptr;
+	assert_not_null(programs);
+	assert_with_message(numPrograms > 0, "You cannot create an effect with no programs");
+
+	// Attach all the shaders to the program
+	const GLuint programID = glCreateProgram();
+	for (POGL_UINT32 i = 0; i < numPrograms; ++i) {
+		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(programs[i]);
+		glAttachShader(programID, program->GetShaderID());
+	}
+
+	// Link program
+	glLinkProgram(programID);
+
+	// Detach the shaders when linking is complete: http://www.opengl.org/wiki/GLSL_Object
+	for (POGL_UINT32 i = 0; i < numPrograms; ++i) {
+		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(programs[i]);
+		glDetachShader(programID, program->GetShaderID());
+	}
+
+	// Verify program
+	GLint status = 0;
+	glGetProgramiv(programID, GL_LINK_STATUS, &status);
+	GLchar infoLogg[2048] = { 0 };
+	glGetProgramInfoLog(programID, sizeof(infoLogg)-1, NULL, infoLogg);
+	if (!status) {
+		glDeleteProgram(programID);
+		THROW_EXCEPTION(POGLResourceException, "Could not link the supplied shader programs. Reason: %s", infoLogg);
+	}
+
+	POGLEffectData* data = new POGLEffectData;
+	data->depthFunc = POGLDepthFunc::DEFAULT;
+	data->colorMask = 0xFF;
+	data->depthMask = true;
+	data->depthTest = true;
+	data->stencilTest = false;
+
+	// Prepare uniforms
+	GLint numUniforms = 0;
+	glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &numUniforms);
+	GLchar nameData[256] = { 0 };
+	for (GLint uniformIndex = 0; uniformIndex < numUniforms; ++uniformIndex) {
+		GLint arraySize = 0;
+		GLenum type = 0;
+		GLsizei actualLength = 0;
+
+		//
+		// http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniform.xml
+		// 
+
+		glGetActiveUniform(programID, uniformIndex, sizeof(nameData), &actualLength, &arraySize, &type, nameData);
+		nameData[actualLength] = 0;
+
+		const POGL_STRING name = POGLStringUtils::ToString(nameData);
+		const GLint componentID = glGetUniformLocation(programID, nameData);
+
+		std::shared_ptr<POGLUniformProperty> p(new POGLUniformProperty());
+		p->name = name;
+		p->componentID = componentID;
+		p->uniformType = type;
+		data->uniformProperties.insert(std::make_pair(p->name, p));
+	}
+
+	return new POGLEffect(programID, data, mDevice);
 }
 
 IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
@@ -201,6 +295,22 @@ void POGLDeviceContext::LoadExtensions()
 	SET_EXTENSION_FUNC(PFNGLGENSAMPLERSPROC, glGenSamplers);
 	SET_EXTENSION_FUNC(PFNGLDELETESAMPLERSPROC, glDeleteSamplers);
 	SET_EXTENSION_FUNC(PFNGLSAMPLERPARAMETERIPROC, glSamplerParameteri);
+
+	SET_EXTENSION_FUNC(PFNGLATTACHSHADERPROC, glAttachShader);
+	SET_EXTENSION_FUNC(PFNGLCOMPILESHADERPROC, glCompileShader);
+	SET_EXTENSION_FUNC(PFNGLCREATEPROGRAMPROC, glCreateProgram);
+	SET_EXTENSION_FUNC(PFNGLCREATESHADERPROC, glCreateShader);
+	SET_EXTENSION_FUNC(PFNGLDELETEPROGRAMPROC, glDeleteProgram);
+	SET_EXTENSION_FUNC(PFNGLDELETESHADERPROC, glDeleteShader);
+	SET_EXTENSION_FUNC(PFNGLDETACHSHADERPROC, glDetachShader);
+	SET_EXTENSION_FUNC(PFNGLSHADERSOURCEPROC, glShaderSource);
+	SET_EXTENSION_FUNC(PFNGLGETSHADERIVPROC, glGetShaderiv);
+	SET_EXTENSION_FUNC(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog);
+	SET_EXTENSION_FUNC(PFNGLLINKPROGRAMPROC, glLinkProgram);
+	SET_EXTENSION_FUNC(PFNGLGETPROGRAMIVPROC, glGetProgramiv);
+	SET_EXTENSION_FUNC(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog);
+	SET_EXTENSION_FUNC(PFNGLGETACTIVEUNIFORMPROC, glGetActiveUniform);
+	SET_EXTENSION_FUNC(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
 }
 
 void POGLDeviceContext::BindBuffer(GLenum target, GLuint bufferID)
@@ -393,6 +503,16 @@ void POGLDeviceContext::DeleteSampler(GLuint samplerObject)
 void POGLDeviceContext::SamplerParameteri(GLuint sampler, GLenum pname, GLint param)
 {
 	glSamplerParameteri(sampler, pname, param);
+}
+
+void POGLDeviceContext::DeleteShader(GLuint shader)
+{
+	glDeleteShader(shader);
+}
+
+void POGLDeviceContext::DeleteProgram(GLuint program)
+{
+	glDeleteProgram(program);
 }
 
 GLuint POGLDeviceContext::GenBufferID()

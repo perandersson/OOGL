@@ -228,6 +228,16 @@ public:
 	*/
 	void SamplerParameteri(GLuint sampler, GLenum pname, GLint param);
 
+	/*!
+		\brief Delete the supplied shader
+	*/
+	void DeleteShader(GLuint shader);
+
+	/*!
+		\brief Delete the supplied program
+	*/
+	void DeleteProgram(GLuint program);
+
 private:
 	/*!
 		\brief Generate a new bufferID
@@ -292,6 +302,22 @@ protected:
 	PFNGLGENSAMPLERSPROC glGenSamplers;
 	PFNGLDELETESAMPLERSPROC glDeleteSamplers;
 	PFNGLSAMPLERPARAMETERIPROC glSamplerParameteri;
+
+	PFNGLATTACHSHADERPROC glAttachShader;
+	PFNGLCOMPILESHADERPROC glCompileShader;
+	PFNGLCREATEPROGRAMPROC glCreateProgram;
+	PFNGLCREATESHADERPROC glCreateShader;
+	PFNGLDELETEPROGRAMPROC glDeleteProgram;
+	PFNGLDELETESHADERPROC glDeleteShader;
+	PFNGLDETACHSHADERPROC glDetachShader;
+	PFNGLSHADERSOURCEPROC glShaderSource;
+	PFNGLGETSHADERIVPROC glGetShaderiv;
+	PFNGLGETSHADERINFOLOGPROC glGetShaderInfoLog;
+	PFNGLLINKPROGRAMPROC glLinkProgram;
+	PFNGLGETPROGRAMIVPROC glGetProgramiv;
+	PFNGLGETPROGRAMINFOLOGPROC glGetProgramInfoLog;
+	PFNGLGETACTIVEUNIFORMPROC glGetActiveUniform;
+	PFNGLGETUNIFORMLOCATIONPROC glGetUniformLocation;
 };
 
 #ifndef SET_EXTENSION_FUNC

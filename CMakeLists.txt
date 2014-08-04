@@ -1,7 +1,7 @@
 # http://brunoabinader.com/?p=29
 # Thank you for this! :-)
 
-project (playogl)
+project (POGL)
 cmake_minimum_required (VERSION 3.0) 
 
 # Appends the cmake/modules path inside the MAKE_MODULE_PATH variable which stores the

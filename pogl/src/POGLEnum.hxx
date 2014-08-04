@@ -13,6 +13,7 @@ public:
 	static GLenum Convert(POGLTextureWrap::Enum e);
 	static GLenum Convert(POGLBufferUsage::Enum e);
 	static GLenum Convert(POGLVertexType::Enum e);
+	static GLenum Convert(POGLShaderProgramType::Enum e);
 
 	static GLenum Convert(POGLDepthFunc::Enum e);
 	//static GLenum Convert(SrcFactor::Enum e);

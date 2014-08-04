@@ -1,5 +1,6 @@
 #include "POGLEffect.hxx"
 #include "POGLEffectData.hxx"
+#include "POGLDeviceContext.hxx"
 #include <atomic>
 
 namespace {
@@ -9,17 +10,23 @@ namespace {
 	}
 }
 
-POGLEffect::POGLEffect(POGLEffectData* data, IPOGLDevice* device)
-: mRefCount(1), mDevice(device), mUID(GenEffectUID()), mData(data)
+POGLEffect::POGLEffect(GLuint programID, POGLEffectData* data, IPOGLDevice* device)
+: mRefCount(1), mProgramID(programID), mDevice(device), mUID(GenEffectUID()), mData(data)
 {
-
+	assert_not_null(data);
 }
 
 POGLEffect::~POGLEffect()
 {
-	if (mData != nullptr)
-		delete mData;
+	delete mData;
 	mData = nullptr;
+
+	if (mProgramID != 0) {
+		IPOGLDeviceContext* context = mDevice->GetDeviceContext();
+		static_cast<POGLDeviceContext*>(context)->DeleteProgram(mProgramID);
+		context->Release();
+		mProgramID = 0;
+	}
 }
 
 void POGLEffect::AddRef()
@@ -117,7 +124,7 @@ POGL_UINT32 POGLEffect::GetUID() const
 
 GLuint POGLEffect::GetProgramID() const
 {
-	return mData->programID;
+	return mProgramID;
 }
 
 const POGLEffectData* POGLEffect::GetData() const

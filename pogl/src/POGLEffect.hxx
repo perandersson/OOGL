@@ -7,7 +7,7 @@ struct POGLEffectData;
 class POGLEffect : public IPOGLEffect
 {
 public:
-	POGLEffect(POGLEffectData* data, IPOGLDevice* device);
+	POGLEffect(GLuint programID, POGLEffectData* data, IPOGLDevice* device);
 	~POGLEffect();
 
 	void AddRef();
@@ -51,6 +51,7 @@ public:
 	
 private:
 	POGL_UINT32 mRefCount;
+	GLuint mProgramID;
 	IPOGLDevice* mDevice;
 	POGL_UINT32 mUID;
 	std::recursive_mutex mMutex;

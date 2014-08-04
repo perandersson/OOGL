@@ -100,6 +100,17 @@ GLenum POGLEnum::Convert(POGLVertexType::Enum e)
 	return enums[(POGL_UINT32)e];
 }
 
+GLenum POGLEnum::Convert(POGLShaderProgramType::Enum e)
+{
+	static const GLenum enums[POGLShaderProgramType::COUNT] = {
+		GL_GEOMETRY_SHADER,
+		GL_VERTEX_SHADER,
+		GL_FRAGMENT_SHADER
+	};
+
+	return enums[(POGL_UINT32)e];
+}
+
 GLenum POGLEnum::Convert(POGLDepthFunc::Enum depthFunc)
 {
 	static const GLenum enums[POGLDepthFunc::COUNT] = {
