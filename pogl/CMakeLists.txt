@@ -2,7 +2,9 @@
 find_package(OpenGL REQUIRED)
 
 # Create a variable containing all .cpp files:
-file(GLOB pogl_SOURCES_allsubfiles ${PlayOpenGL_SOURCE_DIR}/pogl/src/**/*.cpp)
+file(GLOB pogl_SOURCES_allsubfiles ${PlayOpenGL_SOURCE_DIR}/pogl/src/*.cpp)
+set(pogl_SOURCES ${pogl_SOURCES} ${pogl_SOURCES_allsubfiles})
+file(GLOB pogl_SOURCES_allsubfiles ${PlayOpenGL_SOURCE_DIR}/pogl/src/uniforms/*.cpp)
 set(pogl_SOURCES ${pogl_SOURCES} ${pogl_SOURCES_allsubfiles})
 file(GLOB pogl_SOURCES_allfiles ${PlayOpenGL_SOURCE_DIR}/pogl/src/*.cpp)
 set(pogl_SOURCES ${pogl_SOURCES} ${pogl_SOURCES_allfiles})

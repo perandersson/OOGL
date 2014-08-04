@@ -16,6 +16,7 @@ set(CMAKE_CONFIGURATION_TYPES Debug;Release)
 #
 
 add_subdirectory (pogl)
+add_subdirectory (examples_window)
 add_subdirectory (example1_createdevice)
 add_subdirectory (example2_drawtriangle)
 
