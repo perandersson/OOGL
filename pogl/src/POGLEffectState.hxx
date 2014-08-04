@@ -4,6 +4,8 @@
 class POGLDefaultUniform;
 class POGLRenderState;
 class POGLDeviceContext;
+class POGLSamplerObject;
+struct POGLUniformProperty;
 
 class POGLEffectState
 {
@@ -33,6 +35,17 @@ public:
 		\brief Apply the effect state's uniforms
 	*/
 	void ApplyUniforms();
+
+private:
+	/*!
+		\brief Generate a sampler object based on the supplied property
+
+		\param renderState
+		\param property
+					The uniform property
+	*/
+	POGLSamplerObject* GenSamplerObject(POGLRenderState* renderState, const POGLUniformProperty* uniformProperty);
+
 
 private:
 	POGLEffect* mEffect;

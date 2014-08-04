@@ -2,7 +2,7 @@
 #include "config.hxx"
 #include <gl/pogl.hxx>
 
-class POGLUniformNotFound : public IPOGLUniform
+class POGLUniformNotFound : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
 	POGLUniformNotFound();
@@ -44,4 +44,15 @@ public:
 
 	void SetVector4F(const POGL_VECTOR4F& vec);
 	void SetVector4D(const POGL_VECTOR4D& vec);
+
+	IPOGLSamplerState* GetSamplerState();
+
+	void SetTexture(IPOGLTexture* texture);
+
+	void SetMinFilter(POGLMinFilter::Enum minFilter);
+	void SetMagFilter(POGLMagFilter::Enum magFilter);
+	void SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t);
+	void SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r);
+	void SetCompareFunc(POGLCompareFunc::Enum compareFunc);
+	void SetCompareMode(POGLCompareMode::Enum compareMode);
 };

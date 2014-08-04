@@ -15,8 +15,6 @@ public:
 	IPOGLDevice* GetDevice();
 	IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type);
 	IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);
-	IPOGLEffect* CreateEffectFromFile(const POGL_CHAR* path);
-	IPOGLEffect* CreateEffectFromMemory(const POGL_CHAR* memory, POGL_UINT32 size);
 	IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms);
 	IPOGLTexture1D* CreateTexture1D();
 	IPOGLTexture2D* CreateTexture2D();
@@ -69,6 +67,11 @@ public:
 		\param programID
 	*/
 	void UseProgram(GLuint programID);
+
+	/*!
+		\brief Set the uniform
+	*/
+	void Uniform1i(GLint location, GLint v0);
 
 	/*!
 		\brief Set the uniform
@@ -200,6 +203,31 @@ public:
 	*/
 	void DeleteVertexArray(GLuint id);
 
+	/*!
+		\brief
+	*/
+	void ActiveTexture(GLenum texture);
+
+	/*!
+		\brief Generate a new sampler ID
+	*/
+	GLuint GenSamplerID();
+
+	/*!
+		\brief Delete the supplied sampler object
+	*/
+	void BindSampler(GLuint unit, GLuint sampler);
+
+	/*!
+		\brief Delete the supplied sampler object
+	*/
+	void DeleteSampler(GLuint sampler);
+
+	/*!
+		\brief Set the sampler parameter
+	*/
+	void SamplerParameteri(GLuint sampler, GLenum pname, GLint param);
+
 private:
 	/*!
 		\brief Generate a new bufferID
@@ -221,6 +249,8 @@ protected:
 	PFNGLBUFFERDATAPROC glBufferData;
 
 	PFNGLUSEPROGRAMPROC glUseProgram;
+
+	PFNGLUNIFORM1IPROC glUniform1i;
 
 	PFNGLUNIFORM1IVPROC glUniform1iv;
 	PFNGLUNIFORM2IVPROC glUniform2iv;
@@ -256,6 +286,12 @@ protected:
 	PFNGLVERTEXATTRIBPOINTERPROC glVertexAttribPointer;
 	PFNGLVERTEXATTRIBLPOINTERPROC glVertexAttribLPointer;
 
+	PFNGLACTIVETEXTUREPROC glActiveTexture;
+	
+	PFNGLBINDSAMPLERPROC glBindSampler;
+	PFNGLGENSAMPLERSPROC glGenSamplers;
+	PFNGLDELETESAMPLERSPROC glDeleteSamplers;
+	PFNGLSAMPLERPARAMETERIPROC glSamplerParameteri;
 };
 
 #ifndef SET_EXTENSION_FUNC

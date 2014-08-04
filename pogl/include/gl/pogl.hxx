@@ -726,7 +726,7 @@ public:
 
 		\return A device context
 	*/
-	virtual IPOGLDeviceContext* GetContext() = 0;
+	virtual IPOGLDeviceContext* GetDeviceContext() = 0;
 	
 	/*!
 		\brief Swap buffers
@@ -768,25 +768,6 @@ public:
 		\return
 	*/
 	virtual IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type) = 0;
-	
-	/*!
-		\brief Creates an effect based on the supplied file
-
-		\param path
-		\param type
-		\return
-	*/
-	virtual IPOGLEffect* CreateEffectFromFile(const POGL_CHAR* path) = 0;
-	
-	/*!
-		\brief Creates an effect based on the memory buffer
-
-		\param memory
-		\param size
-		\param type
-		\return
-	*/
-	virtual IPOGLEffect* CreateEffectFromMemory(const POGL_CHAR* memory, POGL_UINT32 size) = 0;
 
 	/*!
 		\brief Creates an effect based on the supplied programs
@@ -866,6 +847,49 @@ public:
 };
 
 /*!
+	\brief The sampler state
+*/
+class IPOGLSamplerState
+{
+public:
+	virtual ~IPOGLSamplerState() {}
+
+	/*!
+		\brief Set the min filter
+
+		\param minFilter
+	*/
+	virtual void SetMinFilter(POGLMinFilter::Enum minFilter) = 0;
+	
+	/*!
+		\brief Set the Mag Filter
+
+		\param minFilter
+	*/
+	virtual void SetMagFilter(POGLMagFilter::Enum magFilter) = 0;
+
+	/*!
+		\brief Set the texture warpping
+	*/
+	virtual void SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t) = 0;
+	
+	/*!
+		\brief Set the texture warpping
+	*/
+	virtual void SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r) = 0;
+	
+	/*!
+		\brief Set the compare function
+	*/
+	virtual void SetCompareFunc(POGLCompareFunc::Enum compareFunc) = 0;
+
+	/*!
+		\brief Set the compare mode
+	*/
+	virtual void SetCompareMode(POGLCompareMode::Enum compareMode) = 0;
+};
+
+/*!
 	\brief
 */
 class IPOGLUniform
@@ -909,16 +933,26 @@ public:
 
 	virtual void SetVector4F(const POGL_VECTOR4F& vec) = 0;
 	virtual void SetVector4D(const POGL_VECTOR4D& vec) = 0;
+
+	virtual IPOGLSamplerState* GetSamplerState() = 0;
+
+	virtual void SetTexture(IPOGLTexture* texture) = 0;
 };
 
 /*!
 	\brief
 */
-class IPOGLEffect : public IPOGLInterface
+class IPOGLShaderProgram : public IPOGLResource
 {
 public:
-	virtual IPOGLDevice* GetDevice() = 0;
+};
 
+/*!
+	\brief
+*/
+class IPOGLEffect : public IPOGLResource
+{
+public:
 	/*!
 		\brief
 	*/
@@ -1003,6 +1037,11 @@ public:
 		\brief Retrieves the device 
 	*/
 	virtual IPOGLDevice* GetDevice() = 0;
+	
+	/*!
+		\brief Retrieves the device context
+	*/
+	virtual IPOGLDeviceContext* GetDeviceContext() = 0;
 
 	/*!
 		\brief Clears the current render states back buffers
@@ -1173,7 +1212,7 @@ public:
 	\param deviceInfo
 	\return
 */
-extern IPOGLDevice* POGLCreateDevice(POGL_DEVICE_INFO* info);
+extern IPOGLDevice* POGLCreateDevice(const POGL_DEVICE_INFO* info);
 
 //
 // Exceptions
@@ -1213,6 +1252,15 @@ class POGLEffectException : public POGLException {
 public:
 	POGLEffectException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLEffectException();
+};
+
+/*!
+	\brief Exception thrown if a fatal fault happened when using a state in a way that's not solvable by the rendering engine
+*/
+class POGLStateException : public POGLException {
+public:
+	POGLStateException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLStateException();
 };
 
 #include <cstdarg>

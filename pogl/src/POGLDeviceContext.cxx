@@ -44,16 +44,6 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 	return nullptr;
 }
 
-IPOGLEffect* POGLDeviceContext::CreateEffectFromFile(const POGL_CHAR* path)
-{
-	return nullptr;
-}
-
-IPOGLEffect* POGLDeviceContext::CreateEffectFromMemory(const POGL_CHAR* memory, POGL_UINT32 size)
-{
-	return nullptr;
-}
-
 IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
 {
 	return nullptr;
@@ -169,6 +159,8 @@ void POGLDeviceContext::LoadExtensions()
 
 	SET_EXTENSION_FUNC(PFNGLUSEPROGRAMPROC, glUseProgram);
 
+	SET_EXTENSION_FUNC(PFNGLUNIFORM1IPROC, glUniform1i);
+
 	SET_EXTENSION_FUNC(PFNGLUNIFORM1IVPROC, glUniform1iv);
 	SET_EXTENSION_FUNC(PFNGLUNIFORM2IVPROC, glUniform2iv);
 	SET_EXTENSION_FUNC(PFNGLUNIFORM3IVPROC, glUniform3iv);
@@ -202,6 +194,13 @@ void POGLDeviceContext::LoadExtensions()
 	SET_EXTENSION_FUNC(PFNGLVERTEXATTRIBIPOINTERPROC, glVertexAttribIPointer);
 	SET_EXTENSION_FUNC(PFNGLVERTEXATTRIBPOINTERPROC, glVertexAttribPointer);
 	SET_EXTENSION_FUNC(PFNGLVERTEXATTRIBLPOINTERPROC, glVertexAttribLPointer);
+
+	SET_EXTENSION_FUNC(PFNGLACTIVETEXTUREPROC, glActiveTexture);
+
+	SET_EXTENSION_FUNC(PFNGLBINDSAMPLERPROC, glBindSampler);
+	SET_EXTENSION_FUNC(PFNGLGENSAMPLERSPROC, glGenSamplers);
+	SET_EXTENSION_FUNC(PFNGLDELETESAMPLERSPROC, glDeleteSamplers);
+	SET_EXTENSION_FUNC(PFNGLSAMPLERPARAMETERIPROC, glSamplerParameteri);
 }
 
 void POGLDeviceContext::BindBuffer(GLenum target, GLuint bufferID)
@@ -220,6 +219,11 @@ void POGLDeviceContext::DeleteBuffer(GLuint bufferID)
 void POGLDeviceContext::UseProgram(GLuint programID)
 {
 	glUseProgram(programID);
+}
+
+void POGLDeviceContext::Uniform1i(GLint location, GLint v0)
+{
+	glUniform1i(location, v0);
 }
 
 void POGLDeviceContext::Uniform1iv(GLint location, GLsizei count, const GLint *value)
@@ -357,6 +361,38 @@ void POGLDeviceContext::BindVertexArray(GLuint id)
 void POGLDeviceContext::DeleteVertexArray(GLuint id)
 {
 	glDeleteVertexArrays(1, &id);
+}
+
+void POGLDeviceContext::ActiveTexture(GLenum texture)
+{
+	glActiveTexture(texture);
+}
+
+GLuint POGLDeviceContext::GenSamplerID()
+{
+	GLuint id = 0;
+	glGenSamplers(1, &id);
+
+	const GLenum error = glGetError();
+	if (id == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate sampler ID");
+
+	return id;
+}
+
+void POGLDeviceContext::BindSampler(GLuint unit, GLuint sampler)
+{
+	glBindSampler(unit, sampler);
+}
+
+void POGLDeviceContext::DeleteSampler(GLuint samplerObject)
+{
+	glDeleteSamplers(1, &samplerObject);
+}
+
+void POGLDeviceContext::SamplerParameteri(GLuint sampler, GLenum pname, GLint param)
+{
+	glSamplerParameteri(sampler, pname, param);
 }
 
 GLuint POGLDeviceContext::GenBufferID()

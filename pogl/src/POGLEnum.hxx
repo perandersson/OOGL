@@ -6,11 +6,11 @@ class POGLEnum
 {
 public:
 	//static GLenum Convert(Access::Enum e);
-	//static GLenum Convert(CompareFunc::Enum e);
-	//static GLenum Convert(CompareMode::Enum e);
-	//static GLenum Convert(MagFilter::Enum e);
-	//static GLenum Convert(MinFilter::Enum e);
-	//static GLenum Convert(TextureWrap::Enum e);
+	static GLenum Convert(POGLCompareFunc::Enum e);
+	static GLenum Convert(POGLCompareMode::Enum e);
+	static GLenum Convert(POGLMagFilter::Enum e);
+	static GLenum Convert(POGLMinFilter::Enum e);
+	static GLenum Convert(POGLTextureWrap::Enum e);
 	static GLenum Convert(POGLBufferUsage::Enum e);
 	static GLenum Convert(POGLVertexType::Enum e);
 

@@ -13,6 +13,7 @@ public:
 	void AddRef();
 	void Release();
 	IPOGLDevice* GetDevice();
+	POGL_HANDLE GetHandlePtr();
 	bool GetDepthTest();
 	void SetDepthTest(bool b);
 	void SetDepthFunc(POGLDepthFunc::Enum depthFunc);

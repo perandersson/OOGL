@@ -17,7 +17,7 @@ public:
 
 		\param info
 	*/
-	virtual bool Initialize(POGL_DEVICE_INFO* info);
+	virtual bool Initialize(const POGL_DEVICE_INFO* info);
 
 private:
 	POGL_UINT32 mRefCount;

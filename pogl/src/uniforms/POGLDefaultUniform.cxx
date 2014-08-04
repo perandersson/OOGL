@@ -160,3 +160,43 @@ void POGLDefaultUniform::SetVector4D(const POGL_VECTOR4D& vec)
 {
 	assert(false && "Invalid uniform type");
 }
+
+IPOGLSamplerState* POGLDefaultUniform::GetSamplerState()
+{
+	return this;
+}
+
+void POGLDefaultUniform::SetTexture(IPOGLTexture* texture)
+{
+	assert(false && "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetMinFilter(POGLMinFilter::Enum minFilter)
+{
+	assert(false && "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetMagFilter(POGLMagFilter::Enum magFilter)
+{
+	assert(false && "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
+{
+	assert(false && "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r)
+{
+	assert(false && "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
+{
+	assert(false && "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetCompareMode(POGLCompareMode::Enum compareMode)
+{
+	assert(false && "Invalid uniform type");
+}

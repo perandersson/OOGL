@@ -6,7 +6,12 @@
 #include "uniforms/POGLUniformFloat.hxx"
 #include "uniforms/POGLUniformDouble.hxx"
 #include "uniforms/POGLUniformMat4.hxx"
+#include "uniforms/POGLUniformSampler2D.hxx"
+#include "POGLRenderState.hxx"
 #include "POGLEffectData.hxx"
+#include "POGLDeviceContext.hxx"
+#include "POGLSamplerObject.hxx"
+#include "POGLEnum.hxx"
 
 POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderState, POGLDeviceContext* context)
 : mEffect(effect), mDeviceContext(context)
@@ -51,6 +56,7 @@ POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderStat
 			uniform = new POGLUniformMat4(effect, renderState, context, componentID);
 			break;
 		case GL_SAMPLER_2D:
+			uniform = new POGLUniformSampler2D(effect, renderState, context, componentID, renderState->NextActiveTexture(), GenSamplerObject(renderState, properties));
 			break;
 		case GL_SAMPLER_CUBE:
 			break;
@@ -103,4 +109,21 @@ void POGLEffectState::ApplyUniforms()
 	const GLenum err = glGetError();
 	assert_with_message(err == GL_NO_ERROR, "Could not apply uniforms");
 #endif
+}
+
+POGLSamplerObject* POGLEffectState::GenSamplerObject(POGLRenderState* renderState, const POGLUniformProperty* uniformProperty)
+{
+	const GLuint samplerID = mDeviceContext->GenSamplerID();
+	POGLSamplerObject* samplerObject = new POGLSamplerObject(samplerID, renderState);
+
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(uniformProperty->minFilter));
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(uniformProperty->magFilter));
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(uniformProperty->wrap[0]));
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(uniformProperty->wrap[1]));
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_R, POGLEnum::Convert(uniformProperty->wrap[2]));
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(uniformProperty->compareFunc));
+	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(uniformProperty->compareMode));
+
+	CHECK_GL("Could not set sampler parameters");
+	return samplerObject;
 }

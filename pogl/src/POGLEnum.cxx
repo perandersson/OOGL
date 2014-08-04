@@ -11,67 +11,68 @@
 //
 //	return enums[(uint32)e];
 //}
-//GLenum OGLEnum::Convert(CompareFunc::Enum e)
-//{
-//	static const GLenum enums[CompareFunc::SIZE] = {
-//		GL_NEVER,
-//		GL_LESS,
-//		GL_EQUAL,
-//		GL_LEQUAL,
-//		GL_GREATER,
-//		GL_NOTEQUAL,
-//		GL_GEQUAL,
-//		GL_ALWAYS
-//	};
-//
-//	return enums[(uint32)e];
-//}
-//
-//GLenum OGLEnum::Convert(CompareMode::Enum e)
-//{
-//	static const GLenum enums[CompareMode::SIZE] = {
-//		GL_COMPARE_R_TO_TEXTURE,
-//		GL_NONE
-//	};
-//
-//	return enums[(uint32)e];
-//}
-//
-//GLenum OGLEnum::Convert(MagFilter::Enum e)
-//{
-//	static const GLenum enums[MagFilter::SIZE] = {
-//		GL_NEAREST,
-//		GL_LINEAR
-//	};
-//
-//	return enums[(uint32)e];
-//}
-//
-//GLenum OGLEnum::Convert(MinFilter::Enum e)
-//{
-//	static const GLenum enums[MinFilter::SIZE] = {
-//		GL_NEAREST,
-//		GL_LINEAR,
-//		GL_NEAREST_MIPMAP_NEAREST,
-//		GL_LINEAR_MIPMAP_NEAREST,
-//		GL_NEAREST_MIPMAP_LINEAR,
-//		GL_LINEAR_MIPMAP_LINEAR
-//	};
-//
-//	return enums[(uint32)e];
-//}
-//
-//GLenum OGLEnum::Convert(TextureWrap::Enum e)
-//{
-//	static const GLenum enums[TextureWrap::SIZE] = {
-//		GL_CLAMP_TO_EDGE,
-//		GL_CLAMP_TO_BORDER,
-//		GL_MIRRORED_REPEAT,
-//		GL_REPEAT
-//	};
-//
-//	return enums[(uint32)e];
-//}
+
+GLenum POGLEnum::Convert(POGLCompareFunc::Enum e)
+{
+	static const GLenum enums[POGLCompareFunc::COUNT] = {
+		GL_NEVER,
+		GL_LESS,
+		GL_EQUAL,
+		GL_LEQUAL,
+		GL_GREATER,
+		GL_NOTEQUAL,
+		GL_GEQUAL,
+		GL_ALWAYS
+	};
+
+	return enums[(POGL_UINT32)e];
+}
+
+GLenum POGLEnum::Convert(POGLCompareMode::Enum e)
+{
+	static const GLenum enums[POGLCompareMode::COUNT] = {
+		GL_COMPARE_R_TO_TEXTURE,
+		GL_NONE
+	};
+
+	return enums[(POGL_UINT32)e];
+}
+
+GLenum POGLEnum::Convert(POGLMagFilter::Enum e)
+{
+	static const GLenum enums[POGLMagFilter::COUNT] = {
+		GL_NEAREST,
+		GL_LINEAR
+	};
+
+	return enums[(POGL_UINT32)e];
+}
+
+GLenum POGLEnum::Convert(POGLMinFilter::Enum e)
+{
+	static const GLenum enums[POGLMinFilter::COUNT] = {
+		GL_NEAREST,
+		GL_LINEAR,
+		GL_NEAREST_MIPMAP_NEAREST,
+		GL_LINEAR_MIPMAP_NEAREST,
+		GL_NEAREST_MIPMAP_LINEAR,
+		GL_LINEAR_MIPMAP_LINEAR
+	};
+
+	return enums[(POGL_UINT32)e];
+}
+
+GLenum POGLEnum::Convert(POGLTextureWrap::Enum e)
+{
+	static const GLenum enums[POGLTextureWrap::COUNT] = {
+		GL_CLAMP_TO_EDGE,
+		GL_CLAMP_TO_BORDER,
+		GL_MIRRORED_REPEAT,
+		GL_REPEAT
+	};
+
+	return enums[(POGL_UINT32)e];
+}
 
 GLenum POGLEnum::Convert(POGLBufferUsage::Enum e)
 {

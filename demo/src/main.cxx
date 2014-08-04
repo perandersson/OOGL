@@ -1,38 +1,31 @@
 #include <gl/pogl.hxx>
 #include <thread>
 
-static const POGL_CHAR SIMPLE_EFFECT[] = { R"(
-<Effect>
-	<VertexShader>
-	<![CDATA[
-		uniform mat4 ProjectionMatrix;
-		uniform mat4 ViewMatrix;
-		uniform mat4 ModelMatrix;
+static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
+	uniform mat4 ProjectionMatrix;
+	uniform mat4 ViewMatrix;
+	uniform mat4 ModelMatrix;
 
-		layout(location = 0) in vec3 position;
-		layout(location = 1) in vec4 color;
+	layout(location = 0) in vec3 position;
+	layout(location = 1) in vec4 color;
 
-		out vec4 vs_Color;
+	out vec4 vs_Color;
 
-		void main()
-		{
-			vs_Color = color;
-			gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0);
-		}
-	]]>
-	</VertexShader>
-	<FragmentShader>
-	<![CDATA[
-		in vec4 vs_Color;
-
-		void main()
-		{
-			gl_FragColor = vs_Color;
-		}
-	]]>
-	</FragmentShader>
-</Effect>
+	void main()
+	{
+		vs_Color = color;
+		gl_Position = ProjectionMatrix * ViewMatrix * ModelMatrix * vec4(position, 1.0);
+	}
 )"};
+
+static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
+	in vec4 vs_Color;
+
+	void main()
+	{
+		gl_FragColor = vs_Color;
+	}
+)" };
 
 int main()
 {
@@ -50,10 +43,15 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	// Create a device context for main thread
-	IPOGLDeviceContext* context = device->GetContext();
+	IPOGLDeviceContext* context = device->GetDeviceContext();
 
-	// Load effect
-	IPOGLEffect* simpleEffect = context->CreateEffectFromMemory(SIMPLE_EFFECT, sizeof(SIMPLE_EFFECT));
+	// Create an effect based on the supplied vertex- and fragment shader
+	IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
+	IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
+	IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
+	IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs, 2);
+	vertexShader->Release();
+	fragmentShader->Release();
 
 	// Create vertex buffer
 	POGL_POSITION_COLOR_VERTEX vertices[] = {
@@ -79,7 +77,7 @@ int main()
 	// New thread
 	std::thread t([device, simpleEffect, vertexBuffer, indexBuffer] {
 		// Retrieves a device context for this thread
-		IPOGLDeviceContext* context = device->GetContext();
+		IPOGLDeviceContext* context = device->GetDeviceContext();
 
 		// Apply the simple effect and draw some geometry to to the screen
 		IPOGLRenderState* state = context->Apply(simpleEffect);
@@ -93,6 +91,10 @@ int main()
 		state->FindUniformByName("ProjectionMatrix")->SetMatrix(projectionMatrix);
 		state->FindUniformByName("ViewMatrix")->SetMatrix(viewMatrix);
 		state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
+		
+		// Get uniform usable to set texture
+		IPOGLUniform* texture = state->FindUniformByName("Texture");
+		texture->GetSamplerState()->SetMinFilter(POGLMinFilter::LINEAR);
 
 		// Draw the vertex buffer
 		state->Draw(vertexBuffer, indexBuffer);

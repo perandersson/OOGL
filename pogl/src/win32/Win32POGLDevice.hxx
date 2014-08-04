@@ -10,9 +10,9 @@ public:
 	Win32POGLDevice();
 	~Win32POGLDevice();
 
-	IPOGLDeviceContext* GetContext();
+	IPOGLDeviceContext* GetDeviceContext();
 	void SwapBuffers();
-	bool Initialize(POGL_DEVICE_INFO* info);
+	bool Initialize(const POGL_DEVICE_INFO* info);
 
 private:
 	HWND mWindowHandle;

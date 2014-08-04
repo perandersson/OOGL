@@ -5,6 +5,8 @@
 class POGLDeviceContext;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
+struct POGLTextureHandle;
+class POGLSamplerObject;
 class POGLRenderState : public IPOGLRenderState
 {
 	typedef std::hash_map<POGL_UINT32, std::shared_ptr<POGLEffectState>> EffectStates;
@@ -14,9 +16,10 @@ public:
 	~POGLRenderState();
 
 	void AddRef();
-	void Release();
-	
+	void Release();	
 	IPOGLDevice* GetDevice();
+	IPOGLDeviceContext* GetDeviceContext();
+
 	void Clear(POGL_UINT32 clearBits);
 	IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
 	void Draw(IPOGLVertexBuffer* vertexBuffer);
@@ -51,6 +54,24 @@ public:
 		return mEffectUID == effectUID;
 	}
 
+	/*!
+		\brief Bind the supplied sampler object
+	*/
+	void BindSamplerObject(POGLSamplerObject* samplerObject, POGL_UINT32 idx);
+	
+	/*!
+		\brief Bind the supplied texture handle
+
+		\param textureHandle
+		\param idx
+	*/
+	void BindTextureHandle(POGLTextureHandle* textureHandle, POGL_UINT32 idx);
+
+	/*!
+		\brief Retrieves the next active texture for this render state.
+	*/
+	POGL_UINT32 NextActiveTexture();
+
 private:
 	/*!
 		\brief Binds the supplied effect to this state
@@ -63,9 +84,19 @@ private:
 		\brief Binds the supplied buffers
 	*/
 	void BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer);
+	
+	/*!
+		\brief Bind the supplied vertex buffer
 
+		\param buffer
+	*/
 	void BindVertexBuffer(POGLVertexBuffer* buffer);
 
+	/*!
+		\brief Bind the supplied index buffer
+
+		\param buffer
+	*/
 	void BindIndexBuffer(POGLIndexBuffer* buffer);
 
 private:
@@ -93,4 +124,14 @@ private:
 	POGL_UINT8 mColorMask;
 	bool mStencilTest;
 
+	//
+	// Textures
+	//
+
+	POGL_UINT32 mMaxActiveTextures;
+	POGL_UINT32 mNextActiveTexture;
+	std::vector<POGL_UINT32> mTextureUID;
+	std::vector<GLenum> mTextureTarget;
+	std::vector<POGL_UINT32> mSamplerObjectUID;
+	POGL_UINT32 mActiveTextureIndex;
 };

@@ -17,7 +17,7 @@ POGLIndexBuffer::POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UIN
 POGLIndexBuffer::~POGLIndexBuffer()
 {
 	if (mBufferID != 0) {
-		IPOGLDeviceContext* context = mDevice->GetContext();
+		IPOGLDeviceContext* context = mDevice->GetDeviceContext();
 		static_cast<POGLDeviceContext*>(context)->DeleteBuffer(mBufferID);
 		context->Release();
 		mBufferID = 0;

@@ -4,13 +4,21 @@
 #include "POGLVertexBuffer.hxx"
 #include "POGLIndexBuffer.hxx"
 #include "POGLEnum.hxx"
+#include "POGLTextureHandle.hxx"
+#include "POGLSamplerObject.hxx"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
 mVertexBufferUID(0), mIndexBufferUID(0), mVertexArrayID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
-mColorMask(POGLColorMask::ALL), mStencilTest(false)
+mColorMask(POGLColorMask::ALL), mStencilTest(false),
+mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
 {
+	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxActiveTextures);
+	mTextureUID.resize(mMaxActiveTextures, 0);
+	mTextureTarget.resize(mMaxActiveTextures, 0);
+	mSamplerObjectUID.resize(mMaxActiveTextures, 0);
+
 	for (POGL_UINT32 i = 0; i < MAX_VERTEX_LAYOUT_FIELD_SIZE; ++i)
 		mVertexAttributeLocations[i] = false;
 
@@ -41,6 +49,12 @@ void POGLRenderState::Release()
 IPOGLDevice* POGLRenderState::GetDevice()
 {
 	return mDeviceContext->GetDevice();
+}
+
+IPOGLDeviceContext* POGLRenderState::GetDeviceContext()
+{
+	mDeviceContext->AddRef();
+	return mDeviceContext;
 }
 
 void POGLRenderState::Clear(POGL_UINT32 clearBits)
@@ -188,8 +202,18 @@ void POGLRenderState::SetStencilTest(bool b)
 	CHECK_GL("Cannot set enable/disable stencil test");
 }
 
+//void POGLRenderState::SetTexture(IPOGLTexture* texture, POGL_UINT32 idx)
+//{
+//	if (texture == nullptr)
+//		BindTextureHandle(nullptr, idx);
+//	else
+//		BindTextureHandle(reinterpret_cast<POGLTextureHandle*>(texture->GetHandlePtr()), idx);
+//}
+
 IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
 {
+	assert_not_null(effect);
+
 	// Bind the effect if neccessary
 	POGLEffect* effectImpl = static_cast<POGLEffect*>(effect);
 	BindEffect(effectImpl);
@@ -214,6 +238,7 @@ IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
 
 POGLEffectState* POGLRenderState::GetEffectState(POGLEffect* effect)
 {
+	assert_not_null(effect);
 	const POGL_UINT32 uid = effect->GetUID();
 	auto it = mEffectStates.find(uid);
 	if (it == mEffectStates.end()) {
@@ -223,6 +248,19 @@ POGLEffectState* POGLRenderState::GetEffectState(POGLEffect* effect)
 	}
 
 	return it->second.get();
+}
+
+void POGLRenderState::BindSamplerObject(POGLSamplerObject* samplerObject, POGL_UINT32 idx)
+{
+	assert_not_null(samplerObject);
+	const POGL_UINT32 uid = samplerObject != nullptr ? samplerObject->GetUID() : 0;
+	if (mSamplerObjectUID[idx] == uid)
+		return;
+
+	const GLuint samplerID = samplerObject != nullptr ? samplerObject->GetSamplerID() : 0;
+	mDeviceContext->BindSampler(idx, samplerID);
+	mSamplerObjectUID[idx] = uid;
+	CHECK_GL("Cannot bind sampler ID");
 }
 
 void POGLRenderState::BindEffect(POGLEffect* effect)
@@ -334,4 +372,41 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 
 	CHECK_GL("Could not bind the supplied index buffer");
 	mIndexBufferUID = uid;
+}
+
+void POGLRenderState::BindTextureHandle(POGLTextureHandle* textureHandle, POGL_UINT32 idx)
+{
+	if (idx >= mMaxActiveTextures) {
+		THROW_EXCEPTION(POGLStateException, 
+			"This computer does not support %d consecutive textures. The maximum amount of texture bindable at the same time is %d", idx, mMaxActiveTextures);
+	}
+
+	if (mActiveTextureIndex != idx) {
+		mDeviceContext->ActiveTexture(GL_TEXTURE0 + idx);
+		mActiveTextureIndex = idx;
+		CHECK_GL("Could not set active texture index");
+	}
+
+	const POGL_UINT32 uid = textureHandle != nullptr ? textureHandle->uid : 0;
+
+	// Check if the supplied texture is already bound to this context
+	if (mTextureUID[idx] == uid)
+		return;
+
+	// Bind supplied texture
+	const GLuint textureID = textureHandle != nullptr ? textureHandle->textureID : 0;
+	const GLenum textureTarget = textureHandle != nullptr ? textureHandle->textureTarget : mTextureTarget[idx];
+	glBindTexture(textureTarget, textureID);
+
+	mTextureUID[idx] = uid;
+	mTextureTarget[idx] = textureTarget;
+	CHECK_GL("Could not bind texture");
+}
+
+POGL_UINT32 POGLRenderState::NextActiveTexture()
+{
+	const POGL_UINT32 textureIndex = mNextActiveTexture++;
+	if (mNextActiveTexture >= mMaxActiveTextures)
+		mNextActiveTexture = 0;
+	return textureIndex;
 }

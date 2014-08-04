@@ -1,6 +1,6 @@
 # Create a variable called helloworld_SOURCES containing all .cpp files:
-file(GLOB demo_SOURCES ${PlayGL_SOURCE_DIR}/demo/src/*.cxx)
-include_directories (${PlayGL_SOURCE_DIR}/pogl/include)
+file(GLOB demo_SOURCES ${playogl_SOURCE_DIR}/demo/src/*.cxx)
+include_directories (${playogl_SOURCE_DIR}/pogl/include)
 
 # Find packages
 find_package(OpenGL REQUIRED)

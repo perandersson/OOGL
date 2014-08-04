@@ -30,7 +30,7 @@ Win32POGLDevice::~Win32POGLDevice()
 	}
 }
 
-IPOGLDeviceContext* Win32POGLDevice::GetContext()
+IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 {
 	if (tDeviceContext == nullptr) {
 		Win32POGLDeviceContext* context = new Win32POGLDeviceContext(this, mDeviceContext);
@@ -55,7 +55,7 @@ void Win32POGLDevice::SwapBuffers()
 		THROW_EXCEPTION(POGLException, "Could not swap buffers");
 }
 
-bool Win32POGLDevice::Initialize(POGL_DEVICE_INFO* info)
+bool Win32POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
 {
 	static const BYTE PIXELTYPES[POGLPixelFormat::COUNT] = {
 		PFD_TYPE_RGBA
@@ -97,7 +97,7 @@ bool Win32POGLDevice::Initialize(POGL_DEVICE_INFO* info)
 // Win32 variant of the IPOGLDevice interface
 //
 
-IPOGLDevice* POGLCreateDevice(POGL_DEVICE_INFO* info)
+IPOGLDevice* POGLCreateDevice(const POGL_DEVICE_INFO* info)
 {
 	Win32POGLDevice* device = new Win32POGLDevice();
 	device->Initialize(info);

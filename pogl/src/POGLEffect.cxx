@@ -39,6 +39,11 @@ IPOGLDevice* POGLEffect::GetDevice()
 	return mDevice;
 }
 
+POGL_HANDLE POGLEffect::GetHandlePtr()
+{
+	return this;
+}
+
 bool POGLEffect::GetDepthTest()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);

@@ -123,3 +123,36 @@ void POGLUniformNotFound::SetVector4F(const POGL_VECTOR4F& vec)
 void POGLUniformNotFound::SetVector4D(const POGL_VECTOR4D& vec)
 {
 }
+
+IPOGLSamplerState* POGLUniformNotFound::GetSamplerState()
+{
+	return this;
+}
+
+void POGLUniformNotFound::SetTexture(IPOGLTexture* texture)
+{
+}
+
+void POGLUniformNotFound::SetMinFilter(POGLMinFilter::Enum minFilter)
+{
+}
+
+void POGLUniformNotFound::SetMagFilter(POGLMagFilter::Enum magFilter)
+{
+}
+
+void POGLUniformNotFound::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
+{
+}
+
+void POGLUniformNotFound::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r)
+{
+}
+
+void POGLUniformNotFound::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
+{
+}
+
+void POGLUniformNotFound::SetCompareMode(POGLCompareMode::Enum compareMode)
+{
+}
