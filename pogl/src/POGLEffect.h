@@ -26,6 +26,8 @@ public:
 	POGL_UINT8 GetColorMask();
 	bool GetStencilTest();
 	void SetStencilTest(bool b);
+	void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
+	void SetBlend(bool b);
 
 	/*!
 		\brief Retrieves the uniforms for this effect

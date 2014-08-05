@@ -33,6 +33,8 @@ public:
 	void SetColorMask(POGL_UINT8 mask);
 	bool GetStencilTest();
 	void SetStencilTest(bool b);
+	void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
+	void SetBlend(bool b);
 
 	/*!
 		\brief Applies the supplied effect to this render state
@@ -125,6 +127,9 @@ private:
 	bool mDepthMask;
 	POGL_UINT8 mColorMask;
 	bool mStencilTest;
+	POGLSrcFactor::Enum mSrcFactor;
+	POGLDstFactor::Enum mDstFactor;
+	bool mBlending;
 
 	//
 	// Textures

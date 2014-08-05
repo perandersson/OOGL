@@ -19,4 +19,5 @@ add_subdirectory (pogl)
 add_subdirectory (examples_window)
 add_subdirectory (example1_createdevice)
 add_subdirectory (example2_drawtriangle)
+add_subdirectory (example3_blending)
 

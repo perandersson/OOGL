@@ -367,6 +367,57 @@ struct POGLColorMask
 	static const POGL_UINT8 NONE = 0;
 };
 
+struct POGLSrcFactor
+{
+	enum Enum {
+		ZERO = 0,
+		ONE,
+		SRC_COLOR,
+		ONE_MINUS_SRC_COLOR,
+		SRC_ALPHA,
+		ONE_MINUS_SRC_ALPHA,
+		DST_ALPHA,
+		ONE_MINUS_DST_ALPHA,
+		DST_COLOR,
+		ONE_MINUS_DST_COLOR,
+		CONSTANT_COLOR,
+		ONE_MINUS_CONSTANT_COLOR,
+		CONSTANT_ALPHA,
+		ONE_MINUS_CONSTANT_ALPHA,
+
+		COUNT
+	};
+
+	/* Default source factor used by the rendering engine */
+	static const Enum DEFAULT = ONE;
+};
+
+struct POGLDstFactor
+{
+	enum Enum {
+		ZERO = 0,
+		ONE,
+		SRC_COLOR,
+		ONE_MINUS_SRC_COLOR,
+		SRC_ALPHA,
+		ONE_MINUS_SRC_ALPHA,
+		DST_ALPHA,
+		ONE_MINUS_DST_ALPHA,
+		DST_COLOR,
+		ONE_MINUS_DST_COLOR,
+		CONSTANT_COLOR,
+		ONE_MINUS_CONSTANT_COLOR,
+		CONSTANT_ALPHA,
+		ONE_MINUS_CONSTANT_ALPHA,
+
+		COUNT
+	};
+
+	/* Default destination factor used by the rendering engine */
+	static const Enum DEFAULT = ZERO;
+
+};
+
 //
 // Structs
 //
@@ -1033,6 +1084,19 @@ public:
 			TRUE or FALSE
 	*/
 	virtual void SetStencilTest(bool b) = 0;
+
+	/*!
+		\brief Set the blending factor
+
+		\param sfactor
+		\param dfactor
+	*/
+	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor) = 0;
+
+	/*!
+		\brief
+	*/
+	virtual void SetBlend(bool b) = 0;
 };
 
 /*!
@@ -1130,13 +1194,20 @@ public:
 	/*!
 		\brief 
 
-		This effect needs to be re-applied for the change to come into effect. If you
-		want the change to be applied directly then call IPOGLRenderState::SetStencilTest(bool) instead.
-
 		\param b
 			TRUE or FALSE
 	*/
 	virtual void SetStencilTest(bool b) = 0;
+	
+	/*!
+		\brief
+	*/
+	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor) = 0;
+
+	/*!
+		\brief
+	*/
+	virtual void SetBlend(bool b) = 0;
 };
 
 /*!

@@ -104,6 +104,9 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 	data->depthMask = true;
 	data->depthTest = false;
 	data->stencilTest = false;
+	data->blending = false;
+	data->srcFactor = POGLSrcFactor::DEFAULT;
+	data->dstFactor = POGLDstFactor::DEFAULT;
 
 	// Prepare uniforms
 	GLint numUniforms = 0;

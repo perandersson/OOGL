@@ -128,49 +128,49 @@ GLenum POGLEnum::Convert(POGLDepthFunc::Enum depthFunc)
 	return enums[(POGL_UINT32)depthFunc];
 }
 
-//GLenum OGLEnum::Convert(SrcFactor::Enum sfactor)
-//{
-//	static const GLenum enums[SrcFactor::SIZE] = {
-//		GL_ZERO,
-//		GL_ONE,
-//		GL_SRC_COLOR,
-//		GL_ONE_MINUS_SRC_COLOR,
-//		GL_SRC_ALPHA,
-//		GL_ONE_MINUS_SRC_ALPHA,
-//		GL_DST_ALPHA,
-//		GL_ONE_MINUS_DST_ALPHA,
-//		GL_DST_COLOR,
-//		GL_ONE_MINUS_DST_COLOR,
-//		GL_CONSTANT_COLOR,
-//		GL_ONE_MINUS_CONSTANT_COLOR,
-//		GL_CONSTANT_ALPHA,
-//		GL_ONE_MINUS_CONSTANT_ALPHA
-//	};
-//
-//	return enums[(uint32)sfactor];
-//}
-//
-//GLenum OGLEnum::Convert(DestFactor::Enum dfactor)
-//{
-//	static const GLenum enums[DestFactor::SIZE] = {
-//		GL_ZERO,
-//		GL_ONE,
-//		GL_SRC_COLOR,
-//		GL_ONE_MINUS_SRC_COLOR,
-//		GL_SRC_ALPHA,
-//		GL_ONE_MINUS_SRC_ALPHA,
-//		GL_DST_ALPHA,
-//		GL_ONE_MINUS_DST_ALPHA,
-//		GL_DST_COLOR,
-//		GL_ONE_MINUS_DST_COLOR,
-//		GL_CONSTANT_COLOR,
-//		GL_ONE_MINUS_CONSTANT_COLOR,
-//		GL_CONSTANT_ALPHA,
-//		GL_ONE_MINUS_CONSTANT_ALPHA
-//	};
-//
-//	return enums[(uint32)dfactor];
-//}
+GLenum POGLEnum::Convert(POGLSrcFactor::Enum sfactor)
+{
+	static const GLenum enums[POGLSrcFactor::COUNT] = {
+		GL_ZERO,
+		GL_ONE,
+		GL_SRC_COLOR,
+		GL_ONE_MINUS_SRC_COLOR,
+		GL_SRC_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA,
+		GL_DST_ALPHA,
+		GL_ONE_MINUS_DST_ALPHA,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_DST_COLOR,
+		GL_CONSTANT_COLOR,
+		GL_ONE_MINUS_CONSTANT_COLOR,
+		GL_CONSTANT_ALPHA,
+		GL_ONE_MINUS_CONSTANT_ALPHA
+	};
+
+	return enums[(POGL_UINT32)sfactor];
+}
+
+GLenum POGLEnum::Convert(POGLDstFactor::Enum dfactor)
+{
+	static const GLenum enums[POGLDstFactor::COUNT] = {
+		GL_ZERO,
+		GL_ONE,
+		GL_SRC_COLOR,
+		GL_ONE_MINUS_SRC_COLOR,
+		GL_SRC_ALPHA,
+		GL_ONE_MINUS_SRC_ALPHA,
+		GL_DST_ALPHA,
+		GL_ONE_MINUS_DST_ALPHA,
+		GL_DST_COLOR,
+		GL_ONE_MINUS_DST_COLOR,
+		GL_CONSTANT_COLOR,
+		GL_ONE_MINUS_CONSTANT_COLOR,
+		GL_CONSTANT_ALPHA,
+		GL_ONE_MINUS_CONSTANT_ALPHA
+	};
+
+	return enums[(POGL_UINT32)dfactor];
+}
 //
 //GLenum OGLEnum::Convert(FrontFace::Enum frontFace)
 //{

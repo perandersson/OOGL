@@ -18,4 +18,13 @@ struct POGLEffectData
 
 	/* Should we write to the stencil buffer or not */
 	bool stencilTest;
+
+	/* Source blending factor */
+	POGLSrcFactor::Enum srcFactor;
+
+	/* Destination blending factor */
+	POGLDstFactor::Enum dstFactor;
+
+	/* Is blending enabled or not? */
+	bool blending;
 };

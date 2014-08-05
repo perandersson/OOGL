@@ -114,6 +114,19 @@ void POGLEffect::SetStencilTest(bool b)
 	mData->stencilTest = b;
 }
 
+void POGLEffect::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	mData->srcFactor = sfactor;
+	mData->dstFactor = dfactor;
+}
+
+void POGLEffect::SetBlend(bool b)
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	mData->blending = b;
+}
+
 void POGLEffect::CopyEffectData(POGLEffectData* in)
 {
 	assert_not_null(in);

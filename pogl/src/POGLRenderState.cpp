@@ -12,7 +12,7 @@ POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(0), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0), mVertexArrayID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
-mColorMask(POGLColorMask::ALL), mStencilTest(false),
+mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false),
 mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
 {
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxActiveTextures);
@@ -155,7 +155,7 @@ void POGLRenderState::SetDepthTest(bool b)
 		glDisable(GL_DEPTH_TEST);
 	mDepthTest = b;
 
-	CHECK_GL("Cannot set enable/disable depth test");
+	CHECK_GL("Cannot enable/disable depth test");
 }
 
 void POGLRenderState::SetDepthFunc(POGLDepthFunc::Enum depthFunc)
@@ -213,7 +213,34 @@ void POGLRenderState::SetStencilTest(bool b)
 		glDisable(GL_STENCIL_TEST);
 	mStencilTest = b;
 
-	CHECK_GL("Cannot set enable/disable stencil test");
+	CHECK_GL("Cannot enable/disable stencil test");
+}
+
+void POGLRenderState::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
+{
+	if (mSrcFactor == sfactor && mDstFactor == dfactor) {
+		return;
+	}
+
+	const GLenum src = POGLEnum::Convert(sfactor);
+	const GLenum dest = POGLEnum::Convert(dfactor);
+	glBlendFunc(src, dest);
+
+	CHECK_GL("Cannot set blend functions");
+}
+
+void POGLRenderState::SetBlend(bool b)
+{
+	if (mBlending == b)
+		return;
+
+	if (b)
+		glEnable(GL_BLEND);
+	else
+		glDisable(GL_BLEND);
+	mBlending = b;
+
+	CHECK_GL("Cannot enable/disable blendng");
 }
 
 IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
@@ -237,6 +264,8 @@ IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
 	SetDepthMask(data.depthMask);
 	SetColorMask(data.colorMask);
 	SetStencilTest(data.stencilTest);
+	SetBlend(data.blending);
+	SetBlendFunc(data.srcFactor, data.dstFactor);
 
 	AddRef();
 	return this;
