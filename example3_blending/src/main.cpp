@@ -31,7 +31,7 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 int main()
 {
 	// Create a window
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 2: Create Triangle"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 3: Blending"));
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo;
