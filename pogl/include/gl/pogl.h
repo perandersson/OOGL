@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _PLAYGL_HXX_
-#define _PLAYGL_HXX_
+#ifndef _POGL_H_
+#define _POGL_H_
 
 #include <exception>
 #include <cassert>
