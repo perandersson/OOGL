@@ -2,6 +2,11 @@
 
 PlayOpenGL is an object-oriented multithread friendly interface for OpenGL 3.3 and above and is used by my other projects.
 
+### Requirements ###
+
+* CMake 3.x
+* C++11 Compatible Compiler
+
 ### Window ###
 
 This project contains simple helper functions used by the example projects to create- and destroy the window we draw to. 
