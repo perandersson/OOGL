@@ -14,3 +14,11 @@ This example contains an example how to create an IPOGLDevice instance, which is
 ### Example 2: Draw Triangle ###
 
 This example shows how to draw a triangle using the POGL framework
+
+![alt text](https://github.com/perandersson/POGL/example2_drawtriangle/screenshot.png "Example 2")
+
+### Example 3: Blending ###
+
+Example showing how to use blending
+
+![alt text](https://github.com/perandersson/POGL/example2_blending/screenshot.png "Example 2")
