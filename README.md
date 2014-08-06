@@ -33,4 +33,10 @@ Example showing how to use blending
 
 Example showing perform texture mapping
 
-![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example4_texturing/screenshot.png "Example 3")
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example4_texturing/screenshot.png "Example 4")
+
+### Example 5: Threaded Vertices (WORK IN PROGRESS) ###
+
+Example showing creating and updating vertices in separate threads using the Map-Unmap functionality
+
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example5_threadedvertices/screenshot.png "Example 5")

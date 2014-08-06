@@ -19,6 +19,10 @@ public:
 	*/
 	GLsync GetSyncObject();
 
+	/*!
+		\brief Queue a new fence object
+	*/
+	void QueueFence();
 
 private:
 	std::recursive_mutex mSyncMutex;

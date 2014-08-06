@@ -87,3 +87,12 @@ GLsync POGLSyncObject::GetSyncObject()
 	std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
 	return mSync;
 }
+
+void POGLSyncObject::QueueFence()
+{
+	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	GLsync sync = context->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
+	context->DeleteSync(mSync);
+	mSync = sync;
+}

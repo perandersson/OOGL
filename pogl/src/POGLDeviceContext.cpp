@@ -593,6 +593,11 @@ GLenum POGLDeviceContext::ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64
 	return glClientWaitSync(sync, flags, timeout);
 }
 
+GLsync POGLDeviceContext::FenceSync(GLenum condition, GLbitfield flags)
+{
+	return glFenceSync(condition, flags);
+}
+
 void POGLDeviceContext::DeleteSync(GLsync sync)
 {
 	glDeleteSync(sync);

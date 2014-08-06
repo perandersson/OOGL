@@ -226,6 +226,11 @@ public:
 	GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 
 	/*!
+	
+	*/
+	GLsync FenceSync(GLenum condition, GLbitfield flags);
+
+	/*!
 		\brief
 
 		\param sync
