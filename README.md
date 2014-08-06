@@ -21,4 +21,10 @@ This example shows how to draw a triangle using the POGL framework
 
 Example showing how to use blending
 
-![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example3_blending/screenshot.png "Example 2")
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example3_blending/screenshot.png "Example 3")
+
+### Example 4: Texturing ###
+
+Example showing perform texture mapping
+
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example4_blending/screenshot.png "Example 3")
