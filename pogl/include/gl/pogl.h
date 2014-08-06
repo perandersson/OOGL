@@ -77,6 +77,7 @@ class IPOGLFrameBuffer;
 //
 // typedefs
 //
+#include <cinttypes>
 
 typedef char POGL_INT8;
 typedef unsigned char POGL_UINT8;
@@ -84,8 +85,8 @@ typedef short POGL_INT16;
 typedef unsigned short POGL_UINT16;
 typedef int POGL_INT32;
 typedef unsigned int POGL_UINT32;
-typedef long POGL_INT64;
-typedef unsigned long POGL_UINT64;
+typedef int64_t POGL_INT64;
+typedef uint64_t POGL_UINT64;
 typedef void* POGL_HANDLE;
 typedef float POGL_FLOAT;
 typedef double POGL_DOUBLE;

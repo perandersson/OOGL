@@ -16,13 +16,6 @@ void POGLEnableMemoryLeakDetection()
 #endif
 }
 
-void POGLDisableMemoryLeakDetection()
-{
-#ifdef _DEBUG
-	_CrtSetDbgFlag(gPOGDebugFlag);
-#endif
-}
-
 /////////////////////////////////////
 
 Win32POGLDevice::Win32POGLDevice()
@@ -63,7 +56,6 @@ void Win32POGLDevice::Release()
 		}
 
 		delete this;
-		POGLDisableMemoryLeakDetection();
 	}
 }
 

@@ -29,11 +29,6 @@ mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
 
 POGLRenderState::~POGLRenderState()
 {
-	if (mVertexArrayID != 0) {
-		mDeviceContext->BindVertexArray(0);
-		mDeviceContext->DeleteVertexArray(mVertexArrayID);
-		mVertexArrayID = 0;
-	}
 	mDeviceContext = nullptr;
 }
 
@@ -67,6 +62,17 @@ void POGLRenderState::Release()
 				mTextures[i] = nullptr;
 			}
 		}
+
+		if (mVertexArrayID != 0) {
+			mDeviceContext->BindVertexArray(0);
+			mDeviceContext->DeleteVertexArray(mVertexArrayID);
+			mVertexArrayID = 0;
+		}
+
+		// Clear all effect states
+		mEffectStates.clear();
+
+		delete this;
 	}
 }
 
@@ -481,6 +487,8 @@ void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UI
 	// Save the bound texture
 	mTextureUID[idx] = uid;
 	mTextures[idx] = resource;
+	if (mTextures[idx] != nullptr)
+		mTextures[idx]->AddRef();
 
 	CHECK_GL("Could not bind texture");
 }
@@ -494,6 +502,7 @@ void POGLRenderState::SetTextureResource(POGLTextureResource* texture)
 	// Set the new resource
 	mTextureUID[mActiveTextureIndex] = texture->GetUID();
 	mTextures[mActiveTextureIndex] = texture;
+	texture->AddRef();
 }
 
 POGL_UINT32 POGLRenderState::NextActiveTexture()

@@ -27,7 +27,7 @@ void POGLTexture2D::AddRef()
 void POGLTexture2D::Release()
 {
 	if (--mRefCount == 0) {
-		if (mInternalResource == nullptr) {
+		if (mInternalResource != nullptr) {
 			mInternalResource->Release();
 			mInternalResource = nullptr;
 		}
@@ -43,7 +43,6 @@ IPOGLDevice* POGLTexture2D::GetDevice()
 
 POGL_HANDLE POGLTexture2D::GetHandlePtr()
 {
-	mInternalResource->AddRef();
 	return mInternalResource;
 }
 
