@@ -1,6 +1,7 @@
 #include "MemCheck.h"
 #include "POGLShaderProgram.h"
 #include "POGLDeviceContext.h"
+#include "POGLSyncObject.h"
 #include <atomic>
 
 namespace {
@@ -10,8 +11,8 @@ namespace {
 	}
 }
 
-POGLShaderProgram::POGLShaderProgram(GLuint shaderID, IPOGLDevice* device, POGLShaderProgramType::Enum type, GLsync initSync)
-: mRefCount(1), mUID(GenShaderProgramUID()), mShaderID(shaderID), mDevice(device), mType(type), mSync(initSync)
+POGLShaderProgram::POGLShaderProgram(GLuint shaderID, IPOGLDevice* device, POGLShaderProgramType::Enum type, POGLSyncObject* syncObject)
+: mRefCount(1), mUID(GenShaderProgramUID()), mShaderID(shaderID), mDevice(device), mType(type), mSyncObject(syncObject)
 {
 }
 
@@ -27,12 +28,16 @@ void POGLShaderProgram::AddRef()
 void POGLShaderProgram::Release()
 {
 	if (--mRefCount == 0) {
+		POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 		if (mShaderID != 0) {
-			IPOGLDeviceContext* context = mDevice->GetDeviceContext();
-			static_cast<POGLDeviceContext*>(context)->DeleteShader(mShaderID);
-			context->Release();
+			context->DeleteShader(mShaderID);
 			mShaderID = 0;
 		}
+		if (mSyncObject != nullptr) {
+			delete mSyncObject;
+			mSyncObject = nullptr;
+		}
+		context->Release();
 		delete this;
 	}
 }
@@ -47,55 +52,24 @@ POGL_HANDLE POGLShaderProgram::GetHandlePtr()
 	return this;
 }
 
-void POGLShaderProgram::WaitSyncDriver(POGLResourceFenceType::Enum e)
+void POGLShaderProgram::WaitSyncDriver()
 {
-	static const POGL_UINT64 TIMEOUT_INFINITE = UINT64_MAX;
-	WaitSyncDriver(e, TIMEOUT_INFINITE);
+	mSyncObject->WaitSyncDriver();
 }
 
-void POGLShaderProgram::WaitSyncDriver(POGLResourceFenceType::Enum e, POGL_UINT64 timeout)
+void POGLShaderProgram::WaitSyncClient()
 {
-	IPOGLDeviceContext* context = mDevice->GetDeviceContext();
-	static_cast<POGLDeviceContext*>(context)->WaitSync(mSync, 0, timeout);
-	context->Release();
+	mSyncObject->WaitSyncClient();
 }
 
-void POGLShaderProgram::WaitSyncClient(POGLResourceFenceType::Enum e)
+bool POGLShaderProgram::WaitSyncClient(POGL_UINT64 timeout)
 {
-	static const POGL_UINT64 TIMEOUT_INFINITE = UINT64_MAX;
-	WaitSyncClient(e, TIMEOUT_INFINITE);
+	return mSyncObject->WaitSyncClient(timeout);
 }
 
-bool POGLShaderProgram::WaitSyncClient(POGLResourceFenceType::Enum e, POGL_UINT64 timeout)
+bool POGLShaderProgram::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 {
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
-	const GLenum syncResult = context->ClientWaitSync(mSync, 0, timeout);
-	context->Release();
-	if (syncResult == GL_WAIT_FAILED) {
-		context->Release();
-		THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
-	}
-
-	return syncResult == GL_ALREADY_SIGNALED || syncResult == GL_CONDITION_SATISFIED;
-}
-
-bool POGLShaderProgram::WaitSyncClient(POGLResourceFenceType::Enum e, POGL_UINT64 timeout)
-{
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
-	GLenum result = GL_TIMEOUT_EXPIRED;
-	do {
-
-	} while (true);
-
-	while ((result = context->ClientWaitSync(mSync, 0, timeout) )
-	const GLenum syncResult = context->ClientWaitSync(mSync, 0, timeout);
-	context->Release();
-	if (syncResult == GL_WAIT_FAILED) {
-		context->Release();
-		THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
-	}
-
-	return syncResult == GL_ALREADY_SIGNALED || syncResult == GL_CONDITION_SATISFIED;
+	return mSyncObject->WaitSyncClient(timeout, job);
 }
 
 POGL_UINT32 POGLShaderProgram::GetUID() const

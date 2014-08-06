@@ -3,16 +3,22 @@
 #include <gl/pogl.h>
 
 class POGLIndexBuffer;
+class POGLSyncObject;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
 public:
-	POGLVertexBuffer(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, IPOGLDevice* device);
+	POGLVertexBuffer(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device);
 	~POGLVertexBuffer();
 
 	void AddRef();
 	void Release();
 	IPOGLDevice* GetDevice();
 	POGL_HANDLE GetHandlePtr();
+	void WaitSyncDriver();
+	void WaitSyncClient();
+	bool WaitSyncClient(POGL_UINT64 timeout);
+	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+
 	const POGL_VERTEX_LAYOUT* GetLayout() const;
 	POGL_UINT32 GetNumVertices() const;
 
@@ -54,5 +60,6 @@ private:
 	POGL_UINT32 mNumVertices;
 	GLenum mPrimitiveType;
 	GLenum mBufferUsage;
+	POGLSyncObject* mSyncObject;
 	IPOGLDevice* mDevice;
 };

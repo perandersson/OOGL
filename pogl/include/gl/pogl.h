@@ -420,16 +420,6 @@ struct POGLDstFactor
 
 };
 
-/*!
-
-*/
-struct POGLResourceFenceType
-{
-	enum Enum {
-		COMPLETE = 0		
-	};
-};
-
 //
 // Structs
 //
@@ -815,15 +805,7 @@ public:
 
 		\param e
 	*/
-	virtual void WaitSyncDriver(POGLResourceFenceType::Enum e) = 0;
-
-	/*!
-		\brief Wait for the supplied fence type to complete
-
-		\param e
-		\param timeout
-	*/
-	virtual void WaitSyncDriver(POGLResourceFenceType::Enum e, POGL_UINT64 timeout) = 0;
+	virtual void WaitSyncDriver() = 0;
 
 	/*!
 		\brief Wait for the supplied fence type to complete
@@ -834,7 +816,7 @@ public:
 
 		\param e
 	*/
-	virtual void WaitSyncClient(POGLResourceFenceType::Enum e) = 0;
+	virtual void WaitSyncClient() = 0;
 	
 	/*!
 		\brief Wait for the supplied fence type to complete
@@ -845,7 +827,7 @@ public:
 		\param e
 		\param timeout
 	*/
-	virtual bool WaitSyncClient(POGLResourceFenceType::Enum e, POGL_UINT64 timeout) = 0;
+	virtual bool WaitSyncClient(POGL_UINT64 timeout) = 0;
 	
 	/*!
 		\brief Wait for the supplied fence type to complete
@@ -860,7 +842,7 @@ public:
 		\param timeout
 		\param job
 	*/
-	virtual void WaitSyncClient(POGLResourceFenceType::Enum e, POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
+	virtual bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
 };
 
 /*!
@@ -875,8 +857,9 @@ public:
 		\brief Method called if the synchronization for the IPOGLResource has reached it's timeout.
 
 		\param context
+		\param failCount
 	*/
-	virtual void Execute(IPOGLDeviceContext* context);
+	virtual bool Execute(IPOGLDeviceContext* context, POGL_UINT32 failCount);
 };
 
 /*!

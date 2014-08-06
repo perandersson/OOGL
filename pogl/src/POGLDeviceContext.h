@@ -226,6 +226,13 @@ public:
 	GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
 
 	/*!
+		\brief
+
+		\param sync
+	*/
+	void DeleteSync(GLsync sync);
+
+	/*!
 		\brief Generate a new sampler ID
 	*/
 	GLuint GenSamplerID();
@@ -311,6 +318,7 @@ protected:
 	PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
 	PFNGLWAITSYNCPROC glWaitSync;
 	PFNGLFENCESYNCPROC glFenceSync;
+	PFNGLDELETESYNCPROC glDeleteSync;
 
 	PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC glBindVertexArray;

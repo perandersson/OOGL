@@ -2,16 +2,22 @@
 #include "config.h"
 #include <gl/pogl.h>
 
+class POGLSyncObject;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
-	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, IPOGLDevice* device);
+	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device);
 	~POGLIndexBuffer();
 
 	void AddRef();
 	void Release();
 	IPOGLDevice* GetDevice();
 	POGL_HANDLE GetHandlePtr();
+	void WaitSyncDriver();
+	void WaitSyncClient();
+	bool WaitSyncClient(POGL_UINT64 timeout);
+	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+
 	POGL_UINT32 GetNumElements() const;
 
 	/*!
@@ -46,5 +52,6 @@ private:
 	POGL_UINT32 mTypeSize;
 	GLenum mType;
 	GLenum mBufferUsage;
+	POGLSyncObject* mSyncObject;
 	IPOGLDevice* mDevice;
 };

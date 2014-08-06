@@ -9,6 +9,7 @@
 #include "POGLShaderProgram.h"
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
+#include "POGLSyncObject.h"
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
@@ -80,7 +81,7 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 	}
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	return new POGLShaderProgram(shaderID, mDevice, type, sync);
+	return new POGLShaderProgram(shaderID, mDevice, type, new POGLSyncObject(sync, mDevice));
 }
 
 IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
@@ -156,7 +157,8 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 		uniforms.insert(std::make_pair(p->name, p));
 	}
 
-	return new POGLEffect(programID, data, uniforms, mDevice);
+	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	return new POGLEffect(programID, data, uniforms, new POGLSyncObject(sync, mDevice), mDevice);
 }
 
 IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
@@ -189,8 +191,9 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 	if (status != GL_NO_ERROR) {
 		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: %d", status);
 	}
-	
-	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, mDevice);
+
+	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, new POGLSyncObject(sync, mDevice), mDevice);
 	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetHandlePtr());
 	return texture;
 }
@@ -222,7 +225,8 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 	if (status != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer");
 
-	return new POGLVertexBuffer(bufferID, layout, numVertices, type, usage, mDevice);
+	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	return new POGLVertexBuffer(bufferID, layout, numVertices, type, usage, new POGLSyncObject(sync, mDevice), mDevice);
 }
 
 IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -274,7 +278,8 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	if (status != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer");
 
-	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, mDevice);
+	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, new POGLSyncObject(sync, mDevice), mDevice);
 }
 
 IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
@@ -326,6 +331,7 @@ void POGLDeviceContext::LoadExtensions()
 	SET_EXTENSION_FUNC(PFNGLCLIENTWAITSYNCPROC, glClientWaitSync);
 	SET_EXTENSION_FUNC(PFNGLWAITSYNCPROC, glWaitSync);
 	SET_EXTENSION_FUNC(PFNGLFENCESYNCPROC, glFenceSync);
+	SET_EXTENSION_FUNC(PFNGLDELETESYNCPROC, glDeleteSync);
 
 	SET_EXTENSION_FUNC(PFNGLGENVERTEXARRAYSPROC, glGenVertexArrays);
 	SET_EXTENSION_FUNC(PFNGLBINDVERTEXARRAYPROC, glBindVertexArray);
@@ -586,6 +592,11 @@ GLenum POGLDeviceContext::ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64
 	return glClientWaitSync(sync, flags, timeout);
 }
 
+void POGLDeviceContext::DeleteSync(GLsync sync)
+{
+	glDeleteSync(sync);
+}
+
 GLuint POGLDeviceContext::GenTextureID()
 {
 	GLuint id = 0;
@@ -632,7 +643,7 @@ IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POG
 	}
 
 	// Read image size from header
-	const POGL_SIZEI size(header[18] + (header[19] << 8), header[22] + (header[23] << 8));
+	const POGL_SIZEI size(*(POGL_INT32*)&(header[0x12]), *(POGL_INT32*)&(header[0x16]));
 
 	// Calculate pixel memory size
 	const POGL_UINT32 memorySize = ((size.width * bitsPerPixel + 31) / 32) * 4 * size.height;
@@ -643,7 +654,7 @@ IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POG
 	fclose(file);
 
 	// Create a texture2D resource
-	IPOGLTexture2D* texture = context->CreateTexture2D(size, POGLTextureFormat::RGB, data);
+	IPOGLTexture2D* texture = context->CreateTexture2D(size, POGLTextureFormat::BGR, data);
 	delete[] data;
 	return texture;
 }

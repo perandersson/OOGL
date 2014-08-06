@@ -3,6 +3,7 @@
 #include "POGLDeviceContext.h"
 #include "POGLIndexBuffer.h"
 #include "POGLEnum.h"
+#include "POGLSyncObject.h"
 #include <atomic>
 
 namespace {
@@ -12,8 +13,8 @@ namespace {
 	}
 }
 
-POGLVertexBuffer::POGLVertexBuffer(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, IPOGLDevice* device)
-: mRefCount(1), mUID(GenVertexBufferUID()), mBufferID(bufferID), mLayout(layout), mNumVertices(numVertices), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage), mDevice(device)
+POGLVertexBuffer::POGLVertexBuffer(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device)
+: mRefCount(1), mUID(GenVertexBufferUID()), mBufferID(bufferID), mLayout(layout), mNumVertices(numVertices), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage), mSyncObject(syncObject), mDevice(device)
 {
 }
 
@@ -35,6 +36,10 @@ void POGLVertexBuffer::Release()
 			context->Release();
 			mBufferID = 0;
 		}
+		if (mSyncObject != nullptr) {
+			delete mSyncObject;
+			mSyncObject = nullptr;
+		}
 		delete this;
 	}
 }
@@ -48,6 +53,26 @@ IPOGLDevice* POGLVertexBuffer::GetDevice()
 POGL_HANDLE POGLVertexBuffer::GetHandlePtr()
 {
 	return this;
+}
+
+void POGLVertexBuffer::WaitSyncDriver()
+{
+	mSyncObject->WaitSyncDriver();
+}
+
+void POGLVertexBuffer::WaitSyncClient()
+{
+	mSyncObject->WaitSyncClient();
+}
+
+bool POGLVertexBuffer::WaitSyncClient(POGL_UINT64 timeout)
+{
+	return mSyncObject->WaitSyncClient(timeout);
+}
+
+bool POGLVertexBuffer::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+{
+	return mSyncObject->WaitSyncClient(timeout, job);
 }
 
 const POGL_VERTEX_LAYOUT* POGLVertexBuffer::GetLayout() const

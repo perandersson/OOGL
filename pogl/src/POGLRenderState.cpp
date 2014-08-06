@@ -360,7 +360,7 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 	}
 	mVertexBuffer = buffer;
 	mVertexBuffer->AddRef();
-
+	mVertexBuffer->WaitSyncDriver();
 	mDeviceContext->BindBuffer(GL_ARRAY_BUFFER, buffer->GetBufferID());
 	CHECK_GL("Could not bind the supplied vertex buffer");
 
@@ -436,8 +436,10 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 		mIndexBuffer->Release();
 	}
 	mIndexBuffer = buffer;
-	if (mIndexBuffer != nullptr)
+	if (mIndexBuffer != nullptr) {
 		mIndexBuffer->AddRef();
+		mIndexBuffer->WaitSyncDriver();
+	}
 
 	const GLuint bufferID = buffer != nullptr ? buffer->GetBufferID() : 0;
 	mDeviceContext->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
@@ -468,6 +470,8 @@ void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UI
 	// Bind supplied texture
 	const GLuint textureID = resource != nullptr ? resource->GetTextureID() : 0;
 	const GLenum textureTarget = resource != nullptr ? resource->GetTextureTarget() : mTextures[idx]->GetTextureTarget();
+	if (resource != nullptr)
+		resource->WaitSyncDriver();
 	glBindTexture(textureTarget, textureID);
 
 	// Release the previous bound texture if it exists

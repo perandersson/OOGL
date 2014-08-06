@@ -9,10 +9,10 @@ namespace {
 	}
 }
 
-POGLTexture2D::POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format, IPOGLDevice* device)
+POGLTexture2D::POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format, POGLSyncObject* sync, IPOGLDevice* device)
 : mRefCount(1), mDevice(device), mInternalResource(nullptr), mSize(size)
 {
-	mInternalResource = new POGLTextureResource(textureID, GL_TEXTURE_2D, format, device);
+	mInternalResource = new POGLTextureResource(textureID, GL_TEXTURE_2D, format, sync, device);
 }
 
 POGLTexture2D::~POGLTexture2D()
@@ -45,6 +45,26 @@ POGL_HANDLE POGLTexture2D::GetHandlePtr()
 {
 	mInternalResource->AddRef();
 	return mInternalResource;
+}
+
+void POGLTexture2D::WaitSyncDriver()
+{
+	mInternalResource->WaitSyncDriver();
+}
+
+void POGLTexture2D::WaitSyncClient()
+{
+	mInternalResource->WaitSyncClient();
+}
+
+bool POGLTexture2D::WaitSyncClient(POGL_UINT64 timeout)
+{
+	return mInternalResource->WaitSyncClient(timeout);
+}
+
+bool POGLTexture2D::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+{
+	return mInternalResource->WaitSyncClient(timeout, job);
 }
 
 POGLTextureFormat::Enum POGLTexture2D::GetTextureFormat() const
