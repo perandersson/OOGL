@@ -2,9 +2,13 @@
 
 PlayOpenGL is an object-oriented multithread friendly interface for OpenGL 3.3 and above and is used by my other projects.
 
+## What is it? ##
+
+POGL is used to simplify OpenGL over multiple threads, both with resource sharing and state management. 
+
 ### Requirements ###
 
-* CMake 3.x
+* CMake 2.6, 3.x
 * C++11 Compatible Compiler
 
 ### Example 1: Create Device ###
