@@ -23,7 +23,7 @@ Example showing how to use blending
 
 ![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example3_blending/screenshot.png "Example 3")
 
-### Example 4: Texturing ###
+### Example 4: Texture Mapping ###
 
 Example showing perform texture mapping
 

@@ -10,6 +10,7 @@
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
 #include "POGLSyncObject.h"
+#include <gl/poglext.h>
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
@@ -610,6 +611,21 @@ GLuint POGLDeviceContext::GenTextureID()
 }
 
 ////////////////////////
+/*!
+	\brief Custom delete struct used with std::shared_ptr to delete arrays
+
+	Example:
+	{@code
+		std::shared_ptr<byte> bytes(new byte[10], TDeleteArray<byte>());
+	}
+*/
+template<typename T>
+struct TDeleteArray
+{
+	void operator()(T const * p) {
+		delete[] p;
+	}
+};
 
 IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName)
 {
@@ -621,40 +637,46 @@ IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POG
 	if (file == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "File not found: %s", fileName);
 
-	POGL_CHAR header[54];
-	if (fread(header, 1, 54, file) != 54) {
-		fclose(file);
-		THROW_EXCEPTION(POGLResourceException, "Invalid BMP file: %s", fileName);
-	}
+	fseek(file, 0L, SEEK_END);
+	POGL_UINT32 sz = ftell(file);
+	fseek(file, 0L, SEEK_SET);
 
-	if (header[0] != 'B' || header[1] != 'M') {
-		fclose(file);
-		THROW_EXCEPTION(POGLResourceException, "Invalid BMP file: %s", fileName);
-	}
+	std::shared_ptr<POGL_CHAR> bytes(new POGL_CHAR[sz], TDeleteArray<POGL_CHAR>());
+	fread(bytes.get(), 1, sz, file);
+	fclose(file);
+	return POGLXLoadBMPImageFromMemory(context, bytes.get(), sz);
+}
+
+IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const POGL_CHAR* bytes, POGL_UINT32 size)
+{
+	assert_not_null(context);
+	assert_not_null(bytes);
+	assert_with_message(size > 0, "You cannot load a non-existing image");
+
+	if (size < 54)
+		THROW_EXCEPTION(POGLResourceException, "Invalid BMP file");
+
+	if (bytes[0] != 'B' || bytes[1] != 'M')
+		THROW_EXCEPTION(POGLResourceException, "Invalid BMP file");
 
 	// Get num bits per pixel
-	const POGL_UINT16 bitsPerPixel = header[28];
+	const POGL_UINT16 bitsPerPixel = bytes[28];
 
 	// Verify 24 or 32 bit image type
 	if (bitsPerPixel != 24 && bitsPerPixel != 32)
 	{
-		fclose(file);
-		THROW_EXCEPTION(POGLResourceException, "Invalid File Format for file %s. 24 or 32 bit Image Required.", fileName);
+		THROW_EXCEPTION(POGLResourceException, "Invalid File Format for file. 24 or 32 bit Image Required.");
 	}
 
+	// Data offset
+	const POGL_UINT32 offset = bytes[10] + (bytes[11] << 8);
+
 	// Read image size from header
-	const POGL_SIZEI size(*(POGL_INT32*)&(header[0x12]), *(POGL_INT32*)&(header[0x16]));
+	const POGL_SIZEI imageSize(*(POGL_INT32*)&(bytes[0x12]), *(POGL_INT32*)&(bytes[0x16]));
 
 	// Calculate pixel memory size
-	const POGL_UINT32 memorySize = ((size.width * bitsPerPixel + 31) / 32) * 4 * size.height;
-
-	//
-	POGL_CHAR* data = new POGL_CHAR[memorySize];
-	fread(data, 1, memorySize, file);
-	fclose(file);
+	const POGL_UINT32 memorySize = ((imageSize.width * bitsPerPixel + 31) / 32) * 4 * imageSize.height;
 
 	// Create a texture2D resource
-	IPOGLTexture2D* texture = context->CreateTexture2D(size, POGLTextureFormat::BGR, data);
-	delete[] data;
-	return texture;
+	return context->CreateTexture2D(imageSize, POGLTextureFormat::BGR, &bytes[offset]);
 }
