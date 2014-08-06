@@ -9,13 +9,22 @@
 #include "pogl.h"
 
 /*!
-	\brief Load the supplied fileName into a 2D texture and returns it
+	\brief Load the supplied TGA fileName into a 2D texture and returns it
 
 	\param context
 	\param fileName
 	\return
 */
-IPOGLTexture2D* POGLLoadTextureFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
+extern IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
+
+/*!
+	\brief Load the supplied BMP fileName into a 2D texture and returns it
+
+	\param context
+	\param fileName
+	\return
+*/
+extern IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
 
 
 #endif

@@ -54,6 +54,8 @@
 class IPOGLInterface;
 class IPOGLResource;
 
+class IPOGLWaitSyncJob;
+
 class IPOGLDevice;
 class IPOGLDeviceContext;
 class IPOGLRenderState;
@@ -416,6 +418,16 @@ struct POGLDstFactor
 	/* Default destination factor used by the rendering engine */
 	static const Enum DEFAULT = ZERO;
 
+};
+
+/*!
+
+*/
+struct POGLResourceFenceType
+{
+	enum Enum {
+		COMPLETE = 0		
+	};
 };
 
 //
@@ -792,6 +804,79 @@ public:
 		\brief Retrieves a handle for this resource
 	*/
 	virtual POGL_HANDLE GetHandlePtr() = 0;
+
+	/*!
+		\brief Wait for the supplied fence type to complete
+
+		This method will put a "Wait Sync" marker on the rendering queue, making sure that
+		resources from multiple threads are called in the appropriate order
+
+		\remark This method waits a very long time
+
+		\param e
+	*/
+	virtual void WaitSyncDriver(POGLResourceFenceType::Enum e) = 0;
+
+	/*!
+		\brief Wait for the supplied fence type to complete
+
+		\param e
+		\param timeout
+	*/
+	virtual void WaitSyncDriver(POGLResourceFenceType::Enum e, POGL_UINT64 timeout) = 0;
+
+	/*!
+		\brief Wait for the supplied fence type to complete
+
+		This method will not return until the supplied fence type is marked as signaled
+
+		\remark This method waits a very long time
+
+		\param e
+	*/
+	virtual void WaitSyncClient(POGLResourceFenceType::Enum e) = 0;
+	
+	/*!
+		\brief Wait for the supplied fence type to complete
+
+		This method will not return until the supplied fence type is marked as signaled or if the 
+		supplied timeout has been reached
+
+		\param e
+		\param timeout
+	*/
+	virtual bool WaitSyncClient(POGLResourceFenceType::Enum e, POGL_UINT64 timeout) = 0;
+	
+	/*!
+		\brief Wait for the supplied fence type to complete
+
+		
+		This method will not return until the supplied fence type is marked as signaled. If the timeout is not reached
+		then the supplied job will be invoked and completed until it retries again. 
+
+		\remark This method waits a very long time
+
+		\param e
+		\param timeout
+		\param job
+	*/
+	virtual void WaitSyncClient(POGLResourceFenceType::Enum e, POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
+};
+
+/*!
+
+*/
+class IPOGLWaitSyncJob
+{
+public:
+	virtual ~IPOGLWaitSyncJob() {}
+
+	/*!
+		\brief Method called if the synchronization for the IPOGLResource has reached it's timeout.
+
+		\param context
+	*/
+	virtual void Execute(IPOGLDeviceContext* context);
 };
 
 /*!
@@ -1373,6 +1458,15 @@ class POGLStateException : public POGLException {
 public:
 	POGLStateException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLStateException();
+};
+
+/*!
+	\brief Excepton thrown if synchronization between threads failed.
+*/
+class POGLSyncException : public POGLException {
+public:
+	POGLSyncException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLSyncException();
 };
 
 #include <cstdarg>

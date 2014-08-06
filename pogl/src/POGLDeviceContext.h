@@ -216,6 +216,16 @@ public:
 	void ActiveTexture(GLenum texture);
 
 	/*!
+	
+	*/
+	void WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
+
+	/*!
+	
+	*/
+	GLenum ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout);
+
+	/*!
 		\brief Generate a new sampler ID
 	*/
 	GLuint GenSamplerID();
@@ -297,6 +307,10 @@ protected:
 
 	PFNGLUNIFORMMATRIX4FVPROC glUniformMatrix4fv;
 	PFNGLUNIFORMMATRIX4DVPROC glUniformMatrix4dv;
+
+	PFNGLCLIENTWAITSYNCPROC glClientWaitSync;
+	PFNGLWAITSYNCPROC glWaitSync;
+	PFNGLFENCESYNCPROC glFenceSync;
 
 	PFNGLGENVERTEXARRAYSPROC glGenVertexArrays;
 	PFNGLBINDVERTEXARRAYPROC glBindVertexArray;

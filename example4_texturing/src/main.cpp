@@ -78,7 +78,7 @@ int main()
 		IPOGLIndexBuffer* indexBuffers = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::STATIC);
 
 		// Create texture
-		IPOGLTexture2D* texture = POGLLoadTextureFromFile(context, POGL_TOCHAR("texture.bmp"));
+		IPOGLTexture2D* texture = POGLXLoadBMPImageFromFile(context, POGL_TOCHAR("texture.bmp"));
 
 		while (POGLProcessEvents()) {
 			// Prepare the simple effect

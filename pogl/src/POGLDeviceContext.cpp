@@ -79,7 +79,8 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 		}
 	}
 
-	return new POGLShaderProgram(shaderID, mDevice, type);
+	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	return new POGLShaderProgram(shaderID, mDevice, type, sync);
 }
 
 IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
@@ -147,6 +148,11 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 		p->name = name;
 		p->componentID = componentID;
 		p->uniformType = type;
+		p->minFilter = POGLMinFilter::DEFAULT;
+		p->magFilter = POGLMagFilter::DEFAULT;
+		p->wrap[0] = p->wrap[1] = p->wrap[3] = POGLTextureWrap::DEFAULT;
+		p->compareFunc = POGLCompareFunc::DEFAULT;
+		p->compareMode = POGLCompareMode::DEFAULT;
 		uniforms.insert(std::make_pair(p->name, p));
 	}
 
@@ -316,6 +322,10 @@ void POGLDeviceContext::LoadExtensions()
 
 	SET_EXTENSION_FUNC(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv);
 	SET_EXTENSION_FUNC(PFNGLUNIFORMMATRIX4DVPROC, glUniformMatrix4dv);
+
+	SET_EXTENSION_FUNC(PFNGLCLIENTWAITSYNCPROC, glClientWaitSync);
+	SET_EXTENSION_FUNC(PFNGLWAITSYNCPROC, glWaitSync);
+	SET_EXTENSION_FUNC(PFNGLFENCESYNCPROC, glFenceSync);
 
 	SET_EXTENSION_FUNC(PFNGLGENVERTEXARRAYSPROC, glGenVertexArrays);
 	SET_EXTENSION_FUNC(PFNGLBINDVERTEXARRAYPROC, glBindVertexArray);
@@ -566,6 +576,16 @@ GLuint POGLDeviceContext::GenBufferID()
 	return id;
 }
 
+void POGLDeviceContext::WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+{
+	glWaitSync(sync, flags, timeout);
+}
+
+GLenum POGLDeviceContext::ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
+{
+	return glClientWaitSync(sync, flags, timeout);
+}
+
 GLuint POGLDeviceContext::GenTextureID()
 {
 	GLuint id = 0;
@@ -580,11 +600,7 @@ GLuint POGLDeviceContext::GenTextureID()
 
 ////////////////////////
 
-static const POGL_UINT32 FOURCC_DXT1 = 0x31545844;
-static const POGL_UINT32 FOURCC_DXT3 = 0x33545844;
-static const POGL_UINT32 FOURCC_DXT5 = 0x35545844;
-
-IPOGLTexture2D* POGLLoadTextureFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName)
+IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName)
 {
 	assert_not_null(context);
 	assert_not_null(fileName);
@@ -594,56 +610,40 @@ IPOGLTexture2D* POGLLoadTextureFromFile(IPOGLDeviceContext* context, const POGL_
 	if (file == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "File not found: %s", fileName);
 
-
-	/* verify the type of file */
-	char filecode[4];
-	fread(filecode, 1, 4, file);
-	if (strncmp(filecode, "DDS ", 4) != 0) {
+	POGL_CHAR header[54];
+	if (fread(header, 1, 54, file) != 54) {
 		fclose(file);
-		THROW_EXCEPTION(POGLResourceException, "Not a correct DDS file: %s", fileName);
+		THROW_EXCEPTION(POGLResourceException, "Invalid BMP file: %s", fileName);
 	}
-	// Read header
-	unsigned char header[124];
-	fread(&header, 124, 1, file);
 
-	// Read image information
-	POGL_UINT32 height = *(POGL_UINT32*)&(header[8]);
-	POGL_UINT32 width = *(POGL_UINT32*)&(header[12]);
-	POGL_UINT32 linearSize = *(POGL_UINT32*)&(header[16]);
-	POGL_UINT32 mipMapCount = *(POGL_UINT32*)&(header[24]);
-	POGL_UINT32 fourCC = *(POGL_UINT32*)&(header[80]);
+	if (header[0] != 'B' || header[1] != 'M') {
+		fclose(file);
+		THROW_EXCEPTION(POGLResourceException, "Invalid BMP file: %s", fileName);
+	}
 
-	unsigned char* buffer;
-	unsigned int bufsize;
-	/* how big is it going to be including all mipmaps? */
-	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
-	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
-	fread(buffer, 1, bufsize, file);
+	// Get num bits per pixel
+	const POGL_UINT16 bitsPerPixel = header[28];
 
-	//Everything is in memory now, the file can be closed
+	// Verify 24 or 32 bit image type
+	if (bitsPerPixel != 24 && bitsPerPixel != 32)
+	{
+		fclose(file);
+		THROW_EXCEPTION(POGLResourceException, "Invalid File Format for file %s. 24 or 32 bit Image Required.", fileName);
+	}
+
+	// Read image size from header
+	const POGL_SIZEI size(header[18] + (header[19] << 8), header[22] + (header[23] << 8));
+
+	// Calculate pixel memory size
+	const POGL_UINT32 memorySize = ((size.width * bitsPerPixel + 31) / 32) * 4 * size.height;
+
+	//
+	POGL_CHAR* data = new POGL_CHAR[memorySize];
+	fread(data, 1, memorySize, file);
 	fclose(file);
 
-	// Find out the format
-	POGL_UINT32 components = (fourCC == FOURCC_DXT1) ? 3 : 4;
-	POGL_UINT32 format;
-	switch (fourCC)
-	{
-	case FOURCC_DXT1:
-		format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
-		break;
-	case FOURCC_DXT3:
-		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
-		break;
-	case FOURCC_DXT5:
-		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
-		break;
-	default:
-		free(buffer);
-		THROW_EXCEPTION(POGLResourceException, "Unknown format for DDS file: %s", fileName);
-	}
-
 	// Create a texture2D resource
-	IPOGLTexture2D* texture = context->CreateTexture2D(POGL_SIZEI(width, height), POGLTextureFormat::BGR, data);
+	IPOGLTexture2D* texture = context->CreateTexture2D(size, POGLTextureFormat::RGB, data);
 	delete[] data;
 	return texture;
 }
