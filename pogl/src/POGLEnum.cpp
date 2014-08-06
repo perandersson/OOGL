@@ -229,139 +229,139 @@ GLenum POGLEnum::Convert(POGLPrimitiveType::Enum e)
 //
 //	return textureTargets[(uint32)e];
 //}
-//
-//GLenum OGLEnum::ConvertToTextureFormatEnum(TextureFormat::Enum format)
-//{
-//	GLint _format = GL_RGBA;
-//	switch (format)
-//	{
-//	case TextureFormat::RGB:
-//		_format = GL_RGB;
-//		break;
-//	case TextureFormat::RGB8:
-//		_format = GL_RGB;
-//		break;
-//	case TextureFormat::RGB12:
-//		_format = GL_RGB;
-//		break;
-//	case TextureFormat::RGB16:
-//		_format = GL_RGB;
-//		break;
-//	case TextureFormat::RGBA:
-//		break;
-//	case TextureFormat::RGBA8:
-//		_format = GL_RGBA;
-//		break;
-//	case TextureFormat::RGBA12:
-//		_format = GL_RGBA;
-//		break;
-//	case TextureFormat::RGBA16:
-//		_format = GL_RGBA;
-//		break;
-//	case TextureFormat::RGB10_A2:
-//		_format = GL_RGBA;
-//		break;
-//	case TextureFormat::RGBA16F:
-//		_format = GL_RGBA;
-//		break;
-//	case TextureFormat::RGBA32F:
-//		_format = GL_RGBA;
-//		break;
-//	case TextureFormat::DEPTH24:
-//		_format = GL_DEPTH_COMPONENT;
-//		break;
-//	case TextureFormat::DEPTH32F:
-//		_format = GL_DEPTH_COMPONENT;
-//		break;
-//	case TextureFormat::DEPTH24_STENCIL8:
-//		_format = GL_DEPTH_STENCIL;
-//		break;
-//	case TextureFormat::DEPTH32F_STENCIL8:
-//		_format = GL_DEPTH_STENCIL;
-//		break;
-//	case TextureFormat::R:
-//		_format = GL_RED;
-//		break;
-//	case TextureFormat::R16F:
-//		_format = GL_RED;
-//		break;
-//	case TextureFormat::R32F:
-//		_format = GL_RED;
-//		break;
-//	case TextureFormat::BGR:
-//		_format = GL_BGR;
-//		break;
-//	case TextureFormat::BGRA:
-//		_format = GL_BGRA;
-//		break;
-//	}
-//	return _format;
-//}
-//
-//GLenum OGLEnum::ConvertToInternalTextureFormatEnum(TextureFormat::Enum format)
-//{
-//	GLint _internalFormat = GL_RGBA;
-//	switch (format)
-//	{
-//	case TextureFormat::RGB:
-//		_internalFormat = GL_RGB;
-//		break;
-//	case TextureFormat::RGB8:
-//		_internalFormat = GL_RGB8;
-//		break;
-//	case TextureFormat::RGB12:
-//		_internalFormat = GL_RGB12;
-//		break;
-//	case TextureFormat::RGB16:
-//		_internalFormat = GL_RGB16;
-//		break;
-//	case TextureFormat::RGBA:
-//		break;
-//	case TextureFormat::RGBA8:
-//		_internalFormat = GL_RGBA8;
-//		break;
-//	case TextureFormat::RGBA12:
-//		_internalFormat = GL_RGBA12;
-//		break;
-//	case TextureFormat::RGBA16:
-//		_internalFormat = GL_RGBA16;
-//		break;
-//	case TextureFormat::RGB10_A2:
-//		_internalFormat = GL_RGB10_A2;
-//		break;
-//	case TextureFormat::RGBA16F:
-//		_internalFormat = GL_RGBA16F;
-//		break;
-//	case TextureFormat::RGBA32F:
-//		_internalFormat = GL_RGBA32F;
-//		break;
-//	case TextureFormat::DEPTH24:
-//		_internalFormat = GL_DEPTH_COMPONENT24;
-//		break;
-//	case TextureFormat::DEPTH32F:
-//		_internalFormat = GL_DEPTH_COMPONENT32F;
-//		break;
-//	case TextureFormat::DEPTH24_STENCIL8:
-//		_internalFormat = GL_DEPTH24_STENCIL8;
-//		break;
-//	case TextureFormat::DEPTH32F_STENCIL8:
-//		_internalFormat = GL_DEPTH32F_STENCIL8;
-//		break;
-//	case TextureFormat::R:
-//		_internalFormat = GL_R8;
-//		break;
-//	case TextureFormat::R16F:
-//		_internalFormat = GL_R16F;
-//		break;
-//	case TextureFormat::R32F:
-//		_internalFormat = GL_R32F;
-//		break;
-//	case TextureFormat::BGR:
-//		_internalFormat = GL_RGB;
-//		break;
-//	case TextureFormat::BGRA:
-//		_internalFormat = GL_RGBA;
-//		break;
-//	}
-//	return _internalFormat;
-//}
+
+GLenum POGLEnum::ConvertToTextureFormatEnum(POGLTextureFormat::Enum format)
+{
+	GLint _format = GL_RGBA;
+	switch (format)
+	{
+	case POGLTextureFormat::RGB:
+		_format = GL_RGB;
+		break;
+	case POGLTextureFormat::RGB8:
+		_format = GL_RGB;
+		break;
+	case POGLTextureFormat::RGB12:
+		_format = GL_RGB;
+		break;
+	case POGLTextureFormat::RGB16:
+		_format = GL_RGB;
+		break;
+	case POGLTextureFormat::RGBA:
+		break;
+	case POGLTextureFormat::RGBA8:
+		_format = GL_RGBA;
+		break;
+	case POGLTextureFormat::RGBA12:
+		_format = GL_RGBA;
+		break;
+	case POGLTextureFormat::RGBA16:
+		_format = GL_RGBA;
+		break;
+	case POGLTextureFormat::RGB10_A2:
+		_format = GL_RGBA;
+		break;
+	case POGLTextureFormat::RGBA16F:
+		_format = GL_RGBA;
+		break;
+	case POGLTextureFormat::RGBA32F:
+		_format = GL_RGBA;
+		break;
+	case POGLTextureFormat::DEPTH24:
+		_format = GL_DEPTH_COMPONENT;
+		break;
+	case POGLTextureFormat::DEPTH32F:
+		_format = GL_DEPTH_COMPONENT;
+		break;
+	case POGLTextureFormat::DEPTH24_STENCIL8:
+		_format = GL_DEPTH_STENCIL;
+		break;
+	case POGLTextureFormat::DEPTH32F_STENCIL8:
+		_format = GL_DEPTH_STENCIL;
+		break;
+	case POGLTextureFormat::R:
+		_format = GL_RED;
+		break;
+	case POGLTextureFormat::R16F:
+		_format = GL_RED;
+		break;
+	case POGLTextureFormat::R32F:
+		_format = GL_RED;
+		break;
+	case POGLTextureFormat::BGR:
+		_format = GL_BGR;
+		break;
+	case POGLTextureFormat::BGRA:
+		_format = GL_BGRA;
+		break;
+	}
+	return _format;
+}
+
+GLenum POGLEnum::ConvertToInternalTextureFormatEnum(POGLTextureFormat::Enum format)
+{
+	GLint _internalFormat = GL_RGBA;
+	switch (format)
+	{
+	case POGLTextureFormat::RGB:
+		_internalFormat = GL_RGB;
+		break;
+	case POGLTextureFormat::RGB8:
+		_internalFormat = GL_RGB8;
+		break;
+	case POGLTextureFormat::RGB12:
+		_internalFormat = GL_RGB12;
+		break;
+	case POGLTextureFormat::RGB16:
+		_internalFormat = GL_RGB16;
+		break;
+	case POGLTextureFormat::RGBA:
+		break;
+	case POGLTextureFormat::RGBA8:
+		_internalFormat = GL_RGBA8;
+		break;
+	case POGLTextureFormat::RGBA12:
+		_internalFormat = GL_RGBA12;
+		break;
+	case POGLTextureFormat::RGBA16:
+		_internalFormat = GL_RGBA16;
+		break;
+	case POGLTextureFormat::RGB10_A2:
+		_internalFormat = GL_RGB10_A2;
+		break;
+	case POGLTextureFormat::RGBA16F:
+		_internalFormat = GL_RGBA16F;
+		break;
+	case POGLTextureFormat::RGBA32F:
+		_internalFormat = GL_RGBA32F;
+		break;
+	case POGLTextureFormat::DEPTH24:
+		_internalFormat = GL_DEPTH_COMPONENT24;
+		break;
+	case POGLTextureFormat::DEPTH32F:
+		_internalFormat = GL_DEPTH_COMPONENT32F;
+		break;
+	case POGLTextureFormat::DEPTH24_STENCIL8:
+		_internalFormat = GL_DEPTH24_STENCIL8;
+		break;
+	case POGLTextureFormat::DEPTH32F_STENCIL8:
+		_internalFormat = GL_DEPTH32F_STENCIL8;
+		break;
+	case POGLTextureFormat::R:
+		_internalFormat = GL_R8;
+		break;
+	case POGLTextureFormat::R16F:
+		_internalFormat = GL_R16F;
+		break;
+	case POGLTextureFormat::R32F:
+		_internalFormat = GL_R32F;
+		break;
+	case POGLTextureFormat::BGR:
+		_internalFormat = GL_RGB;
+		break;
+	case POGLTextureFormat::BGRA:
+		_internalFormat = GL_RGBA;
+		break;
+	}
+	return _internalFormat;
+}

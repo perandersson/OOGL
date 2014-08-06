@@ -5,7 +5,7 @@
 class POGLDeviceContext;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
-struct POGLTextureHandle;
+class POGLTextureResource;
 class POGLSamplerObject;
 class POGLRenderState : public IPOGLRenderState
 {
@@ -64,10 +64,17 @@ public:
 	/*!
 		\brief Bind the supplied texture handle
 
-		\param textureHandle
+		\param texture
 		\param idx
 	*/
-	void BindTextureHandle(POGLTextureHandle* textureHandle, POGL_UINT32 idx);
+	void BindTextureResource(POGLTextureResource* texture, POGL_UINT32 idx);
+	
+	/*!
+		\brief Set the currently bound texture resource
+
+		\param texture
+	*/
+	void SetTextureResource(POGLTextureResource* texture);
 
 	/*!
 		\brief Retrieves the next active texture for this render state.
@@ -138,7 +145,7 @@ private:
 	POGL_UINT32 mMaxActiveTextures;
 	POGL_UINT32 mNextActiveTexture;
 	std::vector<POGL_UINT32> mTextureUID;
-	std::vector<GLenum> mTextureTarget;
+	std::vector<POGLTextureResource*> mTextures;
 	std::vector<POGL_UINT32> mSamplerObjectUID;
 	POGL_UINT32 mActiveTextureIndex;
 };

@@ -737,6 +737,32 @@ static const POGL_VERTEX_LAYOUT POGL_POSITION_COLOR_VERTEX_LAYOUT = {
 	sizeof(POGL_POSITION_COLOR_VERTEX)
 };
 
+/*!
+	\brief Vertex containing a position and a texture coordinate
+*/
+struct POGL_POSITION_TEXCOORD_VERTEX
+{
+	POGL_VECTOR3F position;
+	POGL_VECTOR2F texCoord;
+
+	POGL_POSITION_TEXCOORD_VERTEX() {}
+	POGL_POSITION_TEXCOORD_VERTEX(const POGL_VECTOR3F& p, const POGL_VECTOR2F& t) { position = p; texCoord = t; }
+	POGL_POSITION_TEXCOORD_VERTEX(const POGL_POSITION_TEXCOORD_VERTEX& v) { position = v.position; texCoord = v.texCoord; }
+	~POGL_POSITION_TEXCOORD_VERTEX() {}
+	inline POGL_POSITION_TEXCOORD_VERTEX& operator=(const POGL_POSITION_TEXCOORD_VERTEX& rhs) { position = rhs.position; texCoord = rhs.texCoord;  return *this; }
+};
+
+/* Vertex layout for the POGL_POSITION_TEXCOORD_VERTEX struct. */
+static const POGL_VERTEX_LAYOUT POGL_POSITION_TEXCOORD_VERTEX_LAYOUT = {
+	{ 
+		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
+		{ 0 }, 
+		{ sizeof(POGL_VECTOR2F), POGLVertexType::FLOAT, false },
+		0
+	},
+	sizeof(POGL_POSITION_TEXCOORD_VERTEX)
+};
+
 //
 // Class Definitions
 //
@@ -845,7 +871,7 @@ public:
 	/*!
 		\brief Creates a 2D texture
 	*/
-	virtual IPOGLTexture2D* CreateTexture2D() = 0;
+	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes) = 0;
 
 	/*!
 		\brief Creates a 3D texture
@@ -885,6 +911,17 @@ public:
 		\return
 	*/
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
+	
+	/*!
+		\brief Creates a vertex buffer based on the supplied parameters
+
+		\param memory
+		\param memorySize
+		\param primitiveType
+		\param bufferUsage
+		\return
+	*/
+	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
 
 	/*!
 		\brief Creates an index buffer based on the supplied parameters
@@ -1219,7 +1256,7 @@ public:
 	/*!
 		\brief Retrieves the texture color format for this texture
 	*/
-	virtual POGLTextureFormat GetTextureFormat() const = 0;
+	virtual POGLTextureFormat::Enum GetTextureFormat() const = 0;
 };
 
 /*!
@@ -1237,8 +1274,6 @@ public:
 class IPOGLTexture2D : public IPOGLTexture
 {
 public:
-	virtual POGL_UINT32 GetWidth() const = 0;
-	virtual POGL_UINT32 GetHeight() const = 0;
 	virtual const POGL_SIZEI& GetSize() const = 0;
 };
 
@@ -1248,8 +1283,6 @@ public:
 class IPOGLTexture3D : public IPOGLTexture
 {
 public:
-	virtual POGL_UINT32 GetWidth() const = 0;
-	virtual POGL_UINT32 GetHeight() const = 0;
 	virtual POGL_UINT32 GetDepth() const = 0;
 	virtual const POGL_SIZEI& GetSize() const = 0;
 };

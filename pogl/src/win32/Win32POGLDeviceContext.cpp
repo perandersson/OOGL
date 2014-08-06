@@ -3,7 +3,7 @@
 #include <vector>
 
 Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext)
-: POGLDeviceContext(device), mRefCount(0), mDeviceContext(deviceContext),
+: POGLDeviceContext(device), mDeviceContext(deviceContext),
 mRenderContext(nullptr), mBoundToThread(false),
 // Extensions
 wglCreateContextAttribsARB(nullptr)
@@ -49,32 +49,23 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	if (mRenderContext == nullptr)
 		return false;
 	
-	return POGLDeviceContext::Initialize();
+	return true;
 }
 
-void Win32POGLDeviceContext::AddRef()
-{
-	mRefCount++;
-}
-
-void Win32POGLDeviceContext::Release()
-{
-	if (--mRefCount == 0) {
-		assert_with_message(mBoundToThread, "Why is this not bound to the current thread?");
-		wglMakeCurrent(0, 0);
-		mBoundToThread = false;
-	}
-}
-
-Win32POGLDeviceContext* Win32POGLDeviceContext::BindContextIfNeccessary()
+void Win32POGLDeviceContext::Bind()
 {
 	if (!mBoundToThread) {
 		wglMakeCurrent(mDeviceContext, mRenderContext);
 		mBoundToThread = true;
+		InitializeRenderState();
 	}
+}
 
-	AddRef();
-	return this;
+void Win32POGLDeviceContext::Unbind()
+{
+	assert_with_message(mBoundToThread, "Why is this not bound to the current thread?");
+	wglMakeCurrent(0, 0);
+	mBoundToThread = false;
 }
 
 void Win32POGLDeviceContext::LoadExtensions()

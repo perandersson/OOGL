@@ -62,3 +62,8 @@ GLuint POGLIndexBuffer::GetBufferID() const
 {
 	return mBufferID;
 }
+
+GLenum POGLIndexBuffer::GetType() const
+{
+	return mType;
+}

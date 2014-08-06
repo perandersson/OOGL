@@ -26,7 +26,7 @@ void POGLDisableMemoryLeakDetection()
 /////////////////////////////////////
 
 Win32POGLDevice::Win32POGLDevice()
-: POGLDevice(), mRefCount(1),
+: POGLDevice(), mRefCount(1), mReleasing(false),
 mWindowHandle(nullptr), mDeviceContext(nullptr), mMainThreadDeviceContext(nullptr)
 {
 
@@ -34,22 +34,6 @@ mWindowHandle(nullptr), mDeviceContext(nullptr), mMainThreadDeviceContext(nullpt
 
 Win32POGLDevice::~Win32POGLDevice()
 {
-	size_t size = mDeviceContexts.size();
-	for (size_t i = 0; i < size; ++i) {
-		delete mDeviceContexts[i];
-	}
-	mDeviceContexts.clear();
-
-	if (mMainThreadDeviceContext != nullptr) {
-		delete mMainThreadDeviceContext;
-		mMainThreadDeviceContext = nullptr;
-	}
-
-	if (mDeviceContext != nullptr) {
-		ReleaseDC(mWindowHandle, mDeviceContext);
-		mDeviceContext = nullptr;
-		mWindowHandle = nullptr;
-	}
 }
 
 void Win32POGLDevice::AddRef()
@@ -59,7 +43,25 @@ void Win32POGLDevice::AddRef()
 
 void Win32POGLDevice::Release()
 {
-	if (--mRefCount == 0) {
+	if (--mRefCount == 0 && !mReleasing) {
+		mReleasing = true;
+		size_t size = mDeviceContexts.size();
+		for (size_t i = 0; i < size; ++i) {
+			mDeviceContexts[i]->Release();
+		}
+		mDeviceContexts.clear();
+
+		if (mMainThreadDeviceContext != nullptr) {
+			mMainThreadDeviceContext->Release();
+			mMainThreadDeviceContext = nullptr;
+		}
+
+		if (mDeviceContext != nullptr) {
+			ReleaseDC(mWindowHandle, mDeviceContext);
+			mDeviceContext = nullptr;
+			mWindowHandle = nullptr;
+		}
+
 		delete this;
 		POGLDisableMemoryLeakDetection();
 	}
@@ -78,7 +80,9 @@ IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 		mDeviceContexts.push_back(context);
 		tDeviceContext = context;
 	}
-	return tDeviceContext->BindContextIfNeccessary();
+	tDeviceContext->Bind();
+	tDeviceContext->AddRef();
+	return tDeviceContext;
 }
 
 void Win32POGLDevice::SwapBuffers()

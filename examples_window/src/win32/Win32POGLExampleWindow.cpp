@@ -85,4 +85,3 @@ void POGLDestroyExampleWindow(POGL_HANDLE windowHandle)
 	HINSTANCE applicationHandle = GetModuleHandle(NULL);
 	UnregisterClass(EXAMPLE_WINDOW_CLASS_NAME, applicationHandle);
 }
-

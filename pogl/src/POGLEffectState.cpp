@@ -105,10 +105,7 @@ void POGLEffectState::ApplyUniforms()
 		it->second->Apply();
 	}
 
-#if defined(_DEBUG)
-	const GLenum err = glGetError();
-	assert_with_message(err == GL_NO_ERROR, "Could not apply uniforms");
-#endif
+	CHECK_GL("Could not apply uniforms");
 }
 
 POGLSamplerObject* POGLEffectState::GenSamplerObject(POGLRenderState* renderState, const POGLUniformProperty* uniformProperty)

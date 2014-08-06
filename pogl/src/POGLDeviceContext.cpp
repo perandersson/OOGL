@@ -5,21 +5,36 @@
 #include "POGLEnum.h"
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
+#include "POGLTexture2D.h"
 #include "POGLShaderProgram.h"
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRenderState(nullptr), mDevice(device)
+: mRefCount(1), mReleasing(false), mRenderState(nullptr), mDevice(device)
 {
 }
 
 POGLDeviceContext::~POGLDeviceContext()
 {
-	if (mRenderState != nullptr) {
-		delete mRenderState;
-		mRenderState = nullptr;
+}
+
+void POGLDeviceContext::AddRef()
+{
+	mRefCount++;
+}
+
+void POGLDeviceContext::Release()
+{
+	if (--mRefCount == 0 && !mReleasing) {
+		mReleasing = true;
+		if (mRenderState != nullptr) {
+			mRenderState->Release();
+			mRenderState = nullptr;
+		}
+		Unbind();
+		delete this;
 	}
 }
 
@@ -143,9 +158,35 @@ IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
 	return nullptr;
 }
 
-IPOGLTexture2D* POGLDeviceContext::CreateTexture2D()
+IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
 {
-	return nullptr;
+	assert_not_null(bytes);
+	assert(size.x > 0.0f && "You cannot create a texture with 0 width");
+	assert(size.y > 0.0f && "You cannot create a texture with 0 height");
+
+	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
+	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
+	const GLenum minFilter = POGLEnum::Convert(POGLMinFilter::DEFAULT);
+	const GLenum magFilter = POGLEnum::Convert(POGLMagFilter::DEFAULT);
+	const GLenum textureWrap = POGLEnum::Convert(POGLTextureWrap::DEFAULT);
+
+	const GLuint textureID = GenTextureID();
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, size.width, size.height, 0, _format, GL_UNSIGNED_BYTE, bytes);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
+
+	const GLenum status = glGetError();
+	if (status != GL_NO_ERROR) {
+		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: %d", status);
+	}
+	
+	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, mDevice);
+	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetHandlePtr());
+	return texture;
 }
 
 IPOGLTexture3D* POGLDeviceContext::CreateTexture3D()
@@ -188,6 +229,11 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_COL
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_COLOR_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
+IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+{
+	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_TEXCOORD_VERTEX_LAYOUT, primitiveType, bufferUsage);
+}
+
 IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
 {
 	assert_not_null(memory);
@@ -227,16 +273,14 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 
 IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 {
-	if (mRenderState == nullptr) {
-		mRenderState = new POGLRenderState(this);
-	}
-
 	return mRenderState->Apply(effect);
 }
 
-bool POGLDeviceContext::Initialize()
+void POGLDeviceContext::InitializeRenderState()
 {
-	return true;
+	if (mRenderState == nullptr) {
+		mRenderState = new POGLRenderState(this);
+	}
 }
 
 void POGLDeviceContext::LoadExtensions()
@@ -520,4 +564,86 @@ GLuint POGLDeviceContext::GenBufferID()
 		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID");
 
 	return id;
+}
+
+GLuint POGLDeviceContext::GenTextureID()
+{
+	GLuint id = 0;
+	glGenTextures(1, &id);
+
+	const GLenum error = glGetError();
+	if (id == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate texture ID");
+
+	return id;
+}
+
+////////////////////////
+
+static const POGL_UINT32 FOURCC_DXT1 = 0x31545844;
+static const POGL_UINT32 FOURCC_DXT3 = 0x33545844;
+static const POGL_UINT32 FOURCC_DXT5 = 0x35545844;
+
+IPOGLTexture2D* POGLLoadTextureFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName)
+{
+	assert_not_null(context);
+	assert_not_null(fileName);
+
+	// Open file
+	FILE* file = open_file(fileName, POGL_TOCHAR("rb"));
+	if (file == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "File not found: %s", fileName);
+
+
+	/* verify the type of file */
+	char filecode[4];
+	fread(filecode, 1, 4, file);
+	if (strncmp(filecode, "DDS ", 4) != 0) {
+		fclose(file);
+		THROW_EXCEPTION(POGLResourceException, "Not a correct DDS file: %s", fileName);
+	}
+	// Read header
+	unsigned char header[124];
+	fread(&header, 124, 1, file);
+
+	// Read image information
+	POGL_UINT32 height = *(POGL_UINT32*)&(header[8]);
+	POGL_UINT32 width = *(POGL_UINT32*)&(header[12]);
+	POGL_UINT32 linearSize = *(POGL_UINT32*)&(header[16]);
+	POGL_UINT32 mipMapCount = *(POGL_UINT32*)&(header[24]);
+	POGL_UINT32 fourCC = *(POGL_UINT32*)&(header[80]);
+
+	unsigned char* buffer;
+	unsigned int bufsize;
+	/* how big is it going to be including all mipmaps? */
+	bufsize = mipMapCount > 1 ? linearSize * 2 : linearSize;
+	buffer = (unsigned char*)malloc(bufsize * sizeof(unsigned char));
+	fread(buffer, 1, bufsize, file);
+
+	//Everything is in memory now, the file can be closed
+	fclose(file);
+
+	// Find out the format
+	POGL_UINT32 components = (fourCC == FOURCC_DXT1) ? 3 : 4;
+	POGL_UINT32 format;
+	switch (fourCC)
+	{
+	case FOURCC_DXT1:
+		format = GL_COMPRESSED_RGBA_S3TC_DXT1_EXT;
+		break;
+	case FOURCC_DXT3:
+		format = GL_COMPRESSED_RGBA_S3TC_DXT3_EXT;
+		break;
+	case FOURCC_DXT5:
+		format = GL_COMPRESSED_RGBA_S3TC_DXT5_EXT;
+		break;
+	default:
+		free(buffer);
+		THROW_EXCEPTION(POGLResourceException, "Unknown format for DDS file: %s", fileName);
+	}
+
+	// Create a texture2D resource
+	IPOGLTexture2D* texture = context->CreateTexture2D(POGL_SIZEI(width, height), POGLTextureFormat::BGR, data);
+	delete[] data;
+	return texture;
 }

@@ -33,6 +33,11 @@ public:
 		return mTypeSize;
 	}
 
+	/*!
+		\brief Retrieves the value type 
+	*/
+	GLenum GetType() const;
+
 private:
 	POGL_UINT32 mRefCount;
 	POGL_UINT32 mUID;

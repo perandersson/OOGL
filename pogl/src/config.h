@@ -52,10 +52,13 @@ namespace std { using namespace __gnu_cxx; }
 
 #include <fstream>
 #include <sstream>
+#include <cstdio>
 #ifdef UNICODE
 typedef std::wifstream POGL_ISTREAM;
 typedef std::wstringstream POGL_STRINGSTREAM;
+#define open_file _wfopen
 #else
 typedef std::ifstream POGL_ISTREAM;
 typedef std::stringstream POGL_STRINGSTREAM;
+#define open_file fopen
 #endif

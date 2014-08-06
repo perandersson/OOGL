@@ -18,6 +18,7 @@ public:
 
 private:
 	POGL_UINT32 mRefCount;
+	bool mReleasing;
 	HWND mWindowHandle;
 	HDC mDeviceContext;
 	Win32POGLDeviceContext* mMainThreadDeviceContext;

@@ -24,6 +24,6 @@ public:
 	static GLenum Convert(POGLPrimitiveType::Enum e);
 	//static GLenum Convert(TextureCubeSide::Enum e);
 
-	//static GLenum ConvertToTextureFormatEnum(TextureFormat::Enum format);
-	//static GLenum ConvertToInternalTextureFormatEnum(TextureFormat::Enum format);
+	static GLenum ConvertToTextureFormatEnum(POGLTextureFormat::Enum format);
+	static GLenum ConvertToInternalTextureFormatEnum(POGLTextureFormat::Enum format);
 };

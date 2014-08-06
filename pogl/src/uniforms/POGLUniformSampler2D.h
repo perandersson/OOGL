@@ -2,7 +2,7 @@
 #include "POGLDefaultUniform.h"
 
 class POGLSamplerObject;
-struct POGLTextureHandle;
+class POGLTextureResource;
 class POGLUniformSampler2D : public POGLDefaultUniform
 {
 public:
@@ -22,10 +22,10 @@ public:
 	/*!
 		\brief
 	*/
-	void SetTextureHandle(POGLTextureHandle* textureHandle);
+	void SetTextureResource(POGLTextureResource* texture);
 
 private:
-	POGLTextureHandle* mTextureHandle;
+	POGLTextureResource* mTextureResource;
 	POGL_UINT32 mTextureUID;
 	GLuint mActiveTexture;
 	POGLSamplerObject* mSamplerObject;

@@ -5,11 +5,11 @@
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
 #include "POGLEnum.h"
-#include "POGLTextureHandle.h"
+#include "POGLTextureResource.h"
 #include "POGLSamplerObject.h"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
-: mRefCount(0), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
+: mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0), mVertexArrayID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false),
@@ -17,7 +17,7 @@ mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
 {
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxActiveTextures);
 	mTextureUID.resize(mMaxActiveTextures, 0);
-	mTextureTarget.resize(mMaxActiveTextures, 0);
+	mTextures.resize(mMaxActiveTextures, nullptr);
 	mSamplerObjectUID.resize(mMaxActiveTextures, 0);
 
 	for (POGL_UINT32 i = 0; i < MAX_VERTEX_LAYOUT_FIELD_SIZE; ++i)
@@ -58,6 +58,14 @@ void POGLRenderState::Release()
 		if (mEffect != nullptr) {
 			mEffect->Release();
 			mEffect = nullptr;
+		}
+
+		auto size = mTextures.size();
+		for (size_t i = 0; i < size; ++i) {
+			if (mTextures[i] != nullptr) {
+				mTextures[i]->Release();
+				mTextures[i] = nullptr;
+			}
 		}
 	}
 }
@@ -339,8 +347,8 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 {
 	assert_not_null(buffer);
 	const POGL_UINT32 uid = buffer->GetUID();
-	if (mVertexBufferUID == uid && buffer != nullptr) {
-		if (mVertexBuffer != nullptr) {
+	if (mVertexBufferUID == uid) {
+		if (mVertexBuffer == nullptr && buffer != nullptr) {
 			mVertexBuffer = buffer;
 			mVertexBuffer->AddRef();
 		}
@@ -438,7 +446,7 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 	mIndexBufferUID = uid;
 }
 
-void POGLRenderState::BindTextureHandle(POGLTextureHandle* textureHandle, POGL_UINT32 idx)
+void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UINT32 idx)
 {
 	if (idx >= mMaxActiveTextures) {
 		THROW_EXCEPTION(POGLStateException,
@@ -451,20 +459,37 @@ void POGLRenderState::BindTextureHandle(POGLTextureHandle* textureHandle, POGL_U
 		CHECK_GL("Could not set active texture index");
 	}
 
-	const POGL_UINT32 uid = textureHandle != nullptr ? textureHandle->uid : 0;
+	const POGL_UINT32 uid = resource != nullptr ? resource->GetUID() : 0;
 
 	// Check if the supplied texture is already bound to this context
 	if (mTextureUID[idx] == uid)
 		return;
-
+	
 	// Bind supplied texture
-	const GLuint textureID = textureHandle != nullptr ? textureHandle->textureID : 0;
-	const GLenum textureTarget = textureHandle != nullptr ? textureHandle->textureTarget : mTextureTarget[idx];
+	const GLuint textureID = resource != nullptr ? resource->GetTextureID() : 0;
+	const GLenum textureTarget = resource != nullptr ? resource->GetTextureTarget() : mTextures[idx]->GetTextureTarget();
 	glBindTexture(textureTarget, textureID);
 
+	// Release the previous bound texture if it exists
+	if (mTextures[idx] != nullptr)
+		mTextures[idx]->Release();
+
+	// Save the bound texture
 	mTextureUID[idx] = uid;
-	mTextureTarget[idx] = textureTarget;
+	mTextures[idx] = resource;
+
 	CHECK_GL("Could not bind texture");
+}
+
+void POGLRenderState::SetTextureResource(POGLTextureResource* texture)
+{
+	// Release the previous bound texture if it exists
+	if (mTextures[mActiveTextureIndex] != nullptr)
+		mTextures[mActiveTextureIndex]->Release();
+
+	// Set the new resource
+	mTextureUID[mActiveTextureIndex] = texture->GetUID();
+	mTextures[mActiveTextureIndex] = texture;
 }
 
 POGL_UINT32 POGLRenderState::NextActiveTexture()

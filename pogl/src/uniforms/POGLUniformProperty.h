@@ -27,4 +27,17 @@ struct POGLUniformProperty
 
 	/* Compare mode */
 	POGLCompareMode::Enum compareMode;
+
+	POGLUniformProperty() {
+		componentID = 0;
+		uniformType = 0;
+		minFilter = POGLMinFilter::DEFAULT;
+		magFilter = POGLMagFilter::DEFAULT;
+		wrap[0] = wrap[1] = wrap[2] = POGLTextureWrap::DEFAULT;
+		compareFunc = POGLCompareFunc::DEFAULT;
+		compareMode = POGLCompareMode::DEFAULT;
+	}
+
+	~POGLUniformProperty() {
+	}
 };

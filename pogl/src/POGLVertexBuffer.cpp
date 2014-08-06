@@ -86,7 +86,11 @@ void POGLVertexBuffer::Draw(POGL_UINT32 startIndex, POGL_UINT32 count)
 
 void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
 {
-	Draw(indexBuffer, startIndex, indexBuffer->GetNumElements());
+	assert_not_null(indexBuffer);
+
+	const POGL_UINT32 numIndices = indexBuffer->GetNumElements();
+	const GLvoid* indices = (const GLvoid*)(startIndex * indexBuffer->GetTypeSize());
+	glDrawElements(mPrimitiveType, numIndices, indexBuffer->GetType(), indices);
 }
 
 void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
@@ -98,6 +102,6 @@ void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex
 		count = numIndices - startIndex;
 	}
 
-	const GLvoid* indices = (void*)(startIndex * indexBuffer->GetTypeSize());
-	glDrawElements(mPrimitiveType, count, GL_UNSIGNED_INT, indices);
+	const GLvoid* indices = (const GLvoid*)(startIndex * indexBuffer->GetTypeSize());
+	glDrawElements(mPrimitiveType, count, indexBuffer->GetType(), indices);
 }

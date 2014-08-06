@@ -3,12 +3,12 @@
 #include "POGLDeviceContext.h"
 #include "POGLRenderState.h"
 #include "POGLSamplerObject.h"
-#include "POGLTextureHandle.h"
+#include "POGLTextureResource.h"
 #include "POGLEnum.h"
 
 POGLUniformSampler2D::POGLUniformSampler2D(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
 : POGLDefaultUniform(effect, state, context, componentID),
-mTextureHandle(nullptr), mTextureUID(0), mActiveTexture(activeTexture), mSamplerObject(samplerObject)
+mTextureResource(nullptr), mTextureUID(0), mActiveTexture(activeTexture), mSamplerObject(samplerObject)
 {
 	assert_not_null(mSamplerObject);
 }
@@ -19,15 +19,20 @@ POGLUniformSampler2D::~POGLUniformSampler2D()
 		delete mSamplerObject;
 		mSamplerObject = nullptr;
 	}
+
+	if (mTextureResource != nullptr) {
+		mTextureResource->Release();
+		mTextureResource = nullptr;
+	}
 }
 
 void POGLUniformSampler2D::Apply()
 {
-	if (mTextureHandle == nullptr) {
+	if (mTextureResource == nullptr) {
 		return;
 	}
 
-	mRenderState->BindTextureHandle(mTextureHandle, mActiveTexture);
+	mRenderState->BindTextureResource(mTextureResource, mActiveTexture);
 	mRenderState->BindSamplerObject(mSamplerObject, mActiveTexture);
 	mDeviceContext->Uniform1i(mComponentID, mActiveTexture);
 
@@ -37,9 +42,9 @@ void POGLUniformSampler2D::Apply()
 void POGLUniformSampler2D::SetTexture(IPOGLTexture* texture)
 {
 	if (texture == nullptr)
-		SetTextureHandle(nullptr);
+		SetTextureResource(nullptr);
 	else
-		SetTextureHandle(reinterpret_cast<POGLTextureHandle*>(texture->GetHandlePtr()));
+		SetTextureResource(reinterpret_cast<POGLTextureResource*>(texture->GetHandlePtr()));
 }
 
 void POGLUniformSampler2D::SetMinFilter(POGLMinFilter::Enum minFilter)
@@ -73,14 +78,18 @@ void POGLUniformSampler2D::SetCompareMode(POGLCompareMode::Enum compareMode)
 	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(compareMode));
 }
 
-void POGLUniformSampler2D::SetTextureHandle(POGLTextureHandle* textureHandle)
+void POGLUniformSampler2D::SetTextureResource(POGLTextureResource* texture)
 {
-	const POGL_UINT32 uid = textureHandle != nullptr ? textureHandle->uid : 0;
+	const POGL_UINT32 uid = texture != nullptr ? texture->GetUID() : 0;
 	if (mTextureUID == uid)
 		return;
 
 	mTextureUID = uid;
-	mTextureHandle = textureHandle;
+	if (mTextureResource != nullptr)
+		mTextureResource->Release();
+	mTextureResource = texture;
+	if (mTextureResource != nullptr)
+		mTextureResource->AddRef();
 
 	if (IsEffectActive())
 		POGLUniformSampler2D::Apply();

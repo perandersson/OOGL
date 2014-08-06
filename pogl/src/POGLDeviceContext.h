@@ -9,26 +9,36 @@ public:
 	POGLDeviceContext(IPOGLDevice* device);
 	~POGLDeviceContext();
 
+	void AddRef();
+	void Release();
 	IPOGLDevice* GetDevice();
 	IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type);
 	IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);
 	IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms);
 	IPOGLTexture1D* CreateTexture1D();
-	IPOGLTexture2D* CreateTexture2D();
+	IPOGLTexture2D* CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes);
 	IPOGLTexture3D* CreateTexture3D();
 	IPOGLVertexBuffer* CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
+	IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage);
 	IPOGLRenderState* Apply(IPOGLEffect* effect);
 	
 	/*!
-		\brief
-
-		\param
-		\return
+	
 	*/
-	bool Initialize();
+	virtual void Bind() = 0;
+
+	/*!
+	
+	*/
+	virtual void Unbind() = 0;
+
+	/*!
+		\brief 
+	*/
+	void InitializeRenderState();
 	
 	/*!
 		\brief Load the extensions for this device context
@@ -241,7 +251,14 @@ private:
 	*/
 	GLuint GenBufferID();
 
+	/*!
+		\brief Generate a new texture ID
+	*/
+	GLuint GenTextureID();
+
 protected:
+	POGL_UINT32 mRefCount;
+	bool mReleasing;
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;
 
