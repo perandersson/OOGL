@@ -80,19 +80,6 @@ public:
 		\brief Retrieves the next active texture for this render state.
 	*/
 	POGL_UINT32 NextActiveTexture();
-
-private:
-	/*!
-		\brief Binds the supplied effect to this state
-
-		\param effect
-	*/
-	void BindEffect(POGLEffect* effect);
-
-	/*!
-		\brief Binds the supplied buffers
-	*/
-	void BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer);
 	
 	/*!
 		\brief Bind the supplied vertex buffer
@@ -108,6 +95,19 @@ private:
 	*/
 	void BindIndexBuffer(POGLIndexBuffer* buffer);
 
+private:
+	/*!
+		\brief Binds the supplied effect to this state
+
+		\param effect
+	*/
+	void BindEffect(POGLEffect* effect);
+
+	/*!
+		\brief Binds the supplied buffers
+	*/
+	void BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer);
+	
 private:
 	POGL_UINT32 mRefCount;
 	POGLDeviceContext* mDeviceContext;

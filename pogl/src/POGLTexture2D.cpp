@@ -66,6 +66,11 @@ bool POGLTexture2D::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 	return mInternalResource->WaitSyncClient(timeout, job);
 }
 
+POGLResourceType::Enum POGLTexture2D::GetResourceType() const
+{
+	return POGLResourceType::TEXTURE;
+}
+
 POGLTextureFormat::Enum POGLTexture2D::GetTextureFormat() const
 {
 	return mInternalResource->GetTextureFormat();

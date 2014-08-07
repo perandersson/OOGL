@@ -171,6 +171,25 @@ GLenum POGLEnum::Convert(POGLDstFactor::Enum dfactor)
 
 	return enums[(POGL_UINT32)dfactor];
 }
+
+GLenum POGLEnum::ConvertForMapBuffer(POGLStreamType::Enum e)
+{
+	static GLenum access[POGLStreamType::COUNT] = {
+		GL_WRITE_ONLY
+	};
+
+	return access[(POGL_UINT32)e];
+}
+
+GLbitfield POGLEnum::ConvertForMapBufferRange(POGLStreamType::Enum e)
+{
+	static GLenum access[POGLStreamType::COUNT] = {
+		GL_MAP_WRITE_BIT
+	};
+
+	return access[(POGL_UINT32)e];
+}
+
 //
 //GLenum OGLEnum::Convert(FrontFace::Enum frontFace)
 //{

@@ -10,15 +10,27 @@ public:
 	POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format, POGLSyncObject* sync, IPOGLDevice* device);
 	~POGLTexture2D();
 
+// IPOGLInterface
+public:
 	void AddRef();
 	void Release();
+	
+// IPOGLResource
+public:
 	IPOGLDevice* GetDevice();
 	POGL_HANDLE GetHandlePtr();
 	void WaitSyncDriver();
 	void WaitSyncClient();
 	bool WaitSyncClient(POGL_UINT64 timeout);
 	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+	POGLResourceType::Enum GetResourceType() const;
+
+// IPOGLTexture
+public:
 	POGLTextureFormat::Enum GetTextureFormat() const;
+
+// IPOGLTexture2D
+public:
 	const POGL_SIZEI& GetSize() const;
 
 private:

@@ -71,11 +71,9 @@ int main()
 				// glMapBuffer
 				// glUnmapBuffer​
 				//POGL_POSITION_VERTEX* ptr = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, )
-				IPOGLStream* stream = context->OpenStream(vertexBuffer, POGLStreamType::WRITE);
-				POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->GetPtr();
+				POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, POGLStreamType::WRITE);
 				vertices[0].position.x = -1.0f;
-				stream->Release();
-				
+				context->Unmap(vertexBuffer);
 			}
 			context->Release();
 		});

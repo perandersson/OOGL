@@ -6,17 +6,11 @@ class POGLSyncObject;
 class POGLShaderProgram : public IPOGLShaderProgram
 {
 public:
-	POGLShaderProgram(GLuint shaderID, IPOGLDevice* device, POGLShaderProgramType::Enum type, POGLSyncObject* syncObject);
+	POGLShaderProgram(GLuint shaderID, IPOGLDevice* device, POGLShaderProgramType::Enum type);
 	~POGLShaderProgram();
 	
 	void AddRef();
 	void Release();
-	IPOGLDevice* GetDevice();
-	POGL_HANDLE GetHandlePtr();
-	void WaitSyncDriver();
-	void WaitSyncClient();
-	bool WaitSyncClient(POGL_UINT64 timeout);
-	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer
@@ -39,5 +33,4 @@ private:
 	GLuint mShaderID;
 	IPOGLDevice* mDevice;
 	POGLShaderProgramType::Enum mType;
-	POGLSyncObject* mSyncObject;
 };

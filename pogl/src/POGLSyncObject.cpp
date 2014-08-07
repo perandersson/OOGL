@@ -22,6 +22,7 @@ POGLSyncObject::~POGLSyncObject()
 
 void POGLSyncObject::WaitSyncDriver()
 {
+	std::lock_guard<std::recursive_mutex> lock(mGlobalMutex);
 	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 	context->WaitSync(GetSyncObject(), 0, GL_TIMEOUT_IGNORED);
 	context->Release();
@@ -37,6 +38,7 @@ void POGLSyncObject::WaitSyncClient()
 
 bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout)
 {
+	std::lock_guard<std::recursive_mutex> lock(mGlobalMutex);
 	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 	const GLenum result = context->ClientWaitSync(GetSyncObject(), 0, timeout);
 	context->Release();
@@ -51,6 +53,7 @@ bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout)
 
 bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 {
+	std::lock_guard<std::recursive_mutex> lock(mGlobalMutex);
 	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 	bool synchronized = true;
 	POGL_UINT32 failCount = 0;
@@ -82,6 +85,16 @@ bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 	return synchronized;
 }
 
+void POGLSyncObject::Lock()
+{
+	mGlobalMutex.lock();
+}
+
+void POGLSyncObject::Unlock()
+{
+	mGlobalMutex.unlock();
+}
+
 GLsync POGLSyncObject::GetSyncObject()
 {
 	std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
@@ -90,9 +103,11 @@ GLsync POGLSyncObject::GetSyncObject()
 
 void POGLSyncObject::QueueFence()
 {
+	std::lock_guard<std::recursive_mutex> global_lock(mGlobalMutex);
 	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 	GLsync sync = context->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
 	context->DeleteSync(mSync);
+	context->Release();
 	mSync = sync;
 }

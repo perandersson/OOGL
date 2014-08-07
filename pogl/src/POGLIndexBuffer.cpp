@@ -2,6 +2,7 @@
 #include "POGLIndexBuffer.h"
 #include "POGLDeviceContext.h"
 #include "POGLSyncObject.h"
+#include "POGLRenderState.h"
 #include <atomic>
 namespace {
 	std::atomic<POGL_UINT32> uid;
@@ -73,35 +74,35 @@ bool POGLIndexBuffer::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 	return mSyncObject->WaitSyncClient(timeout, job);
 }
 
+POGLResourceType::Enum POGLIndexBuffer::GetResourceType() const
+{
+	return POGLResourceType::INDEX_BUFFER;
+}
+
 POGL_UINT32 POGLIndexBuffer::GetNumElements() const
 {
 	return mNumIndices;
 }
 
-IPOGLStream* POGLIndexBuffer::OpenStream(POGLStreamType::Enum e)
+void* POGLIndexBuffer::Map(POGLDeviceContext* context, POGLRenderState* state, GLenum access)
 {
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
-	IPOGLStream* stream = context->OpenStream(this, mSyncObject, e);
-	context->Release();
-	return stream;
+	mSyncObject->Lock();
+	mSyncObject->WaitSyncClient();
+	state->BindIndexBuffer(this);
+	return context->MapBuffer(GL_ARRAY_BUFFER, access);
 }
 
-POGL_UINT32 POGLIndexBuffer::GetUID() const
+void* POGLIndexBuffer::MapRange(POGLDeviceContext* context, POGLRenderState* state, POGL_UINT32 offset, POGL_UINT32 length, GLbitfield access)
 {
-	return mUID;
+	mSyncObject->Lock();
+	mSyncObject->WaitSyncClient();
+	state->BindIndexBuffer(this);
+	return context->MapBufferRange(GL_ARRAY_BUFFER, offset, length, access);
 }
 
-GLuint POGLIndexBuffer::GetBufferID() const
+void POGLIndexBuffer::Unmap(POGLDeviceContext* context, POGLRenderState* state)
 {
-	return mBufferID;
-}
-
-GLenum POGLIndexBuffer::GetType() const
-{
-	return mType;
-}
-
-POGLSyncObject* POGLIndexBuffer::GetSyncObject()
-{
-	return mSyncObject;
+	context->UnmapBuffer(GL_ARRAY_BUFFER);
+	mSyncObject->QueueFence();
+	mSyncObject->Unlock();
 }

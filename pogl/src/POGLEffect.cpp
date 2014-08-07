@@ -12,8 +12,8 @@ namespace {
 	}
 }
 
-POGLEffect::POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, POGLSyncObject* syncObject, IPOGLDevice* device)
-: mRefCount(1), mProgramID(programID), mDevice(device), mUID(GenEffectUID()), mData(data), mSyncObject(syncObject), mUniforms(uniforms)
+POGLEffect::POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, IPOGLDevice* device)
+: mRefCount(1), mProgramID(programID), mDevice(device), mUID(GenEffectUID()), mData(data), mUniforms(uniforms)
 {
 	assert_not_null(data);
 }
@@ -39,43 +39,8 @@ void POGLEffect::Release()
 			context->Release();
 			mProgramID = 0;
 		}
-		if (mSyncObject != nullptr) {
-			delete mSyncObject;
-			mSyncObject = nullptr;
-		}
 		delete this;
 	}
-}
-
-IPOGLDevice* POGLEffect::GetDevice()
-{
-	mDevice->AddRef();
-	return mDevice;
-}
-
-POGL_HANDLE POGLEffect::GetHandlePtr()
-{
-	return this;
-}
-
-void POGLEffect::WaitSyncDriver()
-{
-	mSyncObject->WaitSyncDriver();
-}
-
-void POGLEffect::WaitSyncClient()
-{
-	mSyncObject->WaitSyncClient();
-}
-
-bool POGLEffect::WaitSyncClient(POGL_UINT64 timeout)
-{
-	return mSyncObject->WaitSyncClient(timeout);
-}
-
-bool POGLEffect::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
-{
-	return mSyncObject->WaitSyncClient(timeout, job);
 }
 
 bool POGLEffect::GetDepthTest()

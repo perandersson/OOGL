@@ -10,17 +10,11 @@ class POGLSyncObject;
 class POGLEffect : public IPOGLEffect
 {
 public:
-	POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, POGLSyncObject* syncObject, IPOGLDevice* device);
+	POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, IPOGLDevice* device);
 	~POGLEffect();
 
 	void AddRef();
 	void Release();
-	IPOGLDevice* GetDevice();
-	POGL_HANDLE GetHandlePtr();
-	void WaitSyncDriver();
-	void WaitSyncClient();
-	bool WaitSyncClient(POGL_UINT64 timeout);
-	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	bool GetDepthTest();
 	void SetDepthTest(bool b);
@@ -73,6 +67,5 @@ private:
 	POGL_UINT32 mUID;
 	std::recursive_mutex mMutex;
 	POGLEffectData* mData;
-	POGLSyncObject* mSyncObject;
 	std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> mUniforms;
 };

@@ -14,7 +14,7 @@
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRefCount(1), mReleasing(false), mRenderState(nullptr), mVertexBufferStream(nullptr), mDevice(device)
+: mRefCount(1), mReleasing(false), mRenderState(nullptr), mDevice(device)
 {
 }
 
@@ -81,8 +81,7 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 		}
 	}
 
-	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	return new POGLShaderProgram(shaderID, mDevice, type, new POGLSyncObject(sync, mDevice));
+	return new POGLShaderProgram(shaderID, mDevice, type);
 }
 
 IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
@@ -158,8 +157,7 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 		uniforms.insert(std::make_pair(p->name, p));
 	}
 
-	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	return new POGLEffect(programID, data, uniforms, new POGLSyncObject(sync, mDevice), mDevice);
+	return new POGLEffect(programID, data, uniforms, mDevice);
 }
 
 IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
@@ -288,20 +286,58 @@ IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 	return mRenderState->Apply(effect);
 }
 
-IPOGLStream* POGLDeviceContext::OpenStream(IPOGLVertexBuffer* buffer, POGLStreamType::Enum e)
+void* POGLDeviceContext::Map(IPOGLResource* resource, POGLStreamType::Enum e)
 {
-	assert_not_null(buffer);
+	assert_not_null(resource);
 
-	POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(buffer);
-	return OpenStream(vb, vb->GetSyncObject(), e);
+	const GLenum access = POGLEnum::ConvertForMapBuffer(e);
+	switch (resource->GetResourceType()) {
+	case POGLResourceType::INDEX_BUFFER:
+		return static_cast<POGLIndexBuffer*>(resource)->Map(this, mRenderState, access);
+	case POGLResourceType::VERTEX_BUFFER:
+		return static_cast<POGLVertexBuffer*>(resource)->Map(this, mRenderState, access);
+	case POGLResourceType::TEXTURE:
+		THROW_EXCEPTION(POGLException, "Not implemented");
+		break;
+	default:
+		THROW_EXCEPTION(POGLException, "Not implemented");
+	}
+
+	//glMapBuffer(mResourceMapping.target, access[(POGL_UINT32)e]);
 }
 
-IPOGLStream* POGLDeviceContext::OpenStream(IPOGLIndexBuffer* buffer, POGLStreamType::Enum e)
+void* POGLDeviceContext::MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e)
 {
-	assert_not_null(buffer);
+	assert_not_null(resource);
 
-	POGLIndexBuffer* ib = static_cast<POGLIndexBuffer*>(buffer);
-	return OpenStream(ib, ib->GetSyncObject(), e);
+	const GLbitfield access = POGLEnum::ConvertForMapBufferRange(e) | GL_MAP_UNSYNCHRONIZED_BIT;
+	switch (resource->GetResourceType()) {
+	case POGLResourceType::INDEX_BUFFER:
+		return static_cast<POGLIndexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
+	case POGLResourceType::VERTEX_BUFFER:
+		return static_cast<POGLVertexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
+	case POGLResourceType::TEXTURE:
+		THROW_EXCEPTION(POGLException, "Not implemented");
+		break;
+	default:
+		THROW_EXCEPTION(POGLException, "Not implemented");
+	}
+}
+
+void POGLDeviceContext::Unmap(IPOGLResource* resource)
+{
+	assert_not_null(resource);
+	switch (resource->GetResourceType()) {
+	case POGLResourceType::INDEX_BUFFER:
+		return static_cast<POGLIndexBuffer*>(resource)->Unmap(this, mRenderState);
+	case POGLResourceType::VERTEX_BUFFER:
+		return static_cast<POGLVertexBuffer*>(resource)->Unmap(this, mRenderState);
+	case POGLResourceType::TEXTURE:
+		THROW_EXCEPTION(POGLException, "Not implemented");
+		break;
+	default:
+		THROW_EXCEPTION(POGLException, "Not implemented");
+	}
 }
 
 void POGLDeviceContext::InitializeRenderState()
@@ -311,29 +347,15 @@ void POGLDeviceContext::InitializeRenderState()
 	}
 }
 
-IPOGLStream* POGLDeviceContext::OpenStream(POGLVertexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e)
-{
-	assert_not_null(buffer);
-	assert_not_null(syncObject);
-
-
-	return this;
-}
-
-IPOGLStream* POGLDeviceContext::OpenStream(POGLIndexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e)
-{
-	assert_not_null(buffer);
-	assert_not_null(syncObject);
-
-	return this;
-}
-
 void POGLDeviceContext::LoadExtensions()
 {
 	SET_EXTENSION_FUNC(PFNGLGENBUFFERSPROC, glGenBuffers);
 	SET_EXTENSION_FUNC(PFNGLDELETEBUFFERSPROC, glDeleteBuffers);
 	SET_EXTENSION_FUNC(PFNGLBINDBUFFERPROC, glBindBuffer);
 	SET_EXTENSION_FUNC(PFNGLBUFFERDATAPROC, glBufferData);
+	SET_EXTENSION_FUNC(PFNGLMAPBUFFERPROC, glMapBuffer);
+	SET_EXTENSION_FUNC(PFNGLMAPBUFFERRANGEPROC, glMapBufferRange);
+	SET_EXTENSION_FUNC(PFNGLUNMAPBUFFERPROC, glUnmapBuffer);
 
 	SET_EXTENSION_FUNC(PFNGLUSEPROGRAMPROC, glUseProgram);
 
@@ -413,6 +435,21 @@ void POGLDeviceContext::DeleteBuffer(GLuint bufferID)
 		return;
 
 	glDeleteBuffers(1, &bufferID);
+}
+
+void* POGLDeviceContext::MapBuffer(GLenum target, GLenum access)
+{
+	return glMapBuffer(target, access);
+}
+
+void* POGLDeviceContext::MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
+{
+	return glMapBufferRange(target, offset, length, access);
+}
+
+void POGLDeviceContext::UnmapBuffer(GLenum target)
+{
+	glUnmapBuffer(target);
 }
 
 void POGLDeviceContext::UseProgram(GLuint programID)

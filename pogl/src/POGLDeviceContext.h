@@ -5,8 +5,7 @@
 class POGLRenderState;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
-class POGLSyncObject;
-class POGLDeviceContext : public IPOGLDeviceContext, public IPOGLStream
+class POGLDeviceContext : public IPOGLDeviceContext
 {
 public:
 	POGLDeviceContext(IPOGLDevice* device);
@@ -27,9 +26,10 @@ public:
 	IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage);
 	IPOGLRenderState* Apply(IPOGLEffect* effect);
-	IPOGLStream* OpenStream(IPOGLVertexBuffer* buffer, POGLStreamType::Enum e);
-	IPOGLStream* OpenStream(IPOGLIndexBuffer* buffer, POGLStreamType::Enum e);
-	
+	void* Map(IPOGLResource* resource, POGLStreamType::Enum e);
+	void* MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e);
+	void Unmap(IPOGLResource* resource);
+
 	/*!
 	
 	*/
@@ -59,28 +59,6 @@ public:
 	virtual void* GetProcAddress(const char* functionName) = 0;
 
 	/*!
-		\brief Open a stream for the supplied vertex buffer in this context.
-
-		Useful for updating buffers from multiple threads at the same time.
-
-		\param buffer
-		\param syncObject
-		\param e
-	*/
-	IPOGLStream* OpenStream(POGLVertexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e);
-	
-	/*!
-		\brief Open a stream for the supplied vertex buffer in this context.
-
-		Useful for updating buffers from multiple threads at the same time.
-
-		\param buffer
-		\param syncObject
-		\param e
-	*/
-	IPOGLStream* OpenStream(POGLIndexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e);
-
-	/*!
 		\brief Binds the supplied bufferID to this context
 
 		\param target
@@ -94,7 +72,30 @@ public:
 		\param bufferID
 	*/
 	void DeleteBuffer(GLuint bufferID);
+
+	/*!
+		\brief Map buffer
+
+		\param target
+		\param access
+		\return
+	*/
+	void* MapBuffer(GLenum target, GLenum access);
 	
+	/*!
+		\brief Map buffer
+
+		\param target
+		\param access
+		\return
+	*/
+	void* MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access);
+	
+	/*!
+		\brief
+	*/
+	void UnmapBuffer(GLenum target);
+
 	/*!
 		\brief Use the supplied program
 
@@ -311,8 +312,6 @@ protected:
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;
 
-	POGLVertexBuffer* mVertexBufferStream;
-
 	//
 	// Extensions
 	//
@@ -321,6 +320,9 @@ protected:
 	PFNGLDELETEBUFFERSPROC glDeleteBuffers;
 	PFNGLBINDBUFFERPROC glBindBuffer;
 	PFNGLBUFFERDATAPROC glBufferData;
+	PFNGLMAPBUFFERPROC glMapBuffer;
+	PFNGLMAPBUFFERRANGEPROC glMapBufferRange;
+	PFNGLUNMAPBUFFERPROC glUnmapBuffer;
 
 	PFNGLUSEPROGRAMPROC glUseProgram;
 

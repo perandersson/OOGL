@@ -4,6 +4,7 @@
 #include "POGLIndexBuffer.h"
 #include "POGLEnum.h"
 #include "POGLSyncObject.h"
+#include "POGLRenderState.h"
 #include <atomic>
 
 namespace {
@@ -75,32 +76,14 @@ bool POGLVertexBuffer::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job
 	return mSyncObject->WaitSyncClient(timeout, job);
 }
 
-const POGL_VERTEX_LAYOUT* POGLVertexBuffer::GetLayout() const
+POGLResourceType::Enum POGLVertexBuffer::GetResourceType() const
 {
-	return mLayout;
+	return POGLResourceType::VERTEX_BUFFER;
 }
 
 POGL_UINT32 POGLVertexBuffer::GetNumVertices() const
 {
 	return mNumVertices;
-}
-
-IPOGLStream* POGLVertexBuffer::OpenStream(POGLStreamType::Enum e)
-{
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
-	IPOGLStream* stream = context->OpenStream(this, mSyncObject, e);
-	context->Release();
-	return stream;
-}
-
-POGL_UINT32 POGLVertexBuffer::GetUID() const
-{
-	return mUID;
-}
-
-GLuint POGLVertexBuffer::GetBufferID() const
-{
-	return mBufferID;
 }
 
 void POGLVertexBuffer::Draw(POGL_UINT32 startIndex)
@@ -139,7 +122,25 @@ void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex
 	glDrawElements(mPrimitiveType, count, indexBuffer->GetType(), indices);
 }
 
-POGLSyncObject* POGLVertexBuffer::GetSyncObject()
+void* POGLVertexBuffer::Map(POGLDeviceContext* context, POGLRenderState* state, GLenum access)
 {
-	return mSyncObject;
+	mSyncObject->Lock();
+	mSyncObject->WaitSyncClient();
+	state->BindVertexBuffer(this);
+	return context->MapBuffer(GL_ARRAY_BUFFER, access);
+}
+
+void* POGLVertexBuffer::MapRange(POGLDeviceContext* context, POGLRenderState* state, POGL_UINT32 offset, POGL_UINT32 length, GLbitfield access)
+{
+	mSyncObject->Lock();
+	mSyncObject->WaitSyncClient();
+	state->BindVertexBuffer(this);
+	return context->MapBufferRange(GL_ARRAY_BUFFER, offset, length, access);
+}
+
+void POGLVertexBuffer::Unmap(POGLDeviceContext* context, POGLRenderState* state)
+{
+	context->UnmapBuffer(GL_ARRAY_BUFFER);
+	mSyncObject->QueueFence();
+	mSyncObject->Unlock();
 }

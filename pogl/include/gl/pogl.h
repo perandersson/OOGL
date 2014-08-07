@@ -62,7 +62,6 @@ class IPOGLRenderState;
 
 class IPOGLVertexBuffer;
 class IPOGLIndexBuffer;
-class IPOGLStream;
 
 class IPOGLTexture;
 class IPOGLTexture1D;
@@ -426,13 +425,26 @@ struct POGLStreamType
 {
 	enum Enum {
 		/* Open a reading stream */
-		READ = 0,
+		//READ = 0,
 
 		/* Open a writing stream */
-		WRITE,
+		WRITE = 0,
 
 		/* Open the stream for reading and writing */
-		READ_AND_WRITE,
+		//READ_AND_WRITE,
+		COUNT
+	};
+};
+
+struct POGLResourceType
+{
+	enum Enum {
+		VERTEX_BUFFER = 0,
+
+		INDEX_BUFFER,
+
+		TEXTURE,
+
 		COUNT
 	};
 };
@@ -860,6 +872,11 @@ public:
 		\param job
 	*/
 	virtual bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
+
+	/*!
+		\brief Retrieves the resource type
+	*/
+	virtual POGLResourceType::Enum GetResourceType() const = 0;
 };
 
 /*!
@@ -1027,20 +1044,32 @@ public:
 	virtual IPOGLRenderState* Apply(IPOGLEffect* effect) = 0;
 
 	/*!
-		\brief Open a stream for the supplied vertex buffer
+		\brief Maps the supplied pointer to a memory location and return a pointer to it
 
-		\param buffer
+		\param resource
 		\param e
+		\return 
 	*/
-	virtual IPOGLStream* OpenStream(IPOGLVertexBuffer* buffer, POGLStreamType::Enum e) = 0;
+	virtual void* Map(IPOGLResource* resource, POGLStreamType::Enum e) = 0;
+	
 
 	/*!
-		\brief Open a stream for the supplied index buffer
+		\brief Maps the supplied pointer to a memory location and return a pointer to it. 
 
-		\param buffer
+		\param resource
+		\param offset
+		\param length
 		\param e
+		\return 
 	*/
-	virtual IPOGLStream* OpenStream(IPOGLIndexBuffer* buffer, POGLStreamType::Enum e) = 0;
+	virtual void* MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e) = 0;
+
+	/*!
+		\brief Unmaps the supplied resource and unlocks it so that OpenGL can resume drawing it in the driver.
+
+		\param resource
+	*/
+	virtual void Unmap(IPOGLResource* resource) = 0;
 };
 
 /*!
@@ -1139,7 +1168,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLShaderProgram : public IPOGLResource
+class IPOGLShaderProgram : public IPOGLInterface
 {
 public:
 };
@@ -1147,7 +1176,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLEffect : public IPOGLResource
+class IPOGLEffect : public IPOGLInterface
 {
 public:
 	/*!
@@ -1349,44 +1378,6 @@ public:
 };
 
 /*!
-
-*/
-class IPOGLStream
-{
-public:
-	virtual ~IPOGLStream() {}
-
-	/*!
-		\brief Update the entire stream with new data. 
-
-		\remark This will deattach the previous vertex data before replacing it.
-
-		\param data
-		\param size
-	*/
-	virtual void Update(const void* data, POGL_UINT32 size) = 0;
-
-	/*!
-		\brief Update parts of the stream with new data. 
-
-		\param data
-		\param offset
-		\param size
-	*/
-	virtual void UpdateRange(const void* data, POGL_UINT32 offset, POGL_UINT32 size) = 0;
-
-	/*!
-		\brief Retrieves a pointer to the data
-	*/
-	virtual void* GetPtr() = 0;
-
-	/*!
-		\brief Close this stream and unmap it's resources
-	*/
-	virtual void Close() = 0;
-};
-
-/*!
 	\brief The default texture interface
 */
 class IPOGLTexture : public IPOGLResource
@@ -1443,11 +1434,6 @@ public:
 		\brief Retrieves the number of vertices located in this buffer
 	*/
 	virtual POGL_UINT32 GetNumVertices() const = 0;
-
-	/*!
-		\brief Open a stream
-	*/
-	virtual IPOGLStream* OpenStream(POGLStreamType::Enum e) = 0;
 };
 
 /*!
@@ -1460,11 +1446,6 @@ public:
 		\brief Retrieves the number of elements found in this buffer
 	*/
 	virtual POGL_UINT32 GetNumElements() const = 0;
-	
-	/*!
-		\brief Open a stream
-	*/
-	virtual IPOGLStream* OpenStream(POGLStreamType::Enum e) = 0;
 };
 
 /*!
@@ -1531,6 +1512,15 @@ class POGLSyncException : public POGLException {
 public:
 	POGLSyncException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLSyncException();
+};
+
+/*!
+	\brief Excepton thrown if you are using the streaming functionality in a way that's not compatible.
+*/
+class POGLStreamException : public POGLException {
+public:
+	POGLStreamException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLStreamException();
 };
 
 #include <cstdarg>
