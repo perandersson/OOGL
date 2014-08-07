@@ -62,6 +62,7 @@ class IPOGLRenderState;
 
 class IPOGLVertexBuffer;
 class IPOGLIndexBuffer;
+class IPOGLStream;
 
 class IPOGLTexture;
 class IPOGLTexture1D;
@@ -419,6 +420,21 @@ struct POGLDstFactor
 	/* Default destination factor used by the rendering engine */
 	static const Enum DEFAULT = ZERO;
 
+};
+
+struct POGLStreamType
+{
+	enum Enum {
+		/* Open a reading stream */
+		READ = 0,
+
+		/* Open a writing stream */
+		WRITE,
+
+		/* Open the stream for reading and writing */
+		READ_AND_WRITE,
+		COUNT
+	};
 };
 
 //
@@ -1009,6 +1025,22 @@ public:
 		\return
 	*/
 	virtual IPOGLRenderState* Apply(IPOGLEffect* effect) = 0;
+
+	/*!
+		\brief Open a stream for the supplied vertex buffer
+
+		\param buffer
+		\param e
+	*/
+	virtual IPOGLStream* OpenStream(IPOGLVertexBuffer* buffer, POGLStreamType::Enum e) = 0;
+
+	/*!
+		\brief Open a stream for the supplied index buffer
+
+		\param buffer
+		\param e
+	*/
+	virtual IPOGLStream* OpenStream(IPOGLIndexBuffer* buffer, POGLStreamType::Enum e) = 0;
 };
 
 /*!
@@ -1317,6 +1349,44 @@ public:
 };
 
 /*!
+
+*/
+class IPOGLStream
+{
+public:
+	virtual ~IPOGLStream() {}
+
+	/*!
+		\brief Update the entire stream with new data. 
+
+		\remark This will deattach the previous vertex data before replacing it.
+
+		\param data
+		\param size
+	*/
+	virtual void Update(const void* data, POGL_UINT32 size) = 0;
+
+	/*!
+		\brief Update parts of the stream with new data. 
+
+		\param data
+		\param offset
+		\param size
+	*/
+	virtual void UpdateRange(const void* data, POGL_UINT32 offset, POGL_UINT32 size) = 0;
+
+	/*!
+		\brief Retrieves a pointer to the data
+	*/
+	virtual void* GetPtr() = 0;
+
+	/*!
+		\brief Close this stream and unmap it's resources
+	*/
+	virtual void Close() = 0;
+};
+
+/*!
 	\brief The default texture interface
 */
 class IPOGLTexture : public IPOGLResource
@@ -1373,6 +1443,11 @@ public:
 		\brief Retrieves the number of vertices located in this buffer
 	*/
 	virtual POGL_UINT32 GetNumVertices() const = 0;
+
+	/*!
+		\brief Open a stream
+	*/
+	virtual IPOGLStream* OpenStream(POGLStreamType::Enum e) = 0;
 };
 
 /*!
@@ -1385,6 +1460,11 @@ public:
 		\brief Retrieves the number of elements found in this buffer
 	*/
 	virtual POGL_UINT32 GetNumElements() const = 0;
+	
+	/*!
+		\brief Open a stream
+	*/
+	virtual IPOGLStream* OpenStream(POGLStreamType::Enum e) = 0;
 };
 
 /*!

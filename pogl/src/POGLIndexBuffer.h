@@ -19,6 +19,7 @@ public:
 	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	POGL_UINT32 GetNumElements() const;
+	IPOGLStream* OpenStream(POGLStreamType::Enum e);
 
 	/*!
 		\brief
@@ -43,6 +44,11 @@ public:
 		\brief Retrieves the value type 
 	*/
 	GLenum GetType() const;
+
+	/*!
+		\brief Retrieves the object responsible for making sure that all resources are synchronized between all the OpenGL threads
+	*/
+	POGLSyncObject* GetSyncObject();
 
 private:
 	POGL_UINT32 mRefCount;

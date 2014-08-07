@@ -14,7 +14,7 @@
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRefCount(1), mReleasing(false), mRenderState(nullptr), mDevice(device)
+: mRefCount(1), mReleasing(false), mRenderState(nullptr), mVertexBufferStream(nullptr), mDevice(device)
 {
 }
 
@@ -288,11 +288,44 @@ IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 	return mRenderState->Apply(effect);
 }
 
+IPOGLStream* POGLDeviceContext::OpenStream(IPOGLVertexBuffer* buffer, POGLStreamType::Enum e)
+{
+	assert_not_null(buffer);
+
+	POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(buffer);
+	return OpenStream(vb, vb->GetSyncObject(), e);
+}
+
+IPOGLStream* POGLDeviceContext::OpenStream(IPOGLIndexBuffer* buffer, POGLStreamType::Enum e)
+{
+	assert_not_null(buffer);
+
+	POGLIndexBuffer* ib = static_cast<POGLIndexBuffer*>(buffer);
+	return OpenStream(ib, ib->GetSyncObject(), e);
+}
+
 void POGLDeviceContext::InitializeRenderState()
 {
 	if (mRenderState == nullptr) {
 		mRenderState = new POGLRenderState(this);
 	}
+}
+
+IPOGLStream* POGLDeviceContext::OpenStream(POGLVertexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e)
+{
+	assert_not_null(buffer);
+	assert_not_null(syncObject);
+
+
+	return this;
+}
+
+IPOGLStream* POGLDeviceContext::OpenStream(POGLIndexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e)
+{
+	assert_not_null(buffer);
+	assert_not_null(syncObject);
+
+	return this;
 }
 
 void POGLDeviceContext::LoadExtensions()

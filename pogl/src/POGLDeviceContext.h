@@ -3,7 +3,10 @@
 #include <gl/pogl.h>
 
 class POGLRenderState;
-class POGLDeviceContext : public IPOGLDeviceContext
+class POGLVertexBuffer;
+class POGLIndexBuffer;
+class POGLSyncObject;
+class POGLDeviceContext : public IPOGLDeviceContext, public IPOGLStream
 {
 public:
 	POGLDeviceContext(IPOGLDevice* device);
@@ -24,6 +27,8 @@ public:
 	IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage);
 	IPOGLRenderState* Apply(IPOGLEffect* effect);
+	IPOGLStream* OpenStream(IPOGLVertexBuffer* buffer, POGLStreamType::Enum e);
+	IPOGLStream* OpenStream(IPOGLIndexBuffer* buffer, POGLStreamType::Enum e);
 	
 	/*!
 	
@@ -52,6 +57,28 @@ public:
 		\return
 	*/
 	virtual void* GetProcAddress(const char* functionName) = 0;
+
+	/*!
+		\brief Open a stream for the supplied vertex buffer in this context.
+
+		Useful for updating buffers from multiple threads at the same time.
+
+		\param buffer
+		\param syncObject
+		\param e
+	*/
+	IPOGLStream* OpenStream(POGLVertexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e);
+	
+	/*!
+		\brief Open a stream for the supplied vertex buffer in this context.
+
+		Useful for updating buffers from multiple threads at the same time.
+
+		\param buffer
+		\param syncObject
+		\param e
+	*/
+	IPOGLStream* OpenStream(POGLIndexBuffer* buffer, POGLSyncObject* syncObject, POGLStreamType::Enum e);
 
 	/*!
 		\brief Binds the supplied bufferID to this context
@@ -283,6 +310,8 @@ protected:
 	bool mReleasing;
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;
+
+	POGLVertexBuffer* mVertexBufferStream;
 
 	//
 	// Extensions

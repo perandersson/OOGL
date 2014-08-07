@@ -21,6 +21,7 @@ public:
 
 	const POGL_VERTEX_LAYOUT* GetLayout() const;
 	POGL_UINT32 GetNumVertices() const;
+	IPOGLStream* OpenStream(POGLStreamType::Enum e);
 
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer
@@ -51,6 +52,11 @@ public:
 		\brief 
 	*/
 	void Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
+	
+	/*!
+		\brief Retrieves the object responsible for making sure that all resources are synchronized between all the OpenGL threads
+	*/
+	POGLSyncObject* GetSyncObject();
 
 private:
 	POGL_UINT32 mRefCount;

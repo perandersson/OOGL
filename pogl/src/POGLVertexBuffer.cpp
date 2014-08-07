@@ -31,8 +31,8 @@ void POGLVertexBuffer::Release()
 {
 	if (--mRefCount == 0) {
 		if (mBufferID != 0) {
-			IPOGLDeviceContext* context = mDevice->GetDeviceContext();
-			static_cast<POGLDeviceContext*>(context)->DeleteBuffer(mBufferID);
+			POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+			context->DeleteBuffer(mBufferID);
 			context->Release();
 			mBufferID = 0;
 		}
@@ -85,6 +85,14 @@ POGL_UINT32 POGLVertexBuffer::GetNumVertices() const
 	return mNumVertices;
 }
 
+IPOGLStream* POGLVertexBuffer::OpenStream(POGLStreamType::Enum e)
+{
+	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	IPOGLStream* stream = context->OpenStream(this, mSyncObject, e);
+	context->Release();
+	return stream;
+}
+
 POGL_UINT32 POGLVertexBuffer::GetUID() const
 {
 	return mUID;
@@ -129,4 +137,9 @@ void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex
 
 	const GLvoid* indices = (const GLvoid*)(startIndex * indexBuffer->GetTypeSize());
 	glDrawElements(mPrimitiveType, count, indexBuffer->GetType(), indices);
+}
+
+POGLSyncObject* POGLVertexBuffer::GetSyncObject()
+{
+	return mSyncObject;
 }

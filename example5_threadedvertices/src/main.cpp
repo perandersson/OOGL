@@ -61,20 +61,24 @@ int main()
 		};
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::DYNAMIC);
 
-		//std::atomic<bool> running(true);
-		//std::thread t([device, vertexBuffer, &running] {
-		//	IPOGLDeviceContext* context = device->GetDeviceContext();
-		//	while (running.load()) {
-		//		// Lock
-		//		// glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_UNSYNCHRONIZED_BIT​);
-		//		// Fence
-		//		// glMapBuffer
-		//		// glUnmapBuffer​
-		//		//POGL_POSITION_VERTEX* ptr = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, )
-		//		context->StreamBufferData()
-		//	}
-		//	context->Release();
-		//});
+		std::atomic<bool> running(true);
+		std::thread t([device, vertexBuffer, &running] {
+			IPOGLDeviceContext* context = device->GetDeviceContext();
+			while (running.load()) {
+				// Lock
+				// glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_UNSYNCHRONIZED_BIT​);
+				// Fence
+				// glMapBuffer
+				// glUnmapBuffer​
+				//POGL_POSITION_VERTEX* ptr = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, )
+				IPOGLStream* stream = context->OpenStream(vertexBuffer, POGLStreamType::WRITE);
+				POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->GetPtr();
+				vertices[0].position.x = -1.0f;
+				stream->Release();
+				
+			}
+			context->Release();
+		});
 
 		while (POGLProcessEvents()) {
 			// Prepare the simple effect
@@ -93,8 +97,8 @@ int main()
 			device->SwapBuffers();
 		}
 
-		//running.store(false);
-		//t.join();
+		running.store(false);
+		t.join();
 
 		// Release resources
 		vertexBuffer->Release();

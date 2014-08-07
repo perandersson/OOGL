@@ -78,6 +78,14 @@ POGL_UINT32 POGLIndexBuffer::GetNumElements() const
 	return mNumIndices;
 }
 
+IPOGLStream* POGLIndexBuffer::OpenStream(POGLStreamType::Enum e)
+{
+	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	IPOGLStream* stream = context->OpenStream(this, mSyncObject, e);
+	context->Release();
+	return stream;
+}
+
 POGL_UINT32 POGLIndexBuffer::GetUID() const
 {
 	return mUID;
@@ -91,4 +99,9 @@ GLuint POGLIndexBuffer::GetBufferID() const
 GLenum POGLIndexBuffer::GetType() const
 {
 	return mType;
+}
+
+POGLSyncObject* POGLIndexBuffer::GetSyncObject()
+{
+	return mSyncObject;
 }
