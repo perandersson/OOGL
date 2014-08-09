@@ -1,6 +1,8 @@
 ﻿#include <gl/pogl.h>
 #include <thread>
 #include <atomic>
+#include <vector>
+#include <cmath>
 #include "POGLExampleWindow.h"
 
 static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
@@ -22,6 +24,8 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 		gl_FragColor = vec4(1, 1, 1, 1);
 	}
 )" };
+
+static const POGL_UINT32 CIRCLE_PTS = 365;
 
 int main()
 {
@@ -53,50 +57,91 @@ int main()
 		vertexShader->Release();
 		fragmentShader->Release();
 
-		// Create vertex buffer
-		const POGL_POSITION_VERTEX VERTICES[] = {
-			POGL_POSITION_VERTEX(POGL_VECTOR3F(-0.5f, -0.5f, 0.0f)),
-			POGL_POSITION_VERTEX(POGL_VECTOR3F(0.0f, 0.5f, 0.0f)),
-			POGL_POSITION_VERTEX(POGL_VECTOR3F(0.5f, -0.5f, 0.0f))
-		};
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::DYNAMIC);
+		//
+		// Create vertex buffer for circle geometry
+		//
+
+		std::vector<POGL_POSITION_VERTEX> vertices;
+		vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3F(0, 0, 0)));
+		for (POGL_UINT32 i = 0; i < CIRCLE_PTS; ++i) {
+			const POGL_FLOAT x = 0.1f * cosf(i * 0.0174532925f);
+			const POGL_FLOAT y = 0.1f * sinf(i * 0.0174532925f);
+			vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3F(x, y, 0)));
+		}
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::DYNAMIC);
 
 		std::atomic<bool> running(true);
-		std::thread t([device, vertexBuffer, &running] {
-			IPOGLDeviceContext* context = device->GetDeviceContext();
-			while (running.load()) {
-				// Lock
-				// glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_UNSYNCHRONIZED_BIT​);
-				// Fence
-				// glMapBuffer
-				// glUnmapBuffer​
-				//POGL_POSITION_VERTEX* ptr = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, )
-				POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, POGLStreamType::WRITE);
-				vertices[0].position.x = -1.0f;
-				context->Unmap(vertexBuffer);
+		std::atomic<POGL_FLOAT> totalTime(0.0f);
+		
+		//
+		// Create two threads. 
+		//
+		// The first thread updates the first half of the circle. The second
+		// thread updates the second half of the circle.
+		//
+
+		std::thread t1([&device, &vertexBuffer, &running, &totalTime] {
+			try {
+				IPOGLDeviceContext* context = device->GetDeviceContext();
+				while (running.load()) {
+					const POGL_FLOAT totalTimeFlt = totalTime.load();
+					const POGL_UINT32 offsetIndex = 1;
+					const POGL_UINT32 length = CIRCLE_PTS / 2;
+					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
+					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map(offsetIndex * sizeof(POGL_POSITION_VERTEX), length * sizeof(POGL_POSITION_VERTEX));
+					const POGL_FLOAT radius = sinf(totalTimeFlt * 0.0174532925f) * 5.0f;
+					for (POGL_UINT32 i = 0; i < length; ++i) {
+						vertices[i].position.x = radius * cosf(i * 0.0174532925f);
+						vertices[i].position.y = radius * sinf(i * 0.0174532925f);
+						vertices[i].position.z = 0.0f;
+					}
+					stream->Close();
+				}
+				context->Release();
 			}
-			context->Release();
+			catch (POGLException e) {
+				POGLAlert(e);
+			}
 		});
 
+		//std::thread t2([&device, &vertexBuffer, &running, &totalTime] {
+		//	try {
+		//		IPOGLDeviceContext* context = device->GetDeviceContext();
+		//		while (running.load()) {
+		//			const POGL_FLOAT totalTimeFlt = totalTime.load();
+		//			const POGL_UINT32 offsetIndex = 1 + (CIRCLE_PTS / 2);
+		//			const POGL_UINT32 length = CIRCLE_PTS / 2;
+		//			IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
+		//			POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map(offsetIndex * sizeof(POGL_POSITION_VERTEX), length * sizeof(POGL_POSITION_VERTEX));
+		//			for (POGL_UINT32 i = 0; i < length; ++i) {
+		//				vertices[i].position.x = sinf(totalTime) * cosf((i + length) * 0.0174532925f);
+		//				vertices[i].position.y = sinf(totalTime) * sinf((i + length) * 0.0174532925f);
+		//			}
+		//			stream->Close();
+		//		}
+		//		context->Release();
+		//	}
+		//	catch (POGLException e) {
+		//		POGLAlert(e);
+		//	}
+		//});
+
+		POGL_FLOAT totalTimeFlt = 0.0f;
 		while (POGLProcessEvents()) {
-			// Prepare the simple effect
+			totalTimeFlt += POGLGetTimeSinceLastTick();
+			totalTime.store(totalTimeFlt);
+
 			IPOGLRenderState* state = context->Apply(simpleEffect);
-
-			// Clear the color and depth buffer
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-
-			// Draw the vertices inside the vertex buffer
 			state->Draw(vertexBuffer);
-
-			// Nofiy the rendering engine that we are finished using the bound effect this frame
 			state->EndFrame();
 
-			// Swap the back buffer with the front buffer
 			device->SwapBuffers();
 		}
 
 		running.store(false);
-		t.join();
+		t1.join();
+		//t2.join();
 
 		// Release resources
 		vertexBuffer->Release();
@@ -104,7 +149,7 @@ int main()
 		context->Release();
 	}
 	catch (POGLException e) {
-		POGLAlert(windowHandle, e);
+		POGLAlert(e);
 	}
 
 	device->Release();

@@ -13,48 +13,52 @@ POGLSyncObject::~POGLSyncObject()
 {
 	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 	if (mSync != nullptr) {
-		std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
+		std::lock_guard<std::recursive_mutex> wlock(mWriteLock);
+		std::lock_guard<std::recursive_mutex> rlock(mReadLock);
 		context->DeleteSync(mSync);
 		mSync = nullptr;
 	}
 	context->Release();
 }
 
-void POGLSyncObject::WaitSyncDriver()
+void POGLSyncObject::WaitSyncDriver(POGLDeviceContext* context)
 {
-	std::lock_guard<std::recursive_mutex> lock(mGlobalMutex);
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	{
+		const GLenum error = glGetError();
+		if (error != GL_NO_ERROR)
+			THROW_EXCEPTION(POGLException, "Could not wait for driver sync. Reason: %d", error);
+	}
 	context->WaitSync(GetSyncObject(), 0, GL_TIMEOUT_IGNORED);
-	context->Release();
-	CHECK_GL("Could not wait for driver sync");
+	//CHECK_GL("Could not wait for driver sync");
+	{ 
+		const GLenum error = glGetError(); 
+		if (error != GL_NO_ERROR) 
+			THROW_EXCEPTION(POGLException, "Could not wait for driver sync. Reason: %d", error); 
+	}
 }
 
-void POGLSyncObject::WaitSyncClient()
+void POGLSyncObject::WaitSyncClient(POGLDeviceContext* context)
 {
-	if (!WaitSyncClient(GL_TIMEOUT_IGNORED)) {
+	if (!WaitSyncClient(context, GL_TIMEOUT_IGNORED)) {
 		THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
 	}
 }
 
-bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout)
+bool POGLSyncObject::WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout)
 {
-	std::lock_guard<std::recursive_mutex> lock(mGlobalMutex);
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	std::lock_guard<std::recursive_mutex> lock(mReadLock);
 	const GLenum result = context->ClientWaitSync(GetSyncObject(), 0, timeout);
-	context->Release();
 	CHECK_GL("Could not wait for client sync");
 	if (result == GL_WAIT_FAILED) {
-		context->Release();
 		THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
 	}
 
 	return result == GL_ALREADY_SIGNALED || result == GL_CONDITION_SATISFIED;
 }
 
-bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+bool POGLSyncObject::WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 {
-	std::lock_guard<std::recursive_mutex> lock(mGlobalMutex);
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	std::lock_guard<std::recursive_mutex> lock(mReadLock);
 	bool synchronized = true;
 	POGL_UINT32 failCount = 0;
 	GLsync syncObject = GetSyncObject();
@@ -63,7 +67,6 @@ bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 
 		// On error then throw exception
 		if (result == GL_WAIT_FAILED) {
-			context->Release();
 			THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
 		}
 
@@ -80,34 +83,45 @@ bool POGLSyncObject::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 		}
 	}
 
-	context->Release();
 	CHECK_GL("Could not wait for client sync");
 	return synchronized;
 }
 
-void POGLSyncObject::Lock()
+void POGLSyncObject::LockRead()
 {
-	mGlobalMutex.lock();
+	mReadLock.lock();
 }
 
-void POGLSyncObject::Unlock()
+void POGLSyncObject::UnlockRead()
 {
-	mGlobalMutex.unlock();
+	mReadLock.unlock();
+}
+
+void POGLSyncObject::LockWrite()
+{
+	mWriteLock.lock();
+}
+
+void POGLSyncObject::UnlockWrite()
+{
+	mWriteLock.unlock();
 }
 
 GLsync POGLSyncObject::GetSyncObject()
 {
-	std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
+	std::lock_guard<std::recursive_mutex> lock(mReadLock);
 	return mSync;
 }
 
-void POGLSyncObject::QueueFence()
+void POGLSyncObject::QueueFence(POGLDeviceContext* context)
 {
-	std::lock_guard<std::recursive_mutex> global_lock(mGlobalMutex);
-	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	LockWrite();
+	LockRead();
 	GLsync sync = context->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	std::lock_guard<std::recursive_mutex> lock(mSyncMutex);
+	glFlush();
 	context->DeleteSync(mSync);
-	context->Release();
 	mSync = sync;
+	UnlockRead();
+	UnlockWrite();
+	CHECK_GL("Could not queue a new fence object");
 }

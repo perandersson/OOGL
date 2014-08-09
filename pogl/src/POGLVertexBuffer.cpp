@@ -56,91 +56,54 @@ POGL_HANDLE POGLVertexBuffer::GetHandlePtr()
 	return this;
 }
 
-void POGLVertexBuffer::WaitSyncDriver()
+void POGLVertexBuffer::WaitSyncDriver(IPOGLDeviceContext* context)
 {
-	mSyncObject->WaitSyncDriver();
+	mSyncObject->WaitSyncDriver(static_cast<POGLDeviceContext*>(context));
 }
 
-void POGLVertexBuffer::WaitSyncClient()
+void POGLVertexBuffer::WaitSyncClient(IPOGLDeviceContext* context)
 {
-	mSyncObject->WaitSyncClient();
+	mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context));
 }
 
-bool POGLVertexBuffer::WaitSyncClient(POGL_UINT64 timeout)
+bool POGLVertexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout)
 {
-	return mSyncObject->WaitSyncClient(timeout);
+	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout);
 }
 
-bool POGLVertexBuffer::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+bool POGLVertexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 {
-	return mSyncObject->WaitSyncClient(timeout, job);
+	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout, job);
 }
 
-POGLResourceType::Enum POGLVertexBuffer::GetResourceType() const
-{
-	return POGLResourceType::VERTEX_BUFFER;
-}
 
 POGL_UINT32 POGLVertexBuffer::GetNumVertices() const
 {
 	return mNumVertices;
 }
 
-void POGLVertexBuffer::Draw(POGL_UINT32 startIndex)
+void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGL_UINT32 startIndex)
 {
-	Draw(startIndex, mNumVertices);
+	mSyncObject->WaitSyncDriver(context);
+	glDrawArrays(mPrimitiveType, startIndex, mNumVertices);
 }
 
-void POGLVertexBuffer::Draw(POGL_UINT32 startIndex, POGL_UINT32 count)
+void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGL_UINT32 startIndex, POGL_UINT32 count)
 {
-	if (count > mNumVertices - startIndex) {
-		count = mNumVertices - startIndex;
-	}
-
+	mSyncObject->WaitSyncDriver(context);
 	glDrawArrays(mPrimitiveType, startIndex, count);
 }
 
-void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
+void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
 {
 	assert_not_null(indexBuffer);
-
-	const POGL_UINT32 numIndices = indexBuffer->GetNumElements();
-	const GLvoid* indices = (const GLvoid*)(startIndex * indexBuffer->GetTypeSize());
-	glDrawElements(mPrimitiveType, numIndices, indexBuffer->GetType(), indices);
+	mSyncObject->WaitSyncDriver(context);
+	indexBuffer->Draw(context, this, mPrimitiveType, startIndex);
 }
 
-void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
+void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
 {
 	assert_not_null(indexBuffer);
-
-	const POGL_UINT32 numIndices = indexBuffer->GetNumElements();
-	if (count > numIndices - startIndex) {
-		count = numIndices - startIndex;
-	}
-
-	const GLvoid* indices = (const GLvoid*)(startIndex * indexBuffer->GetTypeSize());
-	glDrawElements(mPrimitiveType, count, indexBuffer->GetType(), indices);
-}
-
-void* POGLVertexBuffer::Map(POGLDeviceContext* context, POGLRenderState* state, GLenum access)
-{
-	mSyncObject->Lock();
-	mSyncObject->WaitSyncClient();
-	state->BindVertexBuffer(this);
-	return context->MapBuffer(GL_ARRAY_BUFFER, access);
-}
-
-void* POGLVertexBuffer::MapRange(POGLDeviceContext* context, POGLRenderState* state, POGL_UINT32 offset, POGL_UINT32 length, GLbitfield access)
-{
-	mSyncObject->Lock();
-	mSyncObject->WaitSyncClient();
-	state->BindVertexBuffer(this);
-	return context->MapBufferRange(GL_ARRAY_BUFFER, offset, length, access);
-}
-
-void POGLVertexBuffer::Unmap(POGLDeviceContext* context, POGLRenderState* state)
-{
-	context->UnmapBuffer(GL_ARRAY_BUFFER);
-	mSyncObject->QueueFence();
-	mSyncObject->Unlock();
+	mSyncObject->WaitSyncDriver(context);
+	indexBuffer->Draw(context, this, mPrimitiveType, startIndex, count);
 }

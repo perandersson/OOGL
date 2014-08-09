@@ -48,7 +48,7 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	wglDeleteContext(temp);
 	if (mRenderContext == nullptr)
 		return false;
-	
+
 	return true;
 }
 

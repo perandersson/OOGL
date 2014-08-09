@@ -12,10 +12,10 @@ public:
 	void AddRef();
 	void Release();
 
-	void WaitSyncDriver();
-	void WaitSyncClient();
-	bool WaitSyncClient(POGL_UINT64 timeout);
-	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+	void WaitSyncDriver(IPOGLDeviceContext* context);
+	void WaitSyncClient(IPOGLDeviceContext* context);
+	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
+	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	POGL_UINT32 GetUID() const;
 	GLuint GetTextureID() const;

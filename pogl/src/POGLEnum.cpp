@@ -79,7 +79,7 @@ GLenum POGLEnum::Convert(POGLBufferUsage::Enum e)
 {
 	static GLenum values[POGLBufferUsage::COUNT] = {
 		GL_STATIC_DRAW,
-		GL_STREAM_DRAW
+		GL_DYNAMIC_DRAW
 	};
 
 	return values[(POGL_UINT32)e];
@@ -172,19 +172,19 @@ GLenum POGLEnum::Convert(POGLDstFactor::Enum dfactor)
 	return enums[(POGL_UINT32)dfactor];
 }
 
-GLenum POGLEnum::ConvertForMapBuffer(POGLStreamType::Enum e)
+GLenum POGLEnum::ConvertForMapBuffer(POGLResourceStreamType::Enum e)
 {
-	static GLenum access[POGLStreamType::COUNT] = {
+	static GLenum access[POGLResourceStreamType::COUNT] = {
 		GL_WRITE_ONLY
 	};
 
 	return access[(POGL_UINT32)e];
 }
 
-GLbitfield POGLEnum::ConvertForMapBufferRange(POGLStreamType::Enum e)
+GLbitfield POGLEnum::ConvertForMapBufferRange(POGLResourceStreamType::Enum e)
 {
-	static GLenum access[POGLStreamType::COUNT] = {
-		GL_MAP_WRITE_BIT
+	static GLenum access[POGLResourceStreamType::COUNT] = {
+		GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT
 	};
 
 	return access[(POGL_UINT32)e];
@@ -230,6 +230,7 @@ GLenum POGLEnum::Convert(POGLPrimitiveType::Enum e)
 		GL_POINTS,
 		GL_TRIANGLES,
 		GL_TRIANGLE_STRIP,
+		GL_TRIANGLE_FAN,
 		GL_LINES,
 		GL_LINE_LOOP,
 	};

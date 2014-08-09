@@ -21,9 +21,14 @@ extern bool POGLProcessEvents();
 	\param windowHandle
 	\param e
 */
-extern void POGLAlert(POGL_HANDLE windowHandle, const POGLException& e);
+extern void POGLAlert(const POGLException& e);
 
 /*!
 	\brief Destroys the example window
 */
 extern void POGLDestroyExampleWindow(POGL_HANDLE windowHandle);
+
+/*!
+
+*/
+extern POGL_FLOAT POGLGetTimeSinceLastTick();

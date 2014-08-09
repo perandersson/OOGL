@@ -3,31 +3,42 @@
 #include <gl/pogl.h>
 #include <mutex>
 
+class POGLDeviceContext;
 class POGLSyncObject
 {
 public:
 	POGLSyncObject(GLsync initSync, IPOGLDevice* device);
 	~POGLSyncObject();
 
-	void WaitSyncDriver();
-	void WaitSyncClient();
-	bool WaitSyncClient(POGL_UINT64 timeout);
-	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+	void WaitSyncDriver(POGLDeviceContext* context);
+	void WaitSyncClient(POGLDeviceContext* context);
+	bool WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout);
+	bool WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	/*!
-		\brief Lock
+		\brief Lock CPU access to this instance from other threads
 	*/
-	void Lock();
+	void LockRead();
 
 	/*!
+		\brief Unlocks CPU access to this instance from other threads
+	*/
+	void UnlockRead();
 	
+	/*!
+		\brief Locks write access to this object
 	*/
-	void Unlock();
+	void LockWrite();
+
+	/*!
+		\brief Unlocks write access to this object
+	*/
+	void UnlockWrite();
 	
 	/*!
 		\brief Queue a new fence object
 	*/
-	void QueueFence();
+	void QueueFence(POGLDeviceContext* context);
 
 private:
 	/*!
@@ -36,8 +47,8 @@ private:
 	GLsync GetSyncObject();
 
 private:
-	std::recursive_mutex mSyncMutex;
-	std::recursive_mutex mGlobalMutex;
+	std::recursive_mutex mReadLock;
+	std::recursive_mutex mWriteLock;
 	GLsync mSync;
 	IPOGLDevice* mDevice;
 };

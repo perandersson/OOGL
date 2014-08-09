@@ -5,6 +5,7 @@
 class POGLRenderState;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
+class POGLBufferResourceStream;
 class POGLDeviceContext : public IPOGLDeviceContext
 {
 public:
@@ -26,9 +27,8 @@ public:
 	IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage);
 	IPOGLRenderState* Apply(IPOGLEffect* effect);
-	void* Map(IPOGLResource* resource, POGLStreamType::Enum e);
-	void* MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e);
-	void Unmap(IPOGLResource* resource);
+	IPOGLResourceStream* OpenStream(IPOGLVertexBuffer* resource, POGLResourceStreamType::Enum e);
+	IPOGLResourceStream* OpenStream(IPOGLIndexBuffer* resource, POGLResourceStreamType::Enum e);
 
 	/*!
 	
@@ -67,6 +67,11 @@ public:
 	void BindBuffer(GLenum target, GLuint bufferID);
 
 	/*!
+	
+	*/
+	void BufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage);
+
+	/*!
 		\brief Delete the supplied bufferID
 
 		\param bufferID
@@ -94,7 +99,7 @@ public:
 	/*!
 		\brief
 	*/
-	void UnmapBuffer(GLenum target);
+	GLboolean UnmapBuffer(GLenum target);
 
 	/*!
 		\brief Use the supplied program
@@ -311,6 +316,7 @@ protected:
 	bool mReleasing;
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;
+	POGLBufferResourceStream* mResourceStream;
 
 	//
 	// Extensions

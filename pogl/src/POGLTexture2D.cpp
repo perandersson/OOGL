@@ -46,30 +46,30 @@ POGL_HANDLE POGLTexture2D::GetHandlePtr()
 	return mInternalResource;
 }
 
-void POGLTexture2D::WaitSyncDriver()
+void POGLTexture2D::WaitSyncDriver(IPOGLDeviceContext* context)
 {
-	mInternalResource->WaitSyncDriver();
+	mInternalResource->WaitSyncDriver(context);
 }
 
-void POGLTexture2D::WaitSyncClient()
+void POGLTexture2D::WaitSyncClient(IPOGLDeviceContext* context)
 {
-	mInternalResource->WaitSyncClient();
+	mInternalResource->WaitSyncClient(context);
 }
 
-bool POGLTexture2D::WaitSyncClient(POGL_UINT64 timeout)
+bool POGLTexture2D::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout)
 {
-	return mInternalResource->WaitSyncClient(timeout);
+	return mInternalResource->WaitSyncClient(context, timeout);
 }
 
-bool POGLTexture2D::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+bool POGLTexture2D::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 {
-	return mInternalResource->WaitSyncClient(timeout, job);
+	return mInternalResource->WaitSyncClient(context, timeout, job);
 }
 
-POGLResourceType::Enum POGLTexture2D::GetResourceType() const
-{
-	return POGLResourceType::TEXTURE;
-}
+//POGLResourceType::Enum POGLTexture2D::GetResourceType() const
+//{
+//	return POGLResourceType::TEXTURE;
+//}
 
 POGLTextureFormat::Enum POGLTexture2D::GetTextureFormat() const
 {

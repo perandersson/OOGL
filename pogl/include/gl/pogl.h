@@ -54,6 +54,8 @@
 class IPOGLInterface;
 class IPOGLResource;
 
+class IPOGLResourceStream;
+
 class IPOGLWaitSyncJob;
 
 class IPOGLDevice;
@@ -210,6 +212,7 @@ struct POGLPrimitiveType
 		POINT = 0,
 		TRIANGLE,
 		TRIANGLE_STRIP,
+		TRIANGLE_FAN,
 		LINE,
 		LINE_LOOP,
 
@@ -421,7 +424,7 @@ struct POGLDstFactor
 
 };
 
-struct POGLStreamType
+struct POGLResourceStreamType
 {
 	enum Enum {
 		/* Open a reading stream */
@@ -432,19 +435,6 @@ struct POGLStreamType
 
 		/* Open the stream for reading and writing */
 		//READ_AND_WRITE,
-		COUNT
-	};
-};
-
-struct POGLResourceType
-{
-	enum Enum {
-		VERTEX_BUFFER = 0,
-
-		INDEX_BUFFER,
-
-		TEXTURE,
-
 		COUNT
 	};
 };
@@ -834,7 +824,7 @@ public:
 
 		\param e
 	*/
-	virtual void WaitSyncDriver() = 0;
+	virtual void WaitSyncDriver(IPOGLDeviceContext* context) = 0;
 
 	/*!
 		\brief Wait for the supplied fence type to complete
@@ -845,7 +835,7 @@ public:
 
 		\param e
 	*/
-	virtual void WaitSyncClient() = 0;
+	virtual void WaitSyncClient(IPOGLDeviceContext* context) = 0;
 	
 	/*!
 		\brief Wait for the supplied fence type to complete
@@ -856,7 +846,7 @@ public:
 		\param e
 		\param timeout
 	*/
-	virtual bool WaitSyncClient(POGL_UINT64 timeout) = 0;
+	virtual bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout) = 0;
 	
 	/*!
 		\brief Wait for the supplied fence type to complete
@@ -871,12 +861,7 @@ public:
 		\param timeout
 		\param job
 	*/
-	virtual bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
-
-	/*!
-		\brief Retrieves the resource type
-	*/
-	virtual POGLResourceType::Enum GetResourceType() const = 0;
+	virtual bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
 };
 
 /*!
@@ -1044,32 +1029,98 @@ public:
 	virtual IPOGLRenderState* Apply(IPOGLEffect* effect) = 0;
 
 	/*!
-		\brief Maps the supplied pointer to a memory location and return a pointer to it
+		\brief Open a memory stream for the supplied resource
+
+		You are only allowed to have one stream active per context at a time. Trying to open more than one stream will result in a POGLStreamException.
+
+		There are also performance that you have to be aware of. POGL will ensure synchronizity for the resource between all the active contexts, but
+		to ensure data-integrity, a client-wide lock is needed for the supplied resource over the same memory area. 
+		
+		The performance impact for the lock is minimal if you don't write to the same resource from multiple threads at the same time.
 
 		\param resource
+				The resource we want to open a stream to
 		\param e
-		\return 
+				What type of stream are we opening
+		\return
+				An opened stream. Remember to IPOGLResourceStream::Close the stream when you are done with it
 	*/
-	virtual void* Map(IPOGLResource* resource, POGLStreamType::Enum e) = 0;
-	
+	virtual IPOGLResourceStream* OpenStream(IPOGLVertexBuffer* resource, POGLResourceStreamType::Enum e) = 0;
 
 	/*!
-		\brief Maps the supplied pointer to a memory location and return a pointer to it. 
+		\brief Open a memory stream for the supplied resource
+
+		You are only allowed to have one stream active per context at a time. Trying to open more than one stream will result in a POGLStreamException.
+
+		There are also performance that you have to be aware of. POGL will ensure synchronizity for the resource between all the active contexts, but
+		to ensure data-integrity, a client-wide lock is needed for the supplied resource over the same memory area. 
+		
+		The performance impact for the lock is minimal if you don't write to the same resource from multiple threads at the same time.
 
 		\param resource
+				The resource we want to open a stream to
+		\param e
+				What type of stream are we opening
+		\return
+				An opened stream. Remember to IPOGLResourceStream::Close the stream when you are done with it
+	*/
+	virtual IPOGLResourceStream* OpenStream(IPOGLIndexBuffer* resource, POGLResourceStreamType::Enum e) = 0;
+};
+
+/*!
+	\brief A stream to the data of a resource
+*/
+class IPOGLResourceStream
+{
+public:
+	virtual ~IPOGLResourceStream() {}
+
+	/*!
+		\brief Update the entire original buffer. 
+		
+		This might orphan the original buffer data, depending on the implementation
+		
+		\param size
+				The size of the data buffer
+		\param data
+				The new data we want to put into the buffer
+	*/
+	virtual void Update(POGL_UINT32 size, const void* data) = 0;
+
+	/*!
+		\brief Update parts of the original buffer
+		
 		\param offset
-		\param length
-		\param e
-		\return 
+				The offset, in bytes, where we want to start saving the data
+		\param size
+				The size of the data buffer
+		\param data
+				The new data we want to put into the buffer
 	*/
-	virtual void* MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e) = 0;
+	virtual void UpdateRange(POGL_UINT32 offset, POGL_UINT32 size, const void* data) = 0;
 
 	/*!
-		\brief Unmaps the supplied resource and unlocks it so that OpenGL can resume drawing it in the driver.
-
-		\param resource
+		\brief Map the data to a memory location and return a pointer to it
 	*/
-	virtual void Unmap(IPOGLResource* resource) = 0;
+	virtual void* Map() = 0;
+	
+	/*!
+		\brief Map parts of the data to a memory location and return a pointer to it
+		
+		\param offset
+				The offset, in bytes, where we want to start saving the data
+		\param size
+				The size of the data buffer we want to map
+	*/
+	virtual void* Map(POGL_UINT32 offset, POGL_UINT32 size) = 0;
+
+	/*!
+		\brief Close the stream
+
+		This must be done after all the operations have been completed. This unmaps potentially mapped resources and
+		update your objects synchronization status so that any future rending operations will get the correct buffer data.
+	*/
+	virtual void Close() = 0;
 };
 
 /*!

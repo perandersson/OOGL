@@ -18,8 +18,8 @@ public:
 	static GLenum Convert(POGLDepthFunc::Enum e);
 	static GLenum Convert(POGLSrcFactor::Enum e);
 	static GLenum Convert(POGLDstFactor::Enum e);
-	static GLenum ConvertForMapBuffer(POGLStreamType::Enum e);
-	static GLbitfield ConvertForMapBufferRange(POGLStreamType::Enum e);
+	static GLenum ConvertForMapBuffer(POGLResourceStreamType::Enum e);
+	static GLbitfield ConvertForMapBufferRange(POGLResourceStreamType::Enum e);
 	//static GLenum Convert(FrontFace::Enum e);
 	//static GLenum Convert(CullFace::Enum e);
 	//static GLenum Convert(PolygonMode::Enum e);

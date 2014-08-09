@@ -10,11 +10,12 @@
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
 #include "POGLSyncObject.h"
+#include "POGLBufferResourceStream.h"
 #include <gl/poglext.h>
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRefCount(1), mReleasing(false), mRenderState(nullptr), mDevice(device)
+: mRefCount(1), mReleasing(false), mRenderState(nullptr), mResourceStream(nullptr), mDevice(device)
 {
 }
 
@@ -31,6 +32,12 @@ void POGLDeviceContext::Release()
 {
 	if (--mRefCount == 0 && !mReleasing) {
 		mReleasing = true;
+		if (mResourceStream != nullptr) {
+			if (mResourceStream->IsOpen())
+				mResourceStream->Close();
+			delete mResourceStream;
+			mResourceStream = nullptr;
+		}
 		if (mRenderState != nullptr) {
 			mRenderState->Release();
 			mRenderState = nullptr;
@@ -286,59 +293,85 @@ IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 	return mRenderState->Apply(effect);
 }
 
-void* POGLDeviceContext::Map(IPOGLResource* resource, POGLStreamType::Enum e)
+IPOGLResourceStream* POGLDeviceContext::OpenStream(IPOGLVertexBuffer* resource, POGLResourceStreamType::Enum e)
 {
-	assert_not_null(resource);
+	if (mResourceStream == nullptr)
+		mResourceStream = new POGLBufferResourceStream(this);
 
-	const GLenum access = POGLEnum::ConvertForMapBuffer(e);
-	switch (resource->GetResourceType()) {
-	case POGLResourceType::INDEX_BUFFER:
-		return static_cast<POGLIndexBuffer*>(resource)->Map(this, mRenderState, access);
-	case POGLResourceType::VERTEX_BUFFER:
-		return static_cast<POGLVertexBuffer*>(resource)->Map(this, mRenderState, access);
-	case POGLResourceType::TEXTURE:
-		THROW_EXCEPTION(POGLException, "Not implemented");
-		break;
-	default:
-		THROW_EXCEPTION(POGLException, "Not implemented");
-	}
+	if (mResourceStream->IsOpen())
+		THROW_EXCEPTION(POGLStreamException, "You cannot have multiple streams opened at the same time on the same context");
 
-	//glMapBuffer(mResourceMapping.target, access[(POGL_UINT32)e]);
+	POGLVertexBuffer* buffer = static_cast<POGLVertexBuffer*>(resource);
+	mRenderState->BindVertexBuffer(buffer);
+	mResourceStream->Open(resource, buffer->GetSyncObject(), GL_ARRAY_BUFFER, buffer->GetBufferUsage(), e);
+	return mResourceStream;
 }
 
-void* POGLDeviceContext::MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e)
+IPOGLResourceStream* POGLDeviceContext::OpenStream(IPOGLIndexBuffer* resource, POGLResourceStreamType::Enum e)
 {
-	assert_not_null(resource);
+	if (mResourceStream == nullptr)
+		mResourceStream = new POGLBufferResourceStream(this);
 
-	const GLbitfield access = POGLEnum::ConvertForMapBufferRange(e) | GL_MAP_UNSYNCHRONIZED_BIT;
-	switch (resource->GetResourceType()) {
-	case POGLResourceType::INDEX_BUFFER:
-		return static_cast<POGLIndexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
-	case POGLResourceType::VERTEX_BUFFER:
-		return static_cast<POGLVertexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
-	case POGLResourceType::TEXTURE:
-		THROW_EXCEPTION(POGLException, "Not implemented");
-		break;
-	default:
-		THROW_EXCEPTION(POGLException, "Not implemented");
-	}
+	if (mResourceStream->IsOpen())
+		THROW_EXCEPTION(POGLStreamException, "You cannot have multiple streams opened at the same time on the same context");
+
+	POGLIndexBuffer* buffer = static_cast<POGLIndexBuffer*>(resource);
+	mRenderState->BindIndexBuffer(buffer);
+	mResourceStream->Open(resource, buffer->GetSyncObject(), GL_ELEMENT_ARRAY_BUFFER, buffer->GetBufferUsage(), e);
+	return mResourceStream;
 }
 
-void POGLDeviceContext::Unmap(IPOGLResource* resource)
-{
-	assert_not_null(resource);
-	switch (resource->GetResourceType()) {
-	case POGLResourceType::INDEX_BUFFER:
-		return static_cast<POGLIndexBuffer*>(resource)->Unmap(this, mRenderState);
-	case POGLResourceType::VERTEX_BUFFER:
-		return static_cast<POGLVertexBuffer*>(resource)->Unmap(this, mRenderState);
-	case POGLResourceType::TEXTURE:
-		THROW_EXCEPTION(POGLException, "Not implemented");
-		break;
-	default:
-		THROW_EXCEPTION(POGLException, "Not implemented");
-	}
-}
+//void* POGLDeviceContext::Map(IPOGLResource* resource, POGLStreamType::Enum e)
+//{
+//	assert_not_null(resource);
+//
+//	const GLenum access = POGLEnum::ConvertForMapBuffer(e);
+//	switch (resource->GetResourceType()) {
+//	case POGLResourceType::INDEX_BUFFER:
+//		return static_cast<POGLIndexBuffer*>(resource)->Map(this, mRenderState, access);
+//	case POGLResourceType::VERTEX_BUFFER:
+//		return static_cast<POGLVertexBuffer*>(resource)->Map(this, mRenderState, access);
+//	case POGLResourceType::TEXTURE:
+//		THROW_EXCEPTION(POGLException, "Not implemented");
+//		break;
+//	default:
+//		THROW_EXCEPTION(POGLException, "Not implemented");
+//	}
+//}
+//
+//void* POGLDeviceContext::MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e)
+//{
+//	assert_not_null(resource);
+//
+//	const GLbitfield access = POGLEnum::ConvertForMapBufferRange(e) | GL_MAP_UNSYNCHRONIZED_BIT;
+//	switch (resource->GetResourceType()) {
+//	case POGLResourceType::INDEX_BUFFER:
+//		return static_cast<POGLIndexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
+//	case POGLResourceType::VERTEX_BUFFER:
+//		return static_cast<POGLVertexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
+//	case POGLResourceType::TEXTURE:
+//		THROW_EXCEPTION(POGLException, "Not implemented");
+//		break;
+//	default:
+//		THROW_EXCEPTION(POGLException, "Not implemented");
+//	}
+//}
+//
+//void POGLDeviceContext::Unmap(IPOGLResource* resource)
+//{
+//	assert_not_null(resource);
+//	switch (resource->GetResourceType()) {
+//	case POGLResourceType::INDEX_BUFFER:
+//		return static_cast<POGLIndexBuffer*>(resource)->Unmap(this, mRenderState);
+//	case POGLResourceType::VERTEX_BUFFER:
+//		return static_cast<POGLVertexBuffer*>(resource)->Unmap(this, mRenderState);
+//	case POGLResourceType::TEXTURE:
+//		THROW_EXCEPTION(POGLException, "Not implemented");
+//		break;
+//	default:
+//		THROW_EXCEPTION(POGLException, "Not implemented");
+//	}
+//}
 
 void POGLDeviceContext::InitializeRenderState()
 {
@@ -429,6 +462,11 @@ void POGLDeviceContext::BindBuffer(GLenum target, GLuint bufferID)
 	glBindBuffer(target, bufferID);
 }
 
+void POGLDeviceContext::BufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage)
+{
+	glBufferData(target, size, data, usage);
+}
+
 void POGLDeviceContext::DeleteBuffer(GLuint bufferID)
 {
 	if (bufferID == 0)
@@ -447,9 +485,9 @@ void* POGLDeviceContext::MapBufferRange(GLenum target, GLintptr offset, GLsizeip
 	return glMapBufferRange(target, offset, length, access);
 }
 
-void POGLDeviceContext::UnmapBuffer(GLenum target)
+GLboolean POGLDeviceContext::UnmapBuffer(GLenum target)
 {
-	glUnmapBuffer(target);
+	return glUnmapBuffer(target);
 }
 
 void POGLDeviceContext::UseProgram(GLuint programID)

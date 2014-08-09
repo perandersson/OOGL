@@ -40,24 +40,24 @@ void POGLTextureResource::Release()
 	}
 }
 
-void POGLTextureResource::WaitSyncDriver()
+void POGLTextureResource::WaitSyncDriver(IPOGLDeviceContext* context)
 {
-	mSyncObject->WaitSyncDriver();
+	mSyncObject->WaitSyncDriver(static_cast<POGLDeviceContext*>(context));
 }
 
-void POGLTextureResource::WaitSyncClient()
+void POGLTextureResource::WaitSyncClient(IPOGLDeviceContext* context)
 {
-	mSyncObject->WaitSyncClient();
+	mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context));
 }
 
-bool POGLTextureResource::WaitSyncClient(POGL_UINT64 timeout)
+bool POGLTextureResource::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout)
 {
-	return mSyncObject->WaitSyncClient(timeout);
+	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout);
 }
 
-bool POGLTextureResource::WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+bool POGLTextureResource::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
 {
-	return mSyncObject->WaitSyncClient(timeout, job);
+	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout, job);
 }
 
 POGL_UINT32 POGLTextureResource::GetUID() const

@@ -89,7 +89,7 @@ int main()
 		context->Release();
 	}
 	catch (POGLException e) {
-		POGLAlert(windowHandle, e);
+		POGLAlert(e);
 	}
 
 	device->Release();

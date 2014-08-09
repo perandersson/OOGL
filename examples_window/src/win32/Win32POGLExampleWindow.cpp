@@ -1,9 +1,17 @@
 #include "POGLExampleWindow.h"
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
+#include <chrono>
+using namespace std::chrono;
 
 POGL_HANDLE gPOGLWindowHandle = nullptr;
 const POGL_CHAR* EXAMPLE_WINDOW_CLASS_NAME = POGL_TOCHAR("POGLExampleWindow");
+POGL_STRING gTitle;
+
+high_resolution_clock::time_point gPrev;
+POGL_FLOAT gTotalTime = 0.0f;
+POGL_FLOAT gTimeSinceLastTick = 0.0f;
+POGL_UINT32 gNumFPS = 0;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
 {
@@ -49,6 +57,9 @@ POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZEI& size, const POGL_STRING& t
 		UpdateWindow(window);
 	}
 
+	gPrev = high_resolution_clock::now();
+	gTitle = title;
+	gPOGLWindowHandle = window;
 	return window;
 }
 
@@ -64,15 +75,35 @@ bool POGLProcessEvents()
 		TranslateMessage(&gPOGLMessageQueue);
 		DispatchMessage(&gPOGLMessageQueue);
 	}
+
+	// Move the timer cursor one tick forward
+	high_resolution_clock::time_point now = high_resolution_clock::now();
+	duration<POGL_FLOAT> time_span = now - gPrev;
+	gPrev = now;
+	gTimeSinceLastTick = time_span.count();
+
+	gNumFPS++;
+	gTotalTime += POGLGetTimeSinceLastTick();
+	if (gTotalTime >= 1.0f) {
+		gTotalTime = gTotalTime - 1.0f;
+		POGL_CHAR tmp[10];
+#ifdef _UNICODE
+		_itow(gNumFPS, tmp, 10);
+#else
+		_itoa(gNumFPS, tmp, 10);
+#endif
+		gNumFPS = 0;
+		SetWindowText((HWND)gPOGLWindowHandle, (gTitle + POGL_STRING(" - FPS: ") + POGL_STRING(tmp)).c_str());
+	}
 	return running;
 }
 
-void POGLAlert(POGL_HANDLE windowHandle, const POGLException& e)
+void POGLAlert(const POGLException& e)
 {
 #pragma push_macro("GetMessage")
 #undef GetMessage
 	const POGL_STRING& message = e.GetMessage();
-	MessageBox((HWND)windowHandle, message.c_str(), POGL_TOCHAR("Fatal Error"), MB_ICONERROR | MB_OK);
+	MessageBox((HWND)gPOGLWindowHandle, message.c_str(), POGL_TOCHAR("Fatal Error"), MB_ICONERROR | MB_OK);
 #pragma pop_macro("GetMessage")
 }
 
@@ -84,4 +115,9 @@ void POGLDestroyExampleWindow(POGL_HANDLE windowHandle)
 
 	HINSTANCE applicationHandle = GetModuleHandle(NULL);
 	UnregisterClass(EXAMPLE_WINDOW_CLASS_NAME, applicationHandle);
+}
+
+POGL_FLOAT POGLGetTimeSinceLastTick()
+{
+	return gTimeSinceLastTick;
 }

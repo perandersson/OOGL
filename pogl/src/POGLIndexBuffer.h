@@ -5,6 +5,7 @@
 class POGLSyncObject;
 class POGLDeviceContext;
 class POGLRenderState;
+class POGLVertexBuffer;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
@@ -30,6 +31,13 @@ public:
 	}
 
 	/*!
+		\brief Retrieves how this buffer is used internally by OpenGL
+	*/
+	inline GLenum GetBufferUsage() const {
+		return mBufferUsage;
+	}
+
+	/*!
 		\brief Retrieves the size of one element
 
 		\return
@@ -48,19 +56,14 @@ public:
 	}
 	
 	/*!
-		\brief 
+		\brief Retrieves the object responsible for synchronizing this object between contexts
 	*/
-	void* Map(POGLDeviceContext* context, POGLRenderState* state, GLenum access);
+	inline POGLSyncObject* GetSyncObject() {
+		return mSyncObject;
+	}
 	
-	/*!
-		\brief 
-	*/
-	void* MapRange(POGLDeviceContext* context, POGLRenderState* state, POGL_UINT32 offset, POGL_UINT32 length, GLbitfield access);
-	
-	/*!
-		\brief 
-	*/
-	void Unmap(POGLDeviceContext* context, POGLRenderState* state);
+	void Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex);
+	void Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count);
 
 // IPOGLInterface
 public:
@@ -71,11 +74,10 @@ public:
 public:
 	IPOGLDevice* GetDevice();
 	POGL_HANDLE GetHandlePtr();
-	void WaitSyncDriver();
-	void WaitSyncClient();
-	bool WaitSyncClient(POGL_UINT64 timeout);
-	bool WaitSyncClient(POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
-	POGLResourceType::Enum GetResourceType() const;
+	void WaitSyncDriver(IPOGLDeviceContext* context);
+	void WaitSyncClient(IPOGLDeviceContext* context);
+	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
+	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 // IPOGLIndexBuffer
 public:
