@@ -12,8 +12,11 @@ public:
 	POGLDeviceContext(IPOGLDevice* device);
 	~POGLDeviceContext();
 
-	void AddRef();
-	void Release();
+	/*!
+		\brief Destroys this instance and removes the internal release the associated memory with it
+	*/
+	void Destroy();
+
 	IPOGLDevice* GetDevice();
 	IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type);
 	IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);
@@ -29,16 +32,6 @@ public:
 	IPOGLRenderState* Apply(IPOGLEffect* effect);
 	IPOGLResourceStream* OpenStream(IPOGLVertexBuffer* resource, POGLResourceStreamType::Enum e);
 	IPOGLResourceStream* OpenStream(IPOGLIndexBuffer* resource, POGLResourceStreamType::Enum e);
-
-	/*!
-	
-	*/
-	virtual void Bind() = 0;
-
-	/*!
-	
-	*/
-	virtual void Unbind() = 0;
 
 	/*!
 		\brief 
@@ -312,8 +305,6 @@ private:
 	GLuint GenTextureID();
 
 protected:
-	POGL_UINT32 mRefCount;
-	bool mReleasing;
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;
 	POGLBufferResourceStream* mResourceStream;

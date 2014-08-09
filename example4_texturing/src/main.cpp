@@ -35,10 +35,7 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 int main()
 {
-	// Create a window
 	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 4: Texturing"));
-
-	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo;
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
@@ -52,10 +49,8 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		// Create a device context for main thread
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		// Create an effect based on the supplied vertex- and fragment shader
 		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
 		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
 		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
@@ -63,7 +58,11 @@ int main()
 		vertexShader->Release();
 		fragmentShader->Release();
 
-		// Create vertex buffer
+		// 
+		// Create a quad vertex buffer with the appropriate texture coordinates. This example makes use of one of the built-in vertex types.
+		// See the later examples on how you can create your own vertex structures if you want.
+		//
+
 		const POGL_POSITION_TEXCOORD_VERTEX VERTICES[] = {
 			POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3F(-0.5f, -0.5f, 0.0f), POGL_VECTOR2F(0.0f, 0.0f)),
 			POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3F(-0.5f, 0.5f, 0.0f), POGL_VECTOR2F(0.0f, 1.0f)),
@@ -72,37 +71,46 @@ int main()
 		};
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
 
-		// Create index buffers
+		//
+		// Create an index buffer usable when drawing the vertex buffer above
+		//
+
 		const POGL_UINT8 INDICES[] = {
 			0, 1, 2,
 			2, 3, 0
 		};
 		IPOGLIndexBuffer* indexBuffers = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::STATIC);
 
-		// Create texture
+		//
+		// Load a BMP file and return a usable texture resource. This is part of the extended POGL library.
+		//
 		IPOGLTexture2D* texture = POGLXLoadBMPImageFromFile(context, POGL_TOCHAR("texture.bmp"));
 
 		while (POGLProcessEvents()) {
-			// Prepare the simple effect
 			IPOGLRenderState* state = context->Apply(simpleEffect);
-
-			// Clear the color and depth buffer
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
-			// Set uniforms
+			//
+			// Locate the "Texture" uniform (see fragment shader above) and set the texture to it. As described before, all 
+			// unneccessary "state" changes made on the IPOGLRenderState level is prevented so the texture is
+			// only bound once. 
+			//
+			// If the texture is already bound then the only thing the "SetTexture" method does is a couple of simple integer
+			// comparisons. The IPOGLUniform instance returned by the render state is RenderState specific, which means that you
+			// are not allowed to use it on anything other than when rendering on the state returned by the IPOGLDeviceContext::Apply(IPOGLEffect*)
+			// method above. 
+
 			state->FindUniformByName("Texture")->SetTexture(texture);
 
-			// Draw the vertices inside the vertex buffer
 			state->Draw(vertexBuffer, indexBuffers);
-
-			// Nofiy the rendering engine that we are finished using the bound effect this frame
 			state->EndFrame();
-
-			// Swap the back buffer with the front buffer
 			device->SwapBuffers();
 		}
 
+		//
 		// Release resources
+		//
+
 		texture->Release();
 		indexBuffers->Release();
 		vertexBuffer->Release();
@@ -115,9 +123,6 @@ int main()
 
 	device->Release();
 
-	// Destroy the example window
 	POGLDestroyExampleWindow(windowHandle);
-
-	// Quit application
 	return 0;
 }

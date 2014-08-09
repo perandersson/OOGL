@@ -32,10 +32,13 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 int main()
 {
-	// Create a window
+	//
+	// Create an example window. This function is NOT part of the main POGL library and is only usable for these examples.
+	// You are responsible for creating a valid window to be drawn to on your own. 
+	//
+
 	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 2: Create Triangle"));
 
-	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo;
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
@@ -49,43 +52,100 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		// Create a device context for main thread
+		//
+		// Retrieves a device context for this thread. If no device context exists then one is created for you
+		//
+
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		// Create an effect based on the supplied vertex- and fragment shader
+		//
+		// Load a very simple vertex- and fragment shader and link them into an effect resource 
+		// usable when drawing the geometry onto the screen.
+		//
+
 		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
 		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
 		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
 		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs, 2);
+
+		//
+		// The vertex- and fragment shaders are no longer needed. You can reuse the vertex- and fragment shader resources 
+		// for as many effects as you want.
+		// 
+
 		vertexShader->Release();
 		fragmentShader->Release();
 
-		// Create vertex buffer
+		//
+		// Create data for a triangle.
+		//
+
 		const POGL_POSITION_COLOR_VERTEX VERTICES[] = {
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(-0.5f, -0.5f, 0.0f), POGL_COLOR4F(1.0f, 0.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.0f, 0.5f, 0.0f), POGL_COLOR4F(0.0f, 1.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.5f, -0.5f, 0.0f), POGL_COLOR4F(0.0f, 0.0f, 1.0f, 1.0f))
 		};
+
+		// 
+		// Create a vertex buffer based on the above vertices. This example makes use of one of the built-in vertex types.
+		// See the later examples on how you can create your own vertex structures if you want.
+		// 
+		// The layout locations when using the built-in vertex types are:
+		//
+		// Position = 0
+		// Color    = 1
+		// TexCoord = 2
+		// Normal   = 3
+		// Tangent  = 4
+		//
+		// You are free to use any layout locations that you want if you create your own vertex types.
+		//
+
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		
+		//
+		// Poll the opened window's events. This is NOT part of the POGL library
+		//
 
 		while (POGLProcessEvents()) {
-			// Prepare the simple effect
+			
+			//
+			// Prepare the simple effect. The result is a context-specific state which is responsible for 
+			// preventing unneccessary OpenGL state changes. It is also used to help you synchronize resources between concurrent contexts.
+			//
+
 			IPOGLRenderState* state = context->Apply(simpleEffect);
 
-			// Clear the color and depth buffer
+			//
+			// Clear the color and depth buffer on the screen
+			// 
+
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
-			// Draw the vertices inside the vertex buffer
+			//
+			// Draw the triangle vertex buffer. This will automatically bind the vertex buffer if it's not already bound
+			//
+
 			state->Draw(vertexBuffer);
 
-			// Nofiy the rendering engine that we are finished using the bound effect this frame
+			//
+			// Nofiy the rendering engine that we are finished using the bound effect this frame.
+			// This unlocks any attached framebuffers.
+			//
+
 			state->EndFrame();
 
-			// Swap the back buffer with the front buffer
+			//
+			// Swap the back buffer with the front buffer so that we can see the result onto the screen
+			//
+
 			device->SwapBuffers();
 		}
 
+		//
 		// Release resources
+		//
+
 		vertexBuffer->Release();
 		simpleEffect->Release();
 		context->Release();
@@ -96,7 +156,10 @@ int main()
 
 	device->Release();
 
-	// Destroy the example window
+	//
+	// Destroy the example window. This is NOT part of the POGL library
+	//
+
 	POGLDestroyExampleWindow(windowHandle);
 
 	// Quit application

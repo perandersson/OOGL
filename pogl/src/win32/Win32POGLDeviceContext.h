@@ -4,26 +4,24 @@
 class Win32POGLDeviceContext : public POGLDeviceContext
 {
 public:
-	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC legacyRenderContext);
+	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);
 	~Win32POGLDeviceContext();
 
-	void Bind();
-	void Unbind();
-	void Initialize(Win32POGLDeviceContext* parentContext);
+	/*!
+		\brief Retrieves the windows specific render context
+	*/
+	inline HGLRC GetHGLRC() {
+		return mRenderContext;
+	}
 
-	void LoadExtensions();
+	void AddRef();
+	void Release();
+
 	void* GetProcAddress(const char* functionName);
 
 private:
+	POGL_UINT32 mRefCount;
 	HDC mDeviceContext;
-	HGLRC mLegacyRenderContext;
 	HGLRC mRenderContext;
-	bool mBoundToThread;
-
-	//
-	// Extensions
-	//
-
-	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
-	PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
+	bool mInitialized;
 };

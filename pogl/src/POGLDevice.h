@@ -17,6 +17,6 @@ public:
 	*/
 	virtual bool Initialize(const POGL_DEVICE_INFO* info);
 
-private:
+protected:
 	POGL_DEVICE_INFO mDeviceInfo;
 };

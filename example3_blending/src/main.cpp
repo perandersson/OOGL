@@ -32,10 +32,7 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 int main()
 {
-	// Create a window
 	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 3: Blending"));
-
-	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo;
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
@@ -49,10 +46,8 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		// Create a device context for main thread
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		// Create an effect based on the supplied vertex- and fragment shader
 		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
 		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
 		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
@@ -60,7 +55,10 @@ int main()
 		vertexShader->Release();
 		fragmentShader->Release();
 
-		// Create vertex buffer
+		//
+		// Create two triangles with different colors.
+		//
+
 		const POGL_POSITION_COLOR_VERTEX VERTICES[] = {
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(-0.5f, -0.5f, 0.0f), POGL_COLOR4F(1.0f, 0.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.0f, 0.5f, 0.0f), POGL_COLOR4F(1.0f, 0.0f, 0.0f, 1.0f)),
@@ -68,7 +66,6 @@ int main()
 		};
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
 
-		// Create vertex buffer
 		const POGL_POSITION_COLOR_VERTEX VERTICES_INV[] = {
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.5f, 0.5f, 0.0f), POGL_COLOR4F(0.0f, 1.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3F(0.0f, -0.5f, 0.0f), POGL_COLOR4F(0.0f, 1.0f, 0.0f, 1.0f)),
@@ -76,29 +73,35 @@ int main()
 		};
 		IPOGLVertexBuffer* vertexBufferInv = context->CreateVertexBuffer(VERTICES_INV, sizeof(VERTICES_INV), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
 
-		// Setup effect properties
+		//
+		// Setup effect properties. This can be done on the associated RenderState as well, but since we want this to be applied for all
+		// contexts when this applied we do it on the effect instead. 
+		//
+		// Changes made on the effect will NOT be applied until we call IPOGLDeviceContext::Apply(IPOGLEffect*)
+		//
+
 		simpleEffect->SetBlend(true);
 		simpleEffect->SetBlendFunc(POGLSrcFactor::SRC_COLOR, POGLDstFactor::ONE_MINUS_SRC_COLOR);
 
 		while (POGLProcessEvents()) {
-			// Prepare the simple effect
 			IPOGLRenderState* state = context->Apply(simpleEffect);
-
-			// Clear the color and depth buffer
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
-			// Draw the vertices inside the vertex buffer
+			//
+			// Draw the two triangles
+			//
+
 			state->Draw(vertexBuffer);
 			state->Draw(vertexBufferInv);
 
-			// Nofiy the rendering engine that we are finished using the bound effect this frame
 			state->EndFrame();
-
-			// Swap the back buffer with the front buffer
 			device->SwapBuffers();
 		}
 
+		//
 		// Release resources
+		//
+
 		vertexBuffer->Release();
 		vertexBufferInv->Release();
 		simpleEffect->Release();
@@ -109,10 +112,6 @@ int main()
 	}
 
 	device->Release();
-
-	// Destroy the example window
 	POGLDestroyExampleWindow(windowHandle);
-
-	// Quit application
 	return 0;
 }

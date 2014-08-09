@@ -15,7 +15,7 @@
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRefCount(1), mReleasing(false), mRenderState(nullptr), mResourceStream(nullptr), mDevice(device)
+: mRenderState(nullptr), mResourceStream(nullptr), mDevice(device)
 {
 }
 
@@ -23,28 +23,19 @@ POGLDeviceContext::~POGLDeviceContext()
 {
 }
 
-void POGLDeviceContext::AddRef()
+void POGLDeviceContext::Destroy()
 {
-	mRefCount++;
-}
-
-void POGLDeviceContext::Release()
-{
-	if (--mRefCount == 0 && !mReleasing) {
-		mReleasing = true;
-		if (mResourceStream != nullptr) {
-			if (mResourceStream->IsOpen())
-				mResourceStream->Close();
-			delete mResourceStream;
-			mResourceStream = nullptr;
-		}
-		if (mRenderState != nullptr) {
-			mRenderState->Release();
-			mRenderState = nullptr;
-		}
-		Unbind();
-		delete this;
+	if (mResourceStream != nullptr) {
+		if (mResourceStream->IsOpen())
+			mResourceStream->Close();
+		delete mResourceStream;
+		mResourceStream = nullptr;
 	}
+	if (mRenderState != nullptr) {
+		mRenderState->Release();
+		mRenderState = nullptr;
+	}
+	delete this;
 }
 
 IPOGLDevice* POGLDeviceContext::GetDevice()

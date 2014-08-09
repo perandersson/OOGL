@@ -2,7 +2,10 @@
 
 int main()
 {
-	// Create a POGL device based on the supplied information
+	//
+	// Prepare the neccessary information needed by POGL to create a valid device
+	//
+
 	POGL_DEVICE_INFO deviceInfo;
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
@@ -13,9 +16,19 @@ int main()
 	deviceInfo.colorBits = 32;
 	deviceInfo.depthBits = 16;
 	deviceInfo.pixelFormat = POGLPixelFormat::R8G8B8A8;
+
+	//
+	// Create the device
+	//
+
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
+	//
 	// Release the device when you are done with it
+	//
+
 	device->Release();
+
+	// Quit the application
 	return 0;
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "POGLDevice.h"
 #include "Win32POGLDeviceContext.h"
+#include <list>
 #include <vector>
 #include <mutex>
 
@@ -15,6 +16,21 @@ public:
 	IPOGLDeviceContext* GetDeviceContext();
 	void SwapBuffers();
 	bool Initialize(const POGL_DEVICE_INFO* info);
+	
+	/*!
+		\brief Release the supplied render context and return it to the free RenderContext's list.
+	*/
+	void ReleaseRenderContext(Win32POGLDeviceContext* renderContext);
+
+private:
+	/*!
+		\brief Retrieve a free render context. 
+
+		This method creates a render context if no free render context is found
+
+		\return A render context
+	*/
+	Win32POGLDeviceContext* GetOrCreateRenderContext();
 
 private:
 	POGL_UINT32 mRefCount;
@@ -22,8 +38,8 @@ private:
 	HWND mWindowHandle;
 	HDC mDeviceContext;
 	HGLRC mLegacyRenderContext;
-	Win32POGLDeviceContext* mMainThreadDeviceContext;
-
-	std::vector<IPOGLDeviceContext*> mDeviceContexts;
+	
+	std::vector<Win32POGLDeviceContext*> mDeviceContexts;
+	std::list<Win32POGLDeviceContext*> mFreeDeviceContexts;
 	std::recursive_mutex mDeviceContextsMutex;
 };
