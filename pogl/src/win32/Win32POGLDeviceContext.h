@@ -11,13 +11,6 @@ public:
 	void Unbind();
 	void Initialize(Win32POGLDeviceContext* parentContext);
 
-	/*!
-		\brief Retrieves the handle for this context
-	*/
-	inline HGLRC GetHandlePtr() const {
-		return mRenderContext;
-	}
-
 	void LoadExtensions();
 	void* GetProcAddress(const char* functionName);
 

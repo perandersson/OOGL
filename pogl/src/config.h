@@ -28,7 +28,7 @@ namespace std { using namespace __gnu_cxx; }
 
 #ifndef CHECK_GL
 #ifdef _DEBUG
-#define CHECK_GL(message) { const GLenum error = glGetError(); if(error != GL_NO_ERROR) THROW_EXCEPTION(POGLException, POGL_TOCHAR(message)". Reason: %d", error); }
+#define CHECK_GL(message) { const GLenum error = glGetError(); if(error != GL_NO_ERROR) THROW_EXCEPTION(POGLException, POGL_TOCHAR(message)". Reason: 0x%x", error); }
 #else
 #define CHECK_GL(message)
 #endif

@@ -195,7 +195,7 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 
 	const GLenum status = glGetError();
 	if (status != GL_NO_ERROR) {
-		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: %d", status);
+		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: 0x%x", status);
 	}
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
@@ -227,9 +227,9 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 	glBufferData(GL_ARRAY_BUFFER, memorySize, memory, usage);
 
-	const GLenum status = glGetError();
-	if (status != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer");
+	const GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	return new POGLVertexBuffer(bufferID, layout, numVertices, type, usage, new POGLSyncObject(sync, mDevice), mDevice);
@@ -280,9 +280,9 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
 
-	const GLenum status = glGetError();
-	if (status != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer");
+	const GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, new POGLSyncObject(sync, mDevice), mDevice);
@@ -320,58 +320,6 @@ IPOGLResourceStream* POGLDeviceContext::OpenStream(IPOGLIndexBuffer* resource, P
 	mResourceStream->Open(resource, buffer->GetSyncObject(), GL_ELEMENT_ARRAY_BUFFER, buffer->GetBufferUsage(), e);
 	return mResourceStream;
 }
-
-//void* POGLDeviceContext::Map(IPOGLResource* resource, POGLStreamType::Enum e)
-//{
-//	assert_not_null(resource);
-//
-//	const GLenum access = POGLEnum::ConvertForMapBuffer(e);
-//	switch (resource->GetResourceType()) {
-//	case POGLResourceType::INDEX_BUFFER:
-//		return static_cast<POGLIndexBuffer*>(resource)->Map(this, mRenderState, access);
-//	case POGLResourceType::VERTEX_BUFFER:
-//		return static_cast<POGLVertexBuffer*>(resource)->Map(this, mRenderState, access);
-//	case POGLResourceType::TEXTURE:
-//		THROW_EXCEPTION(POGLException, "Not implemented");
-//		break;
-//	default:
-//		THROW_EXCEPTION(POGLException, "Not implemented");
-//	}
-//}
-//
-//void* POGLDeviceContext::MapRange(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLStreamType::Enum e)
-//{
-//	assert_not_null(resource);
-//
-//	const GLbitfield access = POGLEnum::ConvertForMapBufferRange(e) | GL_MAP_UNSYNCHRONIZED_BIT;
-//	switch (resource->GetResourceType()) {
-//	case POGLResourceType::INDEX_BUFFER:
-//		return static_cast<POGLIndexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
-//	case POGLResourceType::VERTEX_BUFFER:
-//		return static_cast<POGLVertexBuffer*>(resource)->MapRange(this, mRenderState, offset, length, access);
-//	case POGLResourceType::TEXTURE:
-//		THROW_EXCEPTION(POGLException, "Not implemented");
-//		break;
-//	default:
-//		THROW_EXCEPTION(POGLException, "Not implemented");
-//	}
-//}
-//
-//void POGLDeviceContext::Unmap(IPOGLResource* resource)
-//{
-//	assert_not_null(resource);
-//	switch (resource->GetResourceType()) {
-//	case POGLResourceType::INDEX_BUFFER:
-//		return static_cast<POGLIndexBuffer*>(resource)->Unmap(this, mRenderState);
-//	case POGLResourceType::VERTEX_BUFFER:
-//		return static_cast<POGLVertexBuffer*>(resource)->Unmap(this, mRenderState);
-//	case POGLResourceType::TEXTURE:
-//		THROW_EXCEPTION(POGLException, "Not implemented");
-//		break;
-//	default:
-//		THROW_EXCEPTION(POGLException, "Not implemented");
-//	}
-//}
 
 void POGLDeviceContext::InitializeRenderState()
 {
@@ -686,7 +634,7 @@ GLuint POGLDeviceContext::GenBufferID()
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID");
+		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
 
 	return id;
 }
@@ -718,7 +666,7 @@ GLuint POGLDeviceContext::GenTextureID()
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate texture ID");
+		THROW_EXCEPTION(POGLResourceException, "Could not generate texture ID. Reason: 0x%x", error);
 
 	return id;
 }

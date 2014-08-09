@@ -53,7 +53,7 @@ void Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	// Create an OpenGL 3.3 render context
 	//
 
-	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parentContext != nullptr ? parentContext->GetHandlePtr() : mLegacyRenderContext, &attributes[0]);
+	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parentContext != nullptr ? parentContext->mRenderContext : 0, &attributes[0]);
 	if (mRenderContext == nullptr)
 		THROW_EXCEPTION(POGLException, "Could not create an OpenGL 3.3 render context");
 }
