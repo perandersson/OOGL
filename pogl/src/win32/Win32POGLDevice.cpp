@@ -49,6 +49,11 @@ void Win32POGLDevice::Release()
 			mMainThreadDeviceContext = nullptr;
 		}
 
+		if (mLegacyRenderContext != nullptr) {
+			wglDeleteContext(mLegacyRenderContext);
+			mLegacyRenderContext = nullptr;
+		}
+
 		if (mDeviceContext != nullptr) {
 			ReleaseDC(mWindowHandle, mDeviceContext);
 			mDeviceContext = nullptr;
@@ -62,7 +67,7 @@ void Win32POGLDevice::Release()
 IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 {
 	if (tDeviceContext == nullptr) {
-		Win32POGLDeviceContext* context = new Win32POGLDeviceContext(this, mDeviceContext);
+		Win32POGLDeviceContext* context = new Win32POGLDeviceContext(this, mDeviceContext, mLegacyRenderContext);
 		if (!context->Initialize(mMainThreadDeviceContext)) {
 			delete context;
 			THROW_EXCEPTION(POGLException, "Could not create a new Device context");
@@ -111,7 +116,12 @@ bool Win32POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
 	if (!SetPixelFormat(mDeviceContext, format, &pfd))
 		return false;
 
-	mMainThreadDeviceContext = new Win32POGLDeviceContext(this, mDeviceContext);
+	// Create a legacy render context, used so that we can load the neccessary extensions 
+	mLegacyRenderContext = wglCreateContext(mDeviceContext);
+	if (!mLegacyRenderContext)
+		return false;
+
+	mMainThreadDeviceContext = new Win32POGLDeviceContext(this, mDeviceContext, mLegacyRenderContext);
 	if (!mMainThreadDeviceContext->Initialize(nullptr)) {
 		delete mMainThreadDeviceContext;
 		mMainThreadDeviceContext = nullptr;

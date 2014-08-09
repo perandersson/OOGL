@@ -21,6 +21,7 @@ private:
 	bool mReleasing;
 	HWND mWindowHandle;
 	HDC mDeviceContext;
+	HGLRC mLegacyRenderContext;
 	Win32POGLDeviceContext* mMainThreadDeviceContext;
 
 	std::vector<IPOGLDeviceContext*> mDeviceContexts;

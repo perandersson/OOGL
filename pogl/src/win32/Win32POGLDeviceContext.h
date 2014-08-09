@@ -4,9 +4,8 @@
 class Win32POGLDeviceContext : public POGLDeviceContext
 {
 public:
-	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext);
+	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);
 	~Win32POGLDeviceContext();
-	
 
 	void Bind();
 	void Unbind();
@@ -32,4 +31,5 @@ private:
 	//
 
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB;
+	PFNWGLCHOOSEPIXELFORMATARBPROC wglChoosePixelFormatARB;
 };

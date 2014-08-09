@@ -2,37 +2,45 @@
 #include "Win32POGLDeviceContext.h"
 #include <vector>
 
-Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext)
+Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext)
 : POGLDeviceContext(device), mDeviceContext(deviceContext),
-mRenderContext(nullptr), mBoundToThread(false),
+mRenderContext(renderContext), mBoundToThread(false),
 // Extensions
-wglCreateContextAttribsARB(nullptr)
+wglCreateContextAttribsARB(nullptr), wglChoosePixelFormatARB(nullptr)
 {
 
 }
 
 Win32POGLDeviceContext::~Win32POGLDeviceContext()
 {
+	if (mRenderContext != nullptr) {
+		wglDeleteContext(mRenderContext);
+		mRenderContext = nullptr;
+	}
 }
 
 bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 {
-	// Create a temp render context so that you can load the extensions
-	HGLRC temp = wglCreateContext(mDeviceContext);
-	if (!temp)
-		return false;
-	wglMakeCurrent(mDeviceContext, temp);
+	// Activate the legacy render context (which is supplied in the constructor) so 
+	// that we can retrieve the necessary extensions
+	wglMakeCurrent(mDeviceContext, mRenderContext);
+	mRenderContext = nullptr;
+	LoadExtensions();
+	wglMakeCurrent(nullptr, nullptr);
 
-	// Load extensions
-	this->LoadExtensions();
-
+	//
 	// Verify that your graphics card support OpenGL 3.3
+	//
+
 	if (wglCreateContextAttribsARB == nullptr) {
-		wglMakeCurrent(0, 0);
+		wglMakeCurrent(nullptr, nullptr);
 		return false;
 	}
 
-	// Attributes
+	//
+	// Set neccessary attributes so that we get an OpenGL 3.3 render context
+	//
+
 	std::vector<int> attributes;
 	attributes.push_back(WGL_CONTEXT_MAJOR_VERSION_ARB); attributes.push_back(3);
 	attributes.push_back(WGL_CONTEXT_MINOR_VERSION_ARB); attributes.push_back(3);
@@ -45,11 +53,11 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	}
 	attributes.push_back(0); attributes.push_back(0);
 
+	//
 	// Create an OpenGL 3.3 render context
-	HGLRC sharedRenderContext = parentContext == nullptr ? nullptr : parentContext->GetHandlePtr();
-	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, sharedRenderContext, &attributes[0]);
-	wglMakeCurrent(0, 0);
-	wglDeleteContext(temp);
+	//
+
+	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parentContext != nullptr ? parentContext->GetHandlePtr() : 0, &attributes[0]);
 	if (mRenderContext == nullptr)
 		return false;
 
@@ -63,7 +71,7 @@ void Win32POGLDeviceContext::Bind()
 		mBoundToThread = true;
 
 		// Make sure to load the extensions from the new library
-		this->LoadExtensions();
+		LoadExtensions();
 
 		InitializeRenderState();
 	}
@@ -79,6 +87,7 @@ void Win32POGLDeviceContext::Unbind()
 void Win32POGLDeviceContext::LoadExtensions()
 {
 	SET_EXTENSION_FUNC(PFNWGLCREATECONTEXTATTRIBSARBPROC, wglCreateContextAttribsARB);
+	SET_EXTENSION_FUNC(PFNWGLCHOOSEPIXELFORMATARBPROC, wglChoosePixelFormatARB);
 
 	POGLDeviceContext::LoadExtensions();
 }
