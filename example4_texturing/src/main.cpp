@@ -25,9 +25,11 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 	in vec2 vs_TexCoord;
 
+	layout(location = 0) out vec4 color;
+
 	void main()
 	{
-		gl_FragColor = texture(Texture, vs_TexCoord);
+		color = texture(Texture, vs_TexCoord);
 	}
 )" };
 

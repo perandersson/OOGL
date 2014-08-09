@@ -22,9 +22,11 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 	in vec4 vs_Color;
 
+	layout(location = 0) out vec4 color;
+
 	void main()
 	{
-		gl_FragColor = vs_Color;
+		color = vs_Color;
 	}
 )" };
 
