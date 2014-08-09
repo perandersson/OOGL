@@ -4,12 +4,12 @@
 class Win32POGLDeviceContext : public POGLDeviceContext
 {
 public:
-	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);
+	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC legacyRenderContext);
 	~Win32POGLDeviceContext();
 
 	void Bind();
 	void Unbind();
-	bool Initialize(Win32POGLDeviceContext* parentContext);
+	void Initialize(Win32POGLDeviceContext* parentContext);
 
 	/*!
 		\brief Retrieves the handle for this context
@@ -23,6 +23,7 @@ public:
 
 private:
 	HDC mDeviceContext;
+	HGLRC mLegacyRenderContext;
 	HGLRC mRenderContext;
 	bool mBoundToThread;
 

@@ -68,10 +68,7 @@ IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 {
 	if (tDeviceContext == nullptr) {
 		Win32POGLDeviceContext* context = new Win32POGLDeviceContext(this, mDeviceContext, mLegacyRenderContext);
-		if (!context->Initialize(mMainThreadDeviceContext)) {
-			delete context;
-			THROW_EXCEPTION(POGLException, "Could not create a new Device context");
-		}
+		context->Initialize(mMainThreadDeviceContext);
 		tDeviceContext = context;
 		std::lock_guard<std::recursive_mutex> lock(mDeviceContextsMutex);
 		mDeviceContexts.push_back(context);
@@ -122,11 +119,7 @@ bool Win32POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
 		return false;
 
 	mMainThreadDeviceContext = new Win32POGLDeviceContext(this, mDeviceContext, mLegacyRenderContext);
-	if (!mMainThreadDeviceContext->Initialize(nullptr)) {
-		delete mMainThreadDeviceContext;
-		mMainThreadDeviceContext = nullptr;
-		return false;
-	}
+	mMainThreadDeviceContext->Initialize(nullptr);
 	tDeviceContext = mMainThreadDeviceContext;
 	return POGLDevice::Initialize(info);
 }

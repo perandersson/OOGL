@@ -2,9 +2,9 @@
 #include "Win32POGLDeviceContext.h"
 #include <vector>
 
-Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext)
+Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC legacyRenderContext)
 : POGLDeviceContext(device), mDeviceContext(deviceContext),
-mRenderContext(renderContext), mBoundToThread(false),
+mRenderContext(nullptr), mLegacyRenderContext(legacyRenderContext), mBoundToThread(false),
 // Extensions
 wglCreateContextAttribsARB(nullptr), wglChoosePixelFormatARB(nullptr)
 {
@@ -19,12 +19,11 @@ Win32POGLDeviceContext::~Win32POGLDeviceContext()
 	}
 }
 
-bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
+void Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 {
 	// Activate the legacy render context (which is supplied in the constructor) so 
 	// that we can retrieve the necessary extensions
-	wglMakeCurrent(mDeviceContext, mRenderContext);
-	mRenderContext = nullptr;
+	wglMakeCurrent(mDeviceContext, mLegacyRenderContext);
 	LoadExtensions();
 	wglMakeCurrent(nullptr, nullptr);
 
@@ -34,7 +33,7 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 
 	if (wglCreateContextAttribsARB == nullptr) {
 		wglMakeCurrent(nullptr, nullptr);
-		return false;
+		THROW_EXCEPTION(POGLException, "Your computer does not support OpenGL 3.3. Make sure that you have the latest graphics-card drivers installed");
 	}
 
 	//
@@ -54,11 +53,9 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	// Create an OpenGL 3.3 render context
 	//
 
-	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parentContext != nullptr ? parentContext->GetHandlePtr() : 0, &attributes[0]);
+	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parentContext != nullptr ? parentContext->GetHandlePtr() : mLegacyRenderContext, &attributes[0]);
 	if (mRenderContext == nullptr)
-		return false;
-
-	return true;
+		THROW_EXCEPTION(POGLException, "Could not create an OpenGL 3.3 render context");
 }
 
 void Win32POGLDeviceContext::Bind()
@@ -66,10 +63,7 @@ void Win32POGLDeviceContext::Bind()
 	if (!mBoundToThread) {
 		wglMakeCurrent(mDeviceContext, mRenderContext);
 		mBoundToThread = true;
-
-		// Make sure to load the extensions from the new library
 		LoadExtensions();
-
 		InitializeRenderState();
 	}
 }
