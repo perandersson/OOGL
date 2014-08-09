@@ -184,7 +184,7 @@ GLenum POGLEnum::ConvertForMapBuffer(POGLResourceStreamType::Enum e)
 GLbitfield POGLEnum::ConvertForMapBufferRange(POGLResourceStreamType::Enum e)
 {
 	static GLenum access[POGLResourceStreamType::COUNT] = {
-		GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT
+		GL_MAP_WRITE_BIT
 	};
 
 	return access[(POGL_UINT32)e];

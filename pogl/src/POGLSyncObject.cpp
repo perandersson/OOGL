@@ -12,9 +12,9 @@ POGLSyncObject::POGLSyncObject(GLsync initSync, IPOGLDevice* device)
 POGLSyncObject::~POGLSyncObject()
 {
 	POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
+	std::lock_guard<std::recursive_mutex> wlock(mWriteLock);
+	std::lock_guard<std::recursive_mutex> rlock(mReadLock);
 	if (mSync != nullptr) {
-		std::lock_guard<std::recursive_mutex> wlock(mWriteLock);
-		std::lock_guard<std::recursive_mutex> rlock(mReadLock);
 		context->DeleteSync(mSync);
 		mSync = nullptr;
 	}
@@ -23,18 +23,9 @@ POGLSyncObject::~POGLSyncObject()
 
 void POGLSyncObject::WaitSyncDriver(POGLDeviceContext* context)
 {
-	{
-		const GLenum error = glGetError();
-		if (error != GL_NO_ERROR)
-			THROW_EXCEPTION(POGLException, "Could not wait for driver sync. Reason: %d", error);
-	}
-	context->WaitSync(GetSyncObject(), 0, GL_TIMEOUT_IGNORED);
-	//CHECK_GL("Could not wait for driver sync");
-	{ 
-		const GLenum error = glGetError(); 
-		if (error != GL_NO_ERROR) 
-			THROW_EXCEPTION(POGLException, "Could not wait for driver sync. Reason: %d", error); 
-	}
+	std::lock_guard<std::recursive_mutex> lock(mReadLock);
+	context->WaitSync(mSync, 0, GL_TIMEOUT_IGNORED);
+	CHECK_GL("Could not wait for driver sync");
 }
 
 void POGLSyncObject::WaitSyncClient(POGLDeviceContext* context)
@@ -47,7 +38,7 @@ void POGLSyncObject::WaitSyncClient(POGLDeviceContext* context)
 bool POGLSyncObject::WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout)
 {
 	std::lock_guard<std::recursive_mutex> lock(mReadLock);
-	const GLenum result = context->ClientWaitSync(GetSyncObject(), 0, timeout);
+	const GLenum result = context->ClientWaitSync(mSync, 0, timeout);
 	CHECK_GL("Could not wait for client sync");
 	if (result == GL_WAIT_FAILED) {
 		THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
@@ -61,7 +52,7 @@ bool POGLSyncObject::WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 time
 	std::lock_guard<std::recursive_mutex> lock(mReadLock);
 	bool synchronized = true;
 	POGL_UINT32 failCount = 0;
-	GLsync syncObject = GetSyncObject();
+	GLsync syncObject = mSync;
 	while (true) {
 		const GLenum result = context->ClientWaitSync(syncObject, 0, timeout);
 
@@ -107,19 +98,13 @@ void POGLSyncObject::UnlockWrite()
 	mWriteLock.unlock();
 }
 
-GLsync POGLSyncObject::GetSyncObject()
-{
-	std::lock_guard<std::recursive_mutex> lock(mReadLock);
-	return mSync;
-}
-
 void POGLSyncObject::QueueFence(POGLDeviceContext* context)
 {
 	LockWrite();
 	LockRead();
 	GLsync sync = context->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	glFlush();
 	context->DeleteSync(mSync);
+	glFlush();
 	mSync = sync;
 	UnlockRead();
 	UnlockWrite();

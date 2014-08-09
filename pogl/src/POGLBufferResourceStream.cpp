@@ -21,6 +21,7 @@ void POGLBufferResourceStream::Open(IPOGLResource* resource, POGLSyncObject* syn
 	mTarget = target;
 	mUsage = usage;
 	mStreamType = streamType;
+	mMapping = false;
 }
 
 void POGLBufferResourceStream::Update(POGL_UINT32 size, const void* data)
@@ -57,7 +58,7 @@ void POGLBufferResourceStream::UpdateRange(POGL_UINT32 offset, POGL_UINT32 size,
 			THROW_EXCEPTION(POGLStreamException, "You are not allowed to update ");
 	}
 
-	// Make sure no one is writing to this buffer before we continue
+	// Make sure no one is writing to this buffer before we continue on the CPU/client side
 	mSyncObject->LockWrite();
 	mSyncObject->WaitSyncClient(mDeviceContext);
 
@@ -74,9 +75,13 @@ void* POGLBufferResourceStream::Map()
 			THROW_EXCEPTION(POGLStreamException, "You are not allowed to map static buffers when writing");
 	}
 
-	// Make sure no one is writing to this buffer before we continue
+	// Make sure no one is writing to this buffer before we continue on the CPU/client side
 	mSyncObject->LockWrite();
+
+	// Wait until the GL server is complete with writing to the buffer from some other context
 	mSyncObject->WaitSyncClient(mDeviceContext);
+
+	// Create fence object on mapping when closing
 	mMapping = true;
 
 	return mDeviceContext->MapBuffer(mTarget, POGLEnum::ConvertForMapBuffer(mStreamType));
@@ -89,9 +94,13 @@ void* POGLBufferResourceStream::Map(POGL_UINT32 offset, POGL_UINT32 size)
 			THROW_EXCEPTION(POGLStreamException, "You are not allowed to map static buffers when writing");
 	}
 
-	// Make sure no one is writing to this buffer before we continue
+	// Make sure no one is writing to this buffer before we continue on the CPU/client side
 	mSyncObject->LockWrite();
+
+	// Wait until the GL server is complete with writing to the buffer from some other context
 	mSyncObject->WaitSyncClient(mDeviceContext);
+
+	// Create fence object on mapping when closing
 	mMapping = true;
 
 	return mDeviceContext->MapBufferRange(mTarget, offset, size, POGLEnum::ConvertForMapBufferRange(mStreamType));
@@ -104,6 +113,8 @@ void POGLBufferResourceStream::Close()
 		mSyncObject->QueueFence(mDeviceContext);
 		mMapping = false;
 	}
+	else
+		glFlush();
 	mSyncObject->UnlockWrite();
 	mResource->Release();
 	mResource = nullptr;

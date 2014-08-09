@@ -43,7 +43,7 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 
 	// Create an OpenGL 3.3 render context
 	HGLRC sharedRenderContext = parentContext == nullptr ? nullptr : parentContext->GetHandlePtr();
-	mRenderContext = wglCreateContextAttribsARB(mDeviceContext, sharedRenderContext, &attributes[0]);
+	mRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, sharedRenderContext, &attributes[0]);
 	wglMakeCurrent(0, 0);
 	wglDeleteContext(temp);
 	if (mRenderContext == nullptr)
@@ -57,6 +57,10 @@ void Win32POGLDeviceContext::Bind()
 	if (!mBoundToThread) {
 		wglMakeCurrent(mDeviceContext, mRenderContext);
 		mBoundToThread = true;
+
+		// Make sure to load the extensions from the new library
+		this->LoadExtensions();
+
 		InitializeRenderState();
 	}
 }

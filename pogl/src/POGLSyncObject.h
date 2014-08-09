@@ -41,12 +41,6 @@ public:
 	void QueueFence(POGLDeviceContext* context);
 
 private:
-	/*!
-		\brief Retrieves the sync object for this resource
-	*/
-	GLsync GetSyncObject();
-
-private:
 	std::recursive_mutex mReadLock;
 	std::recursive_mutex mWriteLock;
 	GLsync mSync;

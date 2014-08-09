@@ -3,21 +3,6 @@
 #define _POGL_H_
 
 #include <exception>
-#include <cassert>
-
-#ifndef assert_with_message
-#define assert_with_message(test, message) assert((test) && message)
-#endif
-
-#ifndef assert_not_null
-#define assert_not_null(param) \
-	assert(param != nullptr && "Parameter "## #param ##" cannot be nullptr")
-#endif
-
-#ifndef assert_null
-#define assert_null(param) \
-	assert(param == nullptr && "Parameter "## #param ##" is expected be nullptr")
-#endif
 
 #ifndef OFFSET
 #define OFFSET(x) ((char *)NULL + x)
@@ -890,7 +875,7 @@ public:
 	/*!
 		\brief Retrieves a device context for the current thread
 
-		If no device context is bound to the current thread then one is created and initializded for you
+		If no device context is bound to the current thread then one is created and initialized for you
 
 		\return A device context
 	*/
@@ -1578,6 +1563,30 @@ public:
 
 #ifndef THROW_EXCEPTION
 #define THROW_EXCEPTION(E, Message, ...) throw E(__FUNCTION__, __LINE__, __FILE__, Message, __VA_ARGS__)
+#endif
+
+#ifndef assert_with_message
+#ifdef _DEBUG
+#define assert_with_message(test, message) if(!(test)) THROW_EXCEPTION(POGLException, message)
+#else
+#define assert_with_message(test, message)
+#endif
+#endif
+
+#ifndef assert_not_null
+#ifdef _DEBUG
+#define assert_not_null(param) if(param == nullptr) THROW_EXCEPTION(POGLException, "Parameter "## #param ## " cannot be nullptr")
+#else
+#define assert_not_null(param)
+#endif
+#endif
+
+#ifndef assert_null
+#ifdef _DEBUG
+#define assert_null(param) if(param != nullptr) THROW_EXCEPTION(POGLException, "Parameter "## #param ## " is expected be nullptr")
+#else
+#define assert_null(param)
+#endif
 #endif
 
 #endif

@@ -37,7 +37,7 @@ int main()
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #else
-	deviceInfo.flags = 0;
+	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #endif
 	deviceInfo.windowHandle = windowHandle;
 	deviceInfo.colorBits = 32;
@@ -74,10 +74,9 @@ int main()
 		std::atomic<POGL_FLOAT> totalTime(0.0f);
 		
 		//
-		// Create two threads. 
+		// Create one thread. 
 		//
-		// The first thread updates the first half of the circle. The second
-		// thread updates the second half of the circle.
+		// The thread is responsible for updating the vertex buffer; increasing and decreasing the radius of the circle over time.
 		//
 
 		std::thread t1([&device, &vertexBuffer, &running, &totalTime] {
@@ -85,47 +84,33 @@ int main()
 				IPOGLDeviceContext* context = device->GetDeviceContext();
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
-					const POGL_UINT32 offsetIndex = 1;
-					const POGL_UINT32 length = CIRCLE_PTS / 2;
+
+					// Open a stream to the vertex buffer
 					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
-					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map(offsetIndex * sizeof(POGL_POSITION_VERTEX), length * sizeof(POGL_POSITION_VERTEX));
+
+					// Map the internal memory
+					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map();
+					POGL_POSITION_VERTEX* ptr = vertices;
+
+					// Update the data
 					const POGL_FLOAT radius = sinf(totalTimeFlt * 0.0174532925f) * 5.0f;
-					for (POGL_UINT32 i = 0; i < length; ++i) {
-						vertices[i].position.x = radius * cosf(i * 0.0174532925f);
-						vertices[i].position.y = radius * sinf(i * 0.0174532925f);
-						vertices[i].position.z = 0.0f;
+					for (POGL_UINT32 i = 0; i < CIRCLE_PTS; ++i) {
+						ptr->position.x = radius * cosf(i * 0.0174532925f);
+						ptr->position.y = radius * cosf(i * 0.0174532925f);
+						ptr->position.z = 0;
+						ptr++;
 					}
+
+					// Close the stream and synchronize between contexts
 					stream->Close();
 				}
 				context->Release();
 			}
 			catch (POGLException e) {
 				POGLAlert(e);
-			}
+			} 
 		});
-
-		//std::thread t2([&device, &vertexBuffer, &running, &totalTime] {
-		//	try {
-		//		IPOGLDeviceContext* context = device->GetDeviceContext();
-		//		while (running.load()) {
-		//			const POGL_FLOAT totalTimeFlt = totalTime.load();
-		//			const POGL_UINT32 offsetIndex = 1 + (CIRCLE_PTS / 2);
-		//			const POGL_UINT32 length = CIRCLE_PTS / 2;
-		//			IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
-		//			POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map(offsetIndex * sizeof(POGL_POSITION_VERTEX), length * sizeof(POGL_POSITION_VERTEX));
-		//			for (POGL_UINT32 i = 0; i < length; ++i) {
-		//				vertices[i].position.x = sinf(totalTime) * cosf((i + length) * 0.0174532925f);
-		//				vertices[i].position.y = sinf(totalTime) * sinf((i + length) * 0.0174532925f);
-		//			}
-		//			stream->Close();
-		//		}
-		//		context->Release();
-		//	}
-		//	catch (POGLException e) {
-		//		POGLAlert(e);
-		//	}
-		//});
-
+		
 		POGL_FLOAT totalTimeFlt = 0.0f;
 		while (POGLProcessEvents()) {
 			totalTimeFlt += POGLGetTimeSinceLastTick();
@@ -141,7 +126,6 @@ int main()
 
 		running.store(false);
 		t1.join();
-		//t2.join();
 
 		// Release resources
 		vertexBuffer->Release();

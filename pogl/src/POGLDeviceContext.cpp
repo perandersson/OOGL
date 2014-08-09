@@ -175,8 +175,8 @@ IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
 IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
 {
 	assert_not_null(bytes);
-	assert(size.x > 0.0f && "You cannot create a texture with 0 width");
-	assert(size.y > 0.0f && "You cannot create a texture with 0 height");
+	assert_with_message(size.x > 0.0f, "You cannot create a texture with 0 width");
+	assert_with_message(size.y > 0.0f, "You cannot create a texture with 0 height");
 
 	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
 	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
@@ -459,12 +459,12 @@ void POGLDeviceContext::LoadExtensions()
 
 void POGLDeviceContext::BindBuffer(GLenum target, GLuint bufferID)
 {
-	glBindBuffer(target, bufferID);
+	(*glBindBuffer)(target, bufferID);
 }
 
 void POGLDeviceContext::BufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage)
 {
-	glBufferData(target, size, data, usage);
+	(*glBufferData)(target, size, data, usage);
 }
 
 void POGLDeviceContext::DeleteBuffer(GLuint bufferID)
@@ -472,153 +472,153 @@ void POGLDeviceContext::DeleteBuffer(GLuint bufferID)
 	if (bufferID == 0)
 		return;
 
-	glDeleteBuffers(1, &bufferID);
+	(*glDeleteBuffers)(1, &bufferID);
 }
 
 void* POGLDeviceContext::MapBuffer(GLenum target, GLenum access)
 {
-	return glMapBuffer(target, access);
+	return (*glMapBuffer)(target, access);
 }
 
 void* POGLDeviceContext::MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
 {
-	return glMapBufferRange(target, offset, length, access);
+	return (*glMapBufferRange)(target, offset, length, access);
 }
 
 GLboolean POGLDeviceContext::UnmapBuffer(GLenum target)
 {
-	return glUnmapBuffer(target);
+	return (*glUnmapBuffer)(target);
 }
 
 void POGLDeviceContext::UseProgram(GLuint programID)
 {
-	glUseProgram(programID);
+	(*glUseProgram)(programID);
 }
 
 void POGLDeviceContext::Uniform1i(GLint location, GLint v0)
 {
-	glUniform1i(location, v0);
+	(*glUniform1i)(location, v0);
 }
 
 void POGLDeviceContext::Uniform1iv(GLint location, GLsizei count, const GLint *value)
 {
-	glUniform1iv(location, count, value);
+	(*glUniform1iv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform2iv(GLint location, GLsizei count, const GLint *value)
 {
-	glUniform2iv(location, count, value);
+	(*glUniform2iv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform3iv(GLint location, GLsizei count, const GLint *value)
 {
-	glUniform3iv(location, count, value);
+	(*glUniform3iv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform4iv(GLint location, GLsizei count, const GLint *value)
 {
-	glUniform4iv(location, count, value);
+	(*glUniform4iv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform1uiv(GLint location, GLsizei count, const GLuint *value)
 {
-	glUniform1uiv(location, count, value);
+	(*glUniform1uiv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform2uiv(GLint location, GLsizei count, const GLuint *value)
 {
-	glUniform2uiv(location, count, value);
+	(*glUniform2uiv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform3uiv(GLint location, GLsizei count, const GLuint *value)
 {
-	glUniform3uiv(location, count, value);
+	(*glUniform3uiv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform4uiv(GLint location, GLsizei count, const GLuint *value)
 {
-	glUniform4uiv(location, count, value);
+	(*glUniform4uiv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
 {
-	glUniform1fv(location, count, value);
+	(*glUniform1fv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
 {
-	glUniform2fv(location, count, value);
+	(*glUniform2fv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
 {
-	glUniform3fv(location, count, value);
+	(*glUniform3fv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
 {
-	glUniform4fv(location, count, value);
+	(*glUniform4fv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform1dv(GLint location, GLsizei count, const GLdouble *value)
 {
-	glUniform1dv(location, count, value);
+	(*glUniform1dv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform2dv(GLint location, GLsizei count, const GLdouble *value)
 {
-	glUniform2dv(location, count, value);
+	(*glUniform2dv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform3dv(GLint location, GLsizei count, const GLdouble *value)
 {
-	glUniform3dv(location, count, value);
+	(*glUniform3dv)(location, count, value);
 }
 
 void POGLDeviceContext::Uniform4dv(GLint location, GLsizei count, const GLdouble *value)
 {
-	glUniform4dv(location, count, value);
+	(*glUniform4dv)(location, count, value);
 }
 
 void POGLDeviceContext::UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
 {
-	glUniformMatrix4fv(location, count, transpose, value);
+	(*glUniformMatrix4fv)(location, count, transpose, value);
 }
 
 void POGLDeviceContext::UniformMatrix4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble* value)
 {
-	glUniformMatrix4dv(location, count, transpose, value);
+	(*glUniformMatrix4dv)(location, count, transpose, value);
 }
 
 void POGLDeviceContext::EnableVertexAttribArray(GLuint index)
 {
-	glEnableVertexAttribArray(index);
+	(*glEnableVertexAttribArray)(index);
 }
 
 void POGLDeviceContext::DisableVertexAttribArray(GLuint index)
 {
-	glDisableVertexAttribArray(index);
+	(*glDisableVertexAttribArray)(index);
 }
 
 void POGLDeviceContext::VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void* pointer)
 {
-	glVertexAttribIPointer(index, size, type, stride, pointer);
+	(*glVertexAttribIPointer)(index, size, type, stride, pointer);
 }
 
 void POGLDeviceContext::VertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer)
 {
-	glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+	(*glVertexAttribPointer)(index, size, type, normalized, stride, pointer);
 }
 
 void POGLDeviceContext::VertexAttribLPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void* pointer)
 {
-	glVertexAttribLPointer(index, size, type, stride, pointer);
+	(*glVertexAttribLPointer)(index, size, type, stride, pointer);
 }
 
 GLuint POGLDeviceContext::GenVertexArray()
 {
 	GLuint id = 0;
-	glGenVertexArrays(1, &id);
+	(*glGenVertexArrays)(1, &id);
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
@@ -629,23 +629,23 @@ GLuint POGLDeviceContext::GenVertexArray()
 
 void POGLDeviceContext::BindVertexArray(GLuint id)
 {
-	glBindVertexArray(id);
+	(*glBindVertexArray)(id);
 }
 
 void POGLDeviceContext::DeleteVertexArray(GLuint id)
 {
-	glDeleteVertexArrays(1, &id);
+	(*glDeleteVertexArrays)(1, &id);
 }
 
 void POGLDeviceContext::ActiveTexture(GLenum texture)
 {
-	glActiveTexture(texture);
+	(*glActiveTexture)(texture);
 }
 
 GLuint POGLDeviceContext::GenSamplerID()
 {
 	GLuint id = 0;
-	glGenSamplers(1, &id);
+	(*glGenSamplers)(1, &id);
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
@@ -656,33 +656,33 @@ GLuint POGLDeviceContext::GenSamplerID()
 
 void POGLDeviceContext::BindSampler(GLuint unit, GLuint sampler)
 {
-	glBindSampler(unit, sampler);
+	(*glBindSampler)(unit, sampler);
 }
 
 void POGLDeviceContext::DeleteSampler(GLuint samplerObject)
 {
-	glDeleteSamplers(1, &samplerObject);
+	(*glDeleteSamplers)(1, &samplerObject);
 }
 
 void POGLDeviceContext::SamplerParameteri(GLuint sampler, GLenum pname, GLint param)
 {
-	glSamplerParameteri(sampler, pname, param);
+	(*glSamplerParameteri)(sampler, pname, param);
 }
 
 void POGLDeviceContext::DeleteShader(GLuint shader)
 {
-	glDeleteShader(shader);
+	(*glDeleteShader)(shader);
 }
 
 void POGLDeviceContext::DeleteProgram(GLuint program)
 {
-	glDeleteProgram(program);
+	(*glDeleteProgram)(program);
 }
 
 GLuint POGLDeviceContext::GenBufferID()
 {
 	GLuint id = 0;
-	glGenBuffers(1, &id);
+	(*glGenBuffers)(1, &id);
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
@@ -693,22 +693,22 @@ GLuint POGLDeviceContext::GenBufferID()
 
 void POGLDeviceContext::WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 {
-	glWaitSync(sync, flags, timeout);
+	(*glWaitSync)(sync, flags, timeout);
 }
 
 GLenum POGLDeviceContext::ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
 {
-	return glClientWaitSync(sync, flags, timeout);
+	return (*glClientWaitSync)(sync, flags, timeout);
 }
 
 GLsync POGLDeviceContext::FenceSync(GLenum condition, GLbitfield flags)
 {
-	return glFenceSync(condition, flags);
+	return (*glFenceSync)(condition, flags);
 }
 
 void POGLDeviceContext::DeleteSync(GLsync sync)
 {
-	glDeleteSync(sync);
+	(*glDeleteSync)(sync);
 }
 
 GLuint POGLDeviceContext::GenTextureID()
