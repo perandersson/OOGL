@@ -46,10 +46,7 @@ bool Win32POGLDeviceContext::Initialize(Win32POGLDeviceContext* parentContext)
 	attributes.push_back(WGL_CONTEXT_MINOR_VERSION_ARB); attributes.push_back(3);
 	attributes.push_back(WGL_CONTEXT_PROFILE_MASK_ARB); attributes.push_back(WGL_CONTEXT_CORE_PROFILE_BIT_ARB);
 	if (BIT_ISSET(mDevice->GetDeviceInfo()->flags, POGLDeviceInfoFlags::DEBUG_MODE)) {
-		attributes.push_back(WGL_CONTEXT_FLAGS_ARB); attributes.push_back(WGL_CONTEXT_DEBUG_BIT_ARB | WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
-	}
-	else {
-		attributes.push_back(WGL_CONTEXT_FLAGS_ARB); attributes.push_back(WGL_CONTEXT_FORWARD_COMPATIBLE_BIT_ARB);
+		attributes.push_back(WGL_CONTEXT_FLAGS_ARB); attributes.push_back(WGL_CONTEXT_DEBUG_BIT_ARB);
 	}
 	attributes.push_back(0); attributes.push_back(0);
 
