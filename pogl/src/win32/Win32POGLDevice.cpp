@@ -149,7 +149,6 @@ Win32POGLDeviceContext* Win32POGLDevice::GetOrCreateRenderContext()
 	}
 
 	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-	wglMakeCurrent(nullptr, nullptr);
 	if (wglCreateContextAttribsARB == nullptr)
 		THROW_EXCEPTION(POGLException, "Your computer does not support OpenGL 3.3. Make sure that you have the latest graphics-card drivers installed");
 
@@ -170,12 +169,21 @@ Win32POGLDeviceContext* Win32POGLDevice::GetOrCreateRenderContext()
 	// Create an OpenGL 3.3 render context
 	//
 
-	HGLRC parentContext = nullptr;
-	if (mDeviceContexts.size() > 0) {
-		parentContext = mDeviceContexts[0]->GetHGLRC();
+	HGLRC parentContext = mLegacyRenderContext;
+	if (mDeviceContexts.empty()) {
+		wglDeleteContext(mLegacyRenderContext);
+		mLegacyRenderContext = (*wglCreateContextAttribsARB)(mDeviceContext, nullptr, &attributes[0]);
+		wglMakeCurrent(nullptr, nullptr);
+		wglMakeCurrent(mDeviceContext, mLegacyRenderContext);
+		if (mLegacyRenderContext == nullptr) {
+			const DWORD error = GetLastError();
+			THROW_EXCEPTION(POGLException, "Failed to create an OpenGL 3.3 render context. Reason: 0x%x", error);
+		}
+		parentContext = mLegacyRenderContext;
 	}
 	
 	HGLRC renderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parentContext, &attributes[0]);
+	wglMakeCurrent(nullptr, nullptr);
 	if (renderContext == nullptr) {
 		const DWORD error = GetLastError();
 		THROW_EXCEPTION(POGLException, "Failed to create an OpenGL 3.3 render context. Reason: 0x%x", error);
