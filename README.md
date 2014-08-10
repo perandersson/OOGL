@@ -41,3 +41,9 @@ Example showing creating and updating vertices in separate threads using the Map
 at the same time.
 
 ![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example5_threadedvertices/screenshot.png "Example 5")
+
+### Example 6: Custom Vertex Type ###
+
+Example showing how we can create custom vertex types instead of using the build-in ones.
+
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example6_customvertextype/screenshot.png "Example 5")

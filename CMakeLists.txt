@@ -22,4 +22,4 @@ add_subdirectory (example2_drawtriangle)
 add_subdirectory (example3_blending)
 add_subdirectory (example4_texturing)
 add_subdirectory (example5_threadedvertices)
-
+add_subdirectory (example6_customvertextype)
