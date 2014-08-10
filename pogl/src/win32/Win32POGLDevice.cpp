@@ -128,7 +128,6 @@ bool Win32POGLDevice::Initialize()
 
 	Win32POGLDeviceContext* mainRenderContext = CreateRenderContext(nullptr);
 	wglMakeCurrent(nullptr, nullptr);
-	wglDeleteContext(legacyRenderContext);
 	current = wglMakeCurrent(mDeviceContext, mainRenderContext->GetHGLRC());
 	if (current == FALSE) {
 		const DWORD error = GetLastError();
@@ -138,11 +137,13 @@ bool Win32POGLDevice::Initialize()
 
 	// Create render contexts that share resources with the main render context
 	const POGL_UINT8 count = GetMaxRenderContexts();
+	HGLRC parent = mainRenderContext->GetHGLRC();
 	for (POGL_UINT8 i = 0; i < count; ++i) {
-		Win32POGLDeviceContext* ctx = CreateRenderContext(mainRenderContext->GetHGLRC());
+		Win32POGLDeviceContext* ctx = CreateRenderContext(parent);
 		mFreeDeviceContexts.push_back(ctx);
 	}
 	wglMakeCurrent(nullptr, nullptr);
+	wglDeleteContext(legacyRenderContext);
 	return POGLDevice::Initialize();
 }
 
@@ -150,8 +151,8 @@ Win32POGLDeviceContext* Win32POGLDevice::TryGetRenderContext()
 {
 	std::lock_guard<std::recursive_mutex> lock(mDeviceContextsMutex);
 	if (mFreeDeviceContexts.empty()) {
-		THROW_EXCEPTION(POGLResourceException, "There are no more free render contexts available. The render context \
-											   count is now: %d. Increase the maximum amount of render contexts and try again", GetMaxRenderContexts());
+		THROW_EXCEPTION(POGLResourceException, "There are no more free render contexts available.\
+											   \nThe render context count is now: %d. Increase the maximum amount of render contexts and try again", GetMaxRenderContexts());
 	}
 
 	auto it = (*mFreeDeviceContexts.begin());

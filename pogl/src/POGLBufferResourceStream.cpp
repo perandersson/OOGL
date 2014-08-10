@@ -113,7 +113,8 @@ void POGLBufferResourceStream::Close()
 		const GLenum error = glGetError();
 		mSyncObject->UnlockWrite();
 		mResource->Release();
-		THROW_EXCEPTION(POGLStreamException, "Could not unmap stream. Reason: 0x%x", error);
+		THROW_EXCEPTION(POGLStreamException, "Could not unmap stream. \
+											 \nMake sure that you are not trying to write more bytes than available. Reason: 0x%x", error);
 	}
 
 	if (mMapping) {

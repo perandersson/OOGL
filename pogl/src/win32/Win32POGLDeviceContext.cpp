@@ -12,6 +12,7 @@ Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceCo
 Win32POGLDeviceContext::~Win32POGLDeviceContext()
 {
 	if (mRenderContext != nullptr) {
+		wglMakeCurrent(mDeviceContext, mRenderContext);
 		wglDeleteContext(mRenderContext);
 		mRenderContext = nullptr;
 	}
@@ -20,7 +21,11 @@ Win32POGLDeviceContext::~Win32POGLDeviceContext()
 void Win32POGLDeviceContext::AddRef()
 {
 	if (++mRefCount == 1) {
-		wglMakeCurrent(mDeviceContext, mRenderContext);
+		const BOOL current = wglMakeCurrent(mDeviceContext, mRenderContext);
+		if (current == FALSE) {
+			const DWORD error = GetLastError();
+			THROW_EXCEPTION(POGLException, "Could not bind the OpenGL 3.3 render context. Reason: 0x%x", error);
+		}
 		if (!mInitialized) {
 			mInitialized = true;
 			LoadExtensions();
@@ -34,7 +39,11 @@ void Win32POGLDeviceContext::Release()
 	assert_with_message(mRefCount > 0, "You are calling Release more often than to AddRef");
 
 	if (--mRefCount == 0) {
-		wglMakeCurrent(nullptr, nullptr);
+		const BOOL current = wglMakeCurrent(nullptr, nullptr);
+		if (current == FALSE) {
+			const DWORD error = GetLastError();
+			THROW_EXCEPTION(POGLException, "Could not unbind the OpenGL 3.3 render context. Reason: 0x%x", error);
+		}
 		static_cast<Win32POGLDevice*>(mDevice)->ReleaseRenderContext(this);
 	}
 }
