@@ -2,17 +2,21 @@
 
 PlayOpenGL is an object-oriented multithread friendly interface for OpenGL 3.3 and above and is used by my other projects.
 
-### What is it? ###
+## What is it? ##
 
 POGL is used to simplify OpenGL over multiple threads, both with resource sharing and state management. 
 
-### What is it not? ###
+## What is it not? ##
 
 POGL have a high initial performance cost, relative to vanilla OpenGL. The reason for this is that a lot of code running is to prevent unnecessary state changes and to help synchronize OpenGL data between multiple render contexts. 
 
 Using POGL in a single thread only will, at the moment, make use of synchronization methods (such as glFenceSync, glClientWaitSync and std::recursive_mutex). 
 The glClientWaitSync function will lock the CPU until the GL server (Graphics Card driver) has reached the glFenceSync command on the OpenGL queue. This is, for example, to
 ensure that no threads is working on an undefined/incomplete buffer. Some of the synchronizations done are not needed in single-thread mode, and have an unnecessary cost.
+
+## Known issues ##
+
+Visit the [Issues page](https://github.com/perandersson/POGL/labels/bug) for more information.
 
 ## Requirements ##
 
