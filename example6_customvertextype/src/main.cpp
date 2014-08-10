@@ -9,7 +9,7 @@ static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
 	#version 330
 
 	layout(location = 0) in vec3 position;
-	layout(location = 1) in float value;
+	layout(location = 2) in float value;
 
 	out float vs_Value;
 
@@ -74,7 +74,16 @@ static const POGL_VERTEX_LAYOUT CustomVertexLayout = {
 		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
 
 		//
-		// Attribute location = 1
+		// Do not use attribute location = 1
+		// 
+		// You are free to put the attributes in any location that you want. Some drivers, however, might optimize access to
+		// the vertex data if they are. 
+		//
+
+		{ 0 },
+
+		//
+		// Attribute location = 2
 		//
 
 		{ sizeof(POGL_FLOAT), POGLVertexType::FLOAT, false },
