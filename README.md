@@ -43,7 +43,7 @@ Example showing how to blend two vertice colors on the screen.
 
 ### Example 4: Texture Mapping ###
 
-This examples shows you how to use texture mapping to display a texture onto the screen using a quad vertex buffer.
+This examples shows you how to use texture mapping to display a texture onto the screen using a vertex- and index buffer.
 
 ![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example4_texturing/screenshot.png "Example 4")
 
