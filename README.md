@@ -49,7 +49,7 @@ Example showing perform texture mapping
 
 ### Example 5: Threaded Vertices ###
 
-Example showing creating and updating vertices in separate threads using the Map-Unmap functionality and render the same vertex buffer
+Example showing creating and updating the same VertexBuffer in separate threads using the Map-Unmap functionality and render the same vertex buffer
 at the same time.
 
 ![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example5_threadedvertices/screenshot.png "Example 5")

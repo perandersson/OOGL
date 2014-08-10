@@ -76,9 +76,9 @@ int main()
 		std::atomic<POGL_FLOAT> totalTime(0.0f);
 		
 		//
-		// Create two threads. 
+		// Create two threads. Each thread update different parts of the same VertexBuffer instance.
 		//
-		// The first thread is responsible for updating the vertex buffer; increasing and decreasing the radius of the top-part of the circle over time.
+		// The first thread is responsible for increasing and decreasing the radius of the top-part of the circle over time.
 		// The second thread is responsible for increasing and decreasing the radius of the bottom-part of the circle over time.
 		//
 
@@ -92,7 +92,7 @@ int main()
 					const POGL_UINT32 length = CIRCLE_PTS / 2;
 					
 					//
-					// Open a stream to the vertex buffer
+					// Open a stream to the vertex buffer (same VertexBuffer as in thread "t2")
 					//
 
 					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
@@ -140,7 +140,7 @@ int main()
 					const POGL_UINT32 length = (1 + CIRCLE_PTS) - offset;
 
 					//
-					// Open a stream to the vertex buffer
+					// Open a stream to the vertex buffer (same VertexBuffer as in thread "t1")
 					//
 
 					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
