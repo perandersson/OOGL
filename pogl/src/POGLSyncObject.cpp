@@ -25,7 +25,6 @@ void POGLSyncObject::WaitSyncDriver(POGLDeviceContext* context)
 {
 	std::lock_guard<std::recursive_mutex> lock(mReadLock);
 	context->WaitSync(mSync, 0, GL_TIMEOUT_IGNORED);
-	glFlush();
 	CHECK_GL("Could not wait for driver sync");
 }
 
@@ -40,7 +39,6 @@ bool POGLSyncObject::WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 time
 {
 	std::lock_guard<std::recursive_mutex> lock(mReadLock);
 	const GLenum result = context->ClientWaitSync(mSync, 0, timeout);
-	glFlush();
 	CHECK_GL("Could not wait for client sync");
 	if (result == GL_WAIT_FAILED) {
 		THROW_EXCEPTION(POGLSyncException, "Waiting for synchronization failed");
@@ -57,7 +55,6 @@ bool POGLSyncObject::WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 time
 	GLsync syncObject = mSync;
 	while (true) {
 		const GLenum result = context->ClientWaitSync(syncObject, 0, timeout);
-		glFlush();
 
 		// On error then throw exception
 		if (result == GL_WAIT_FAILED) {
@@ -107,8 +104,8 @@ void POGLSyncObject::QueueFence(POGLDeviceContext* context)
 	LockRead();
 	GLsync sync = context->FenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 	context->DeleteSync(mSync);
-	glFlush();
 	mSync = sync;
+	glFlush();
 	UnlockRead();
 	UnlockWrite();
 	CHECK_GL("Could not queue a new fence object");
