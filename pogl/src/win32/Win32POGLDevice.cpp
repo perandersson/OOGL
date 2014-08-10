@@ -1,6 +1,7 @@
 #include "MemCheck.h"
 #include "Win32POGLDevice.h"
 #include "Win32POGLDeviceContext.h"
+#include <algorithm>
 
 /* Thread local container for the device context */
 THREAD_LOCAL Win32POGLDeviceContext* tDeviceContext = nullptr;
@@ -46,6 +47,9 @@ void Win32POGLDevice::Release()
 		int size = mDeviceContexts.size();
 		for (int i = size - 1; i >= 0; --i) {
 			mDeviceContexts[i]->Destroy();
+			auto it = std::find(mFreeDeviceContexts.begin(), mFreeDeviceContexts.end(), mDeviceContexts[i]);
+			if (it != mFreeDeviceContexts.end())
+				mFreeDeviceContexts.erase(it);
 		}
 		mDeviceContexts.clear();
 		mFreeDeviceContexts.clear();
