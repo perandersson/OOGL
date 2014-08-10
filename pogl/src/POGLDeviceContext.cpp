@@ -189,6 +189,7 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 	}
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	glFlush();
 	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, new POGLSyncObject(sync, mDevice), mDevice);
 	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetHandlePtr());
 	return texture;
@@ -222,6 +223,7 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	glFlush();
 	return new POGLVertexBuffer(bufferID, layout, numVertices, type, usage, new POGLSyncObject(sync, mDevice), mDevice);
 }
 
@@ -275,6 +277,7 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
 	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	glFlush();
 	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, new POGLSyncObject(sync, mDevice), mDevice);
 }
 
