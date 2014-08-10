@@ -58,7 +58,9 @@ struct CustomVertex
 static const POGL_VERTEX_LAYOUT CustomVertexLayout = {
 
 	//
-	// Vertex attribute location
+	// Vertex attribute locations. 
+	//
+	// The index inside the POGL_VERTEX_LAYOUT_FIELD field will become the attribute location
 	//
 
 	{ 
