@@ -5,9 +5,12 @@
 class POGLDevice : public IPOGLDevice
 {
 public:
-	POGLDevice();
+	POGLDevice(const POGL_DEVICE_INFO* info);
 	~POGLDevice();
 
+	/*!
+		\brief Retrieves the device information
+	*/
 	const POGL_DEVICE_INFO* GetDeviceInfo();
 
 	/*!
@@ -15,7 +18,12 @@ public:
 
 		\param info
 	*/
-	virtual bool Initialize(const POGL_DEVICE_INFO* info);
+	virtual bool Initialize();
+	
+	/*!
+		\brief Retrieves the maximum amount of render contexts
+	*/
+	POGL_UINT8 GetMaxRenderContexts() const;
 
 protected:
 	POGL_DEVICE_INFO mDeviceInfo;

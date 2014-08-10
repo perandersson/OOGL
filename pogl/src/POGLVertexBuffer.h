@@ -1,6 +1,7 @@
 #pragma once
 #include "config.h"
 #include <gl/pogl.h>
+#include <atomic>
 
 class POGLIndexBuffer;
 class POGLSyncObject; 

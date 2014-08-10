@@ -6,7 +6,7 @@ int main()
 	// Prepare the neccessary information needed by POGL to create a valid device
 	//
 
-	POGL_DEVICE_INFO deviceInfo;
+	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #else

@@ -8,14 +8,14 @@
 class Win32POGLDevice : public POGLDevice
 {
 public:
-	Win32POGLDevice();
+	Win32POGLDevice(const POGL_DEVICE_INFO* info);
 	~Win32POGLDevice();
 
 	void AddRef();
 	void Release();
 	IPOGLDeviceContext* GetDeviceContext();
 	void SwapBuffers();
-	bool Initialize(const POGL_DEVICE_INFO* info);
+	bool Initialize();
 	
 	/*!
 		\brief Release the supplied render context and return it to the free RenderContext's list.
@@ -30,14 +30,18 @@ private:
 
 		\return A render context
 	*/
-	Win32POGLDeviceContext* GetOrCreateRenderContext();
+	Win32POGLDeviceContext* TryGetRenderContext();
+
+	/*!
+		\brief Creates a new render context
+	*/
+	Win32POGLDeviceContext* CreateRenderContext(HGLRC parent);
 
 private:
 	POGL_UINT32 mRefCount;
 	bool mReleasing;
 	HWND mWindowHandle;
 	HDC mDeviceContext;
-	HGLRC mLegacyRenderContext;
 	
 	std::vector<Win32POGLDeviceContext*> mDeviceContexts;
 	std::list<Win32POGLDeviceContext*> mFreeDeviceContexts;

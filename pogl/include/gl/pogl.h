@@ -655,7 +655,16 @@ struct POGL_DEVICE_INFO
 
 	/* Extra flags for the device info, for example: DEBUG mode */
 	POGL_UINT8 flags;
+
+	/* Max render contexts. If 0 then default is used, which is POGL_DEFAULT_MAX_RENDER_CONTEXTS */
+	POGL_UINT8 maxRenderContexts;
 };
+
+/* The default maximum amount of render-contexts. */
+static const POGL_UINT8 POGL_DEFAULT_MAX_RENDER_CONTEXTS = 6;
+
+/* The maximum limit of render contexts we are allowing in total */
+static const POGL_UINT8 POGL_TOTAL_MAX_RENDER_CONTEXTS = 36;
 
 /*!
 	\brief

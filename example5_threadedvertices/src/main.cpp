@@ -35,7 +35,7 @@ int main()
 	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 5: Threaded Vertices"));
 
 	// Create a POGL device based on the supplied information
-	POGL_DEVICE_INFO deviceInfo;
+	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #else
@@ -86,18 +86,18 @@ int main()
 				IPOGLDeviceContext* context = device->GetDeviceContext();
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
-
+					
 					// Open a stream to the vertex buffer
 					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
 
 					// Map the internal memory
 					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map();
-					POGL_POSITION_VERTEX* ptr = vertices;
+					POGL_POSITION_VERTEX* ptr = ++vertices;
 
 					// Update the data
 					const POGL_FLOAT radius = sinf(totalTimeFlt * 0.0174532925f) * 5.0f;
 					for (POGL_UINT32 i = 0; i < CIRCLE_PTS; ++i) {
-						ptr->position.x = radius * cosf(i * 0.0174532925f);
+						ptr->position.x = radius * sinf(i * 0.0174532925f);
 						ptr->position.y = radius * cosf(i * 0.0174532925f);
 						ptr->position.z = 0;
 						ptr++;
@@ -105,6 +105,7 @@ int main()
 
 					// Close the stream and synchronize between contexts
 					stream->Close();
+
 				}
 				context->Release();
 			}

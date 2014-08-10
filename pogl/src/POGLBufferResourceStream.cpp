@@ -103,18 +103,26 @@ void* POGLBufferResourceStream::Map(POGL_UINT32 offset, POGL_UINT32 size)
 	// Create fence object on mapping when closing
 	mMapping = true;
 
-	return mDeviceContext->MapBufferRange(mTarget, offset, size, POGLEnum::ConvertForMapBufferRange(mStreamType));
+	return mDeviceContext->MapBufferRange(mTarget, offset, size, POGLEnum::ConvertForMapBufferRange(mStreamType) | GL_MAP_UNSYNCHRONIZED_BIT);
 }
 
 void POGLBufferResourceStream::Close()
 {
-	mDeviceContext->UnmapBuffer(mTarget);
+	GLboolean unmapped = mDeviceContext->UnmapBuffer(mTarget);
+	if (unmapped == GL_FALSE) {
+		const GLenum error = glGetError();
+		mSyncObject->UnlockWrite();
+		mResource->Release();
+		THROW_EXCEPTION(POGLStreamException, "Could not unmap stream. Reason: 0x%x", error);
+	}
+
 	if (mMapping) {
 		mSyncObject->QueueFence(mDeviceContext);
 		mMapping = false;
 	}
 	else
 		glFlush();
+
 	mSyncObject->UnlockWrite();
 	mResource->Release();
 	mResource = nullptr;

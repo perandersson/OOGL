@@ -113,9 +113,9 @@ POGLStreamException::~POGLStreamException()
 //
 //
 
-POGLDevice::POGLDevice()
+POGLDevice::POGLDevice(const POGL_DEVICE_INFO* info)
 {
-
+	memcpy(&mDeviceInfo, info, sizeof(mDeviceInfo));
 }
 
 POGLDevice::~POGLDevice()
@@ -127,8 +127,13 @@ const POGL_DEVICE_INFO* POGLDevice::GetDeviceInfo()
 	return &mDeviceInfo;
 }
 
-bool POGLDevice::Initialize(const POGL_DEVICE_INFO* info)
+bool POGLDevice::Initialize()
 {
-	memcpy(&mDeviceInfo, info, sizeof(mDeviceInfo));
 	return true;
+}
+
+POGL_UINT8 POGLDevice::GetMaxRenderContexts() const
+{
+	const POGL_UINT8 result = mDeviceInfo.maxRenderContexts == 0 ? POGL_DEFAULT_MAX_RENDER_CONTEXTS : mDeviceInfo.maxRenderContexts - 1;
+	return result > POGL_TOTAL_MAX_RENDER_CONTEXTS ? POGL_TOTAL_MAX_RENDER_CONTEXTS : result;
 }
