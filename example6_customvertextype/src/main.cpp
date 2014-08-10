@@ -67,17 +67,19 @@ static const POGL_VERTEX_LAYOUT CustomVertexLayout = {
 		// 
 		// Attribute location = 0
 		//
-		// First value tells us how large the attribute is
-		// The second value tells us what type of data is contained in the attribute (float, int, etc.)
-		// The third value indicates if we want OpenGL to normalize the value on input
+		// First value tells us how large the attribute is. This is almost always the size of the attribute.
+		// 
+		// The second value tells us what type of data is contained in the attribute (floats, integers etc.)
+		//
+		// The third value indicates if we want OpenGL to normalize the value on input. This is almost always "false".
+		//
 
 		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
 
 		//
 		// Do not use attribute location = 1
 		// 
-		// You are free to put the attributes in any location that you want. Some drivers, however, might optimize access to
-		// the vertex data if they are. 
+		// You are free to put the attributes in any location that you want.
 		//
 
 		{ 0 },
