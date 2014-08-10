@@ -12,7 +12,6 @@ Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceCo
 Win32POGLDeviceContext::~Win32POGLDeviceContext()
 {
 	if (mRenderContext != nullptr) {
-		wglMakeCurrent(mDeviceContext, mRenderContext);
 		wglDeleteContext(mRenderContext);
 		mRenderContext = nullptr;
 	}

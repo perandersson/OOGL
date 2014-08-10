@@ -103,7 +103,7 @@ void POGLAlert(const POGLException& e)
 #pragma push_macro("GetMessage")
 #undef GetMessage
 	const POGL_STRING& message = e.GetMessage();
-	MessageBox((HWND)gPOGLWindowHandle, message.c_str(), POGL_TOCHAR("Fatal Error"), MB_ICONERROR | MB_OK);
+	MessageBox(NULL, message.c_str(), POGL_TOCHAR("Fatal Error"), MB_ICONERROR | MB_OK);
 #pragma pop_macro("GetMessage")
 }
 

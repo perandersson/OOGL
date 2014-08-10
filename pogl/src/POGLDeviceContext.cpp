@@ -35,7 +35,6 @@ void POGLDeviceContext::Destroy()
 		mRenderState->Release();
 		mRenderState = nullptr;
 	}
-	delete this;
 }
 
 IPOGLDevice* POGLDeviceContext::GetDevice()

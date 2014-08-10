@@ -50,6 +50,9 @@ void Win32POGLDevice::Release()
 			auto it = std::find(mFreeDeviceContexts.begin(), mFreeDeviceContexts.end(), mDeviceContexts[i]);
 			if (it != mFreeDeviceContexts.end())
 				mFreeDeviceContexts.erase(it);
+			if (i == 0) mDeviceContexts[i]->Release();
+			delete mDeviceContexts[i];
+			mDeviceContexts[i] = nullptr;
 		}
 		mDeviceContexts.clear();
 		mFreeDeviceContexts.clear();
@@ -127,8 +130,7 @@ bool Win32POGLDevice::Initialize()
 	}
 
 	Win32POGLDeviceContext* mainRenderContext = CreateRenderContext(nullptr);
-	wglMakeCurrent(nullptr, nullptr);
-	current = wglMakeCurrent(mDeviceContext, mainRenderContext->GetHGLRC());
+	mainRenderContext->AddRef();
 	if (current == FALSE) {
 		const DWORD error = GetLastError();
 		THROW_EXCEPTION(POGLException, "Could not bind the new OpenGL 3.3 render context. Reason: 0x%x", error);
@@ -138,11 +140,10 @@ bool Win32POGLDevice::Initialize()
 	// Create render contexts that share resources with the main render context
 	const POGL_UINT8 count = GetMaxRenderContexts();
 	HGLRC parent = mainRenderContext->GetHGLRC();
-	for (POGL_UINT8 i = 0; i < count; ++i) {
+	for (POGL_UINT8 i = 0; i < count - 1; ++i) {
 		Win32POGLDeviceContext* ctx = CreateRenderContext(parent);
 		mFreeDeviceContexts.push_back(ctx);
 	}
-	wglMakeCurrent(nullptr, nullptr);
 	wglDeleteContext(legacyRenderContext);
 	return POGLDevice::Initialize();
 }
