@@ -34,20 +34,20 @@ int main()
 	// Create a window
 	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example 5: Threaded Vertices"));
 
-	try {
-		// Create a POGL device based on the supplied information
-		POGL_DEVICE_INFO deviceInfo = { 0 };
+	// Create a POGL device based on the supplied information
+	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG
-		deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
+	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #else
-		deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
+	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #endif
-		deviceInfo.windowHandle = windowHandle;
-		deviceInfo.colorBits = 32;
-		deviceInfo.depthBits = 16;
-		deviceInfo.pixelFormat = POGLPixelFormat::R8G8B8A8;
-		IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
+	deviceInfo.windowHandle = windowHandle;
+	deviceInfo.colorBits = 32;
+	deviceInfo.depthBits = 16;
+	deviceInfo.pixelFormat = POGLPixelFormat::R8G8B8A8;
+	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
+	try {
 		// Create a device context for main thread
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
@@ -91,15 +91,24 @@ int main()
 					const POGL_UINT32 offset = 1;
 					const POGL_UINT32 length = CIRCLE_PTS / 2;
 					
+					//
 					// Open a stream to the vertex buffer
+					//
+
 					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
 
+					//
 					// Map the internal memory
+					//
+
 					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map(offset * sizeof(POGL_POSITION_VERTEX), length * sizeof(POGL_POSITION_VERTEX));
 					POGL_POSITION_VERTEX* ptr = vertices;
 
-					// Update the data
-					const POGL_FLOAT radius = sinf(totalTimeFlt * 0.0174532925f) * 5.0f;
+					//
+					// Update the buffer data
+					//
+
+					const POGL_FLOAT radius = sinf((totalTimeFlt * 15.0f) * 0.0174532925f) * 0.5f;
 					for (POGL_UINT32 i = 0; i < length; ++i) {
 						ptr->position.x = radius * cosf(i * 0.0174532925f);
 						ptr->position.y = radius * sinf(i * 0.0174532925f);
@@ -107,7 +116,10 @@ int main()
 						ptr++;
 					}
 
+					//
 					// Close the stream and synchronize between contexts
+					//
+
 					stream->Close();
 
 				}
@@ -127,15 +139,24 @@ int main()
 					const POGL_UINT32 offset = 1 + CIRCLE_PTS / 2;
 					const POGL_UINT32 length = (1 + CIRCLE_PTS) - offset;
 
+					//
 					// Open a stream to the vertex buffer
+					//
+
 					IPOGLResourceStream* stream = context->OpenStream(vertexBuffer, POGLResourceStreamType::WRITE);
 
+					//
 					// Map the internal memory
+					//
+
 					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)stream->Map(offset * sizeof(POGL_POSITION_VERTEX), length * sizeof(POGL_POSITION_VERTEX));
 					POGL_POSITION_VERTEX* ptr = vertices;
 
-					// Update the data
-					const POGL_FLOAT radius = sinf(totalTimeFlt * 0.0174532925f) * 5.0f;
+					//
+					// Update the buffer data
+					//
+
+					const POGL_FLOAT radius = sinf((totalTimeFlt * 15.0f) * 0.0174532925f) * 0.5f;
 					for (POGL_UINT32 i = 0; i < length; ++i) {
 						ptr->position.x = radius * cosf((i + length) * 0.0174532925f);
 						ptr->position.y = radius * sinf((i + length) * 0.0174532925f);
@@ -143,7 +164,10 @@ int main()
 						ptr++;
 					}
 
+					//
 					// Close the stream and synchronize between contexts
+					//
+
 					stream->Close();
 
 				}
@@ -175,13 +199,13 @@ int main()
 		vertexBuffer->Release();
 		simpleEffect->Release();
 		context->Release();
-
-		// Release the device
-		device->Release();
 	}
 	catch (POGLException e) {
 		POGLAlert(e);
 	}
+
+	// Release the device
+	device->Release();
 
 	// Destroy the example window
 	POGLDestroyExampleWindow(windowHandle);
