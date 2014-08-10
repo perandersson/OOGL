@@ -8,9 +8,13 @@
 static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
 	#version 330
 
+	// The "position" value is located on location = "0", defined in CustomVertexLayout
 	layout(location = 0) in vec3 position;
+
+	// The "value" value is located on location = "2", defined in CustomVertexLayout
 	layout(location = 2) in float value;
 
+	// Send the value to the fragment shader
 	out float vs_Value;
 
 	void main()
@@ -36,7 +40,8 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 //
 // Custom vertex structure
 // 
-// Each custom vertex structure must have a matching POGL_VERTEX_LAYOUT object
+// Each custom vertex structure must have a matching POGL_VERTEX_LAYOUT object. The order of the attributes inside the custom
+// vertex structure must match the attribute location order in the POGL_VERTEX_LAYOUT object.
 //
 
 struct CustomVertex
@@ -60,7 +65,11 @@ static const POGL_VERTEX_LAYOUT CustomVertexLayout = {
 	//
 	// Vertex attribute locations. 
 	//
-	// The index of POGL_VERTEX_LAYOUT_FIELD fields array will become the attribute location
+	// The index of POGL_VERTEX_LAYOUT_FIELD fields array will become the attribute location.
+	// 
+	// The attributes can be put in any location that you want, as long as they are in the same order as
+	// they are in the custom vertex structure. The POGL_VECTOR3F "position" is located before the POGL_FLOAT "value" in this 
+	// example, thus the "position" must be have a lower attribute location than the "value". 
 	//
 
 	{ 
