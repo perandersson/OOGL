@@ -50,7 +50,8 @@ void Win32POGLDevice::Release()
 			auto it = std::find(mFreeDeviceContexts.begin(), mFreeDeviceContexts.end(), mDeviceContexts[i]);
 			if (it != mFreeDeviceContexts.end())
 				mFreeDeviceContexts.erase(it);
-			if (i == 0) mDeviceContexts[i]->Release();
+			if (i == 0) 
+				mDeviceContexts[i]->Release();
 			delete mDeviceContexts[i];
 			mDeviceContexts[i] = nullptr;
 		}
@@ -84,7 +85,7 @@ void Win32POGLDevice::ReleaseRenderContext(Win32POGLDeviceContext* renderContext
 	tDeviceContext = nullptr;
 }
 
-void Win32POGLDevice::SwapBuffers()
+void Win32POGLDevice::EndFrame()
 {
 	::SwapBuffers(mDeviceContext);
 

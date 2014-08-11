@@ -39,6 +39,12 @@ void POGLRenderState::AddRef()
 
 void POGLRenderState::Release()
 {
+	mApplyCurrentEffectState = true;
+	if (mEffect != nullptr) {
+		mEffect->Release();
+		mEffect = nullptr;
+	}
+
 	if (--mRefCount == 0) {
 		if (mVertexBuffer != nullptr) {
 			mVertexBuffer->Release();
@@ -48,11 +54,6 @@ void POGLRenderState::Release()
 		if (mIndexBuffer != nullptr) {
 			mIndexBuffer->Release();
 			mIndexBuffer = nullptr;
-		}
-
-		if (mEffect != nullptr) {
-			mEffect->Release();
-			mEffect = nullptr;
 		}
 
 		auto size = mTextures.size();
@@ -72,7 +73,9 @@ void POGLRenderState::Release()
 		// Clear all effect states
 		mEffectStates.clear();
 
+		mDeviceContext = nullptr;
 		delete this;
+		return;
 	}
 }
 
@@ -150,12 +153,6 @@ void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* in
 		vbo->Draw(mDeviceContext, ibo, startIndex, count);
 
 	CHECK_GL("Cannot draw vertex- and index buffer");
-}
-
-void POGLRenderState::EndFrame()
-{
-	mApplyCurrentEffectState = true;
-	Release();
 }
 
 void POGLRenderState::SetDepthTest(bool b)
@@ -259,7 +256,13 @@ void POGLRenderState::SetBlend(bool b)
 
 IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
 {
-	assert_not_null(effect);
+	if (effect == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing effect");
+
+	// If an effect is bound then release this render state 
+	if (mEffect != nullptr) {
+		Release();
+	}
 
 	// Bind the effect if neccessary
 	POGLEffect* effectImpl = static_cast<POGLEffect*>(effect);

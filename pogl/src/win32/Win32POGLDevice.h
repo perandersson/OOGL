@@ -14,7 +14,7 @@ public:
 	void AddRef();
 	void Release();
 	IPOGLDeviceContext* GetDeviceContext();
-	void SwapBuffers();
+	void EndFrame();
 	bool Initialize();
 	
 	/*!

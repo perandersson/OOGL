@@ -26,7 +26,6 @@ public:
 	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
 	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
 	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
-	void EndFrame();
 	void SetDepthTest(bool b);
 	void SetDepthFunc(POGLDepthFunc::Enum depthFunc);
 	void SetDepthMask(bool b);

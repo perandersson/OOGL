@@ -94,8 +94,8 @@ int main()
 			state->Draw(vertexBuffer);
 			state->Draw(vertexBufferInv);
 
-			state->EndFrame();
-			device->SwapBuffers();
+			state->Release();
+			device->EndFrame();
 		}
 
 		//

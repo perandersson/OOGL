@@ -170,8 +170,8 @@ int main()
 
 			state->Draw(vertexBuffer);
 
-			state->EndFrame();
-			device->SwapBuffers();
+			state->Release();
+			device->EndFrame();
 		}
 
 		//

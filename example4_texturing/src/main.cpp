@@ -103,8 +103,8 @@ int main()
 			state->FindUniformByName("Texture")->SetTexture(texture);
 
 			state->Draw(vertexBuffer, indexBuffers);
-			state->EndFrame();
-			device->SwapBuffers();
+			state->Release();
+			device->EndFrame();
 		}
 
 		//

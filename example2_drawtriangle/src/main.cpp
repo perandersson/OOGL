@@ -133,13 +133,13 @@ int main()
 			// This unlocks any attached framebuffers.
 			//
 
-			state->EndFrame();
+			state->Release();
 
 			//
-			// Swap the back buffer with the front buffer so that we can see the result onto the screen
+			// End the frame, execute command lists and swap the back buffer with the front buffer so that we can see the result onto the screen
 			//
 
-			device->SwapBuffers();
+			device->EndFrame();
 		}
 
 		//

@@ -186,9 +186,9 @@ int main()
 			IPOGLRenderState* state = context->Apply(simpleEffect);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			state->Draw(vertexBuffer);
-			state->EndFrame();
+			state->Release();
 
-			device->SwapBuffers();
+			device->EndFrame();
 		}
 
 		running.store(false);

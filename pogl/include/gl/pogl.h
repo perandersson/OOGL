@@ -893,7 +893,7 @@ public:
 	/*!
 		\brief Swap buffers
 	*/
-	virtual void SwapBuffers() = 0;
+	virtual void EndFrame() = 0;
 
 	/*!
 		\brief Retrieves the device info
@@ -1373,11 +1373,6 @@ public:
 	*/
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count) = 0;
 
-	/*!
-		\brief Ends the current frame
-	*/
-	virtual void EndFrame() = 0;
-	
 	/*!
 		\brief
 	*/
