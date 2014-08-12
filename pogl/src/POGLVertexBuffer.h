@@ -10,7 +10,7 @@ class POGLRenderState;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
 public:
-	POGLVertexBuffer(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device);
+	POGLVertexBuffer(GLuint bufferID, GLuint vaoID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, IPOGLDevice* device);
 	~POGLVertexBuffer();
 	
 	/*!
@@ -28,18 +28,25 @@ public:
 	}
 
 	/*!
+		\brief Retrieves the vertex array object ID for this buffer
+	*/
+	inline GLuint GetVertexArrayObjectID() const {
+		return mVertexArrayObject;
+	}
+
+	/*!
 		\brief How this buffer is used internally
 	*/
 	inline GLenum GetBufferUsage() const {
 		return mBufferUsage;
 	}
 
-	/*!
-		\brief Retrieves the object responsible for synchronizing this object between contexts
-	*/
-	inline POGLSyncObject* GetSyncObject() {
-		return mSyncObject;
-	}
+	///*!
+	//	\brief Retrieves the object responsible for synchronizing this object between contexts
+	//*/
+	//inline POGLSyncObject* GetSyncObject() {
+	//	return mSyncObject;
+	//}
 	
 	/*!
 		\brief Draw this vertex buffer
@@ -70,10 +77,10 @@ public:
 public:
 	IPOGLDevice* GetDevice();
 	POGL_HANDLE GetHandlePtr();
-	void WaitSyncDriver(IPOGLDeviceContext* context);
-	void WaitSyncClient(IPOGLDeviceContext* context);
-	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
-	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+	//void WaitSyncDriver(IPOGLDeviceContext* context);
+	//void WaitSyncClient(IPOGLDeviceContext* context);
+	//bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
+	//bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 	//POGLResourceType::Enum GetResourceType() const;
 
 // IPOGLVertexBuffer
@@ -87,11 +94,12 @@ public:
 private:
 	POGL_UINT32 mRefCount;
 	POGL_UINT32 mUID;
+	GLuint mVertexArrayObject;
 	GLuint mBufferID;
 	const POGL_VERTEX_LAYOUT* mLayout;
 	POGL_UINT32 mNumVertices;
 	GLenum mPrimitiveType;
 	GLenum mBufferUsage;
-	POGLSyncObject* mSyncObject;
+	//POGLSyncObject* mSyncObject;
 	IPOGLDevice* mDevice;
 };

@@ -14,8 +14,9 @@ namespace {
 	}
 }
 
-POGLVertexBuffer::POGLVertexBuffer(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device)
-: mRefCount(1), mUID(GenVertexBufferUID()), mBufferID(bufferID), mLayout(layout), mNumVertices(numVertices), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage), mSyncObject(syncObject), mDevice(device)
+POGLVertexBuffer::POGLVertexBuffer(GLuint bufferID, GLuint vaoID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, IPOGLDevice* device)
+: mRefCount(1), mUID(GenVertexBufferUID()), mVertexArrayObject(vaoID), mBufferID(bufferID), 
+mLayout(layout), mNumVertices(numVertices), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage), mDevice(device)
 {
 }
 
@@ -31,16 +32,19 @@ void POGLVertexBuffer::AddRef()
 void POGLVertexBuffer::Release()
 {
 	if (--mRefCount == 0) {
+
+		POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 		if (mBufferID != 0) {
-			POGLDeviceContext* context = static_cast<POGLDeviceContext*>(mDevice->GetDeviceContext());
 			context->DeleteBuffer(mBufferID);
-			context->Release();
 			mBufferID = 0;
 		}
-		if (mSyncObject != nullptr) {
-			delete mSyncObject;
-			mSyncObject = nullptr;
+		if (mVertexArrayObject != 0) {
+			context->BindVertexArray(0);
+			context->DeleteVertexArray(mVertexArrayObject);
+			mVertexArrayObject = 0;
 		}
+		context->Release();
+
 		delete this;
 	}
 }
@@ -56,27 +60,6 @@ POGL_HANDLE POGLVertexBuffer::GetHandlePtr()
 	return this;
 }
 
-void POGLVertexBuffer::WaitSyncDriver(IPOGLDeviceContext* context)
-{
-	mSyncObject->WaitSyncDriver(static_cast<POGLDeviceContext*>(context));
-}
-
-void POGLVertexBuffer::WaitSyncClient(IPOGLDeviceContext* context)
-{
-	mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context));
-}
-
-bool POGLVertexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout)
-{
-	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout);
-}
-
-bool POGLVertexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
-{
-	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout, job);
-}
-
-
 POGL_UINT32 POGLVertexBuffer::GetNumVertices() const
 {
 	return mNumVertices;
@@ -84,26 +67,22 @@ POGL_UINT32 POGLVertexBuffer::GetNumVertices() const
 
 void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGL_UINT32 startIndex)
 {
-	mSyncObject->WaitSyncDriver(context);
 	glDrawArrays(mPrimitiveType, startIndex, mNumVertices);
 }
 
 void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGL_UINT32 startIndex, POGL_UINT32 count)
 {
-	mSyncObject->WaitSyncDriver(context);
 	glDrawArrays(mPrimitiveType, startIndex, count);
 }
 
 void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
 {
 	assert_not_null(indexBuffer);
-	mSyncObject->WaitSyncDriver(context);
 	indexBuffer->Draw(context, this, mPrimitiveType, startIndex);
 }
 
 void POGLVertexBuffer::Draw(POGLDeviceContext* context, POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
 {
 	assert_not_null(indexBuffer);
-	mSyncObject->WaitSyncDriver(context);
 	indexBuffer->Draw(context, this, mPrimitiveType, startIndex, count);
 }

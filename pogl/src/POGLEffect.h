@@ -13,8 +13,11 @@ public:
 	POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, IPOGLDevice* device);
 	~POGLEffect();
 
-	void AddRef();
-	void Release();
+	virtual void AddRef();
+	virtual void Release();
+
+	virtual IPOGLDevice* GetDevice();
+	virtual POGL_HANDLE GetHandlePtr();
 
 	bool GetDepthTest();
 	void SetDepthTest(bool b);

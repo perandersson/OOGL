@@ -1,5 +1,6 @@
 #include "MemCheck.h"
 #include "POGLDevice.h"
+#include "POGLDeferredDeviceContext.h"
 
 // 
 // Exceptions
@@ -83,7 +84,7 @@ POGLStateException::~POGLStateException()
 {
 }
 
-POGLSyncException::POGLSyncException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...)
+POGLInitializationException::POGLInitializationException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...)
 : POGLException(function, line, file)
 {
 	va_list arglist;
@@ -92,20 +93,7 @@ POGLSyncException::POGLSyncException(const POGL_CHAR* function, const POGL_UINT6
 	va_end(arglist);
 }
 
-POGLSyncException::~POGLSyncException()
-{
-}
-
-POGLStreamException::POGLStreamException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...)
-: POGLException(function, line, file)
-{
-	va_list arglist;
-	va_start(arglist, message);
-	strcpy_s(mMessage, sizeof(mMessage), GenExceptionMessage(message, arglist).c_str());
-	va_end(arglist);
-}
-
-POGLStreamException::~POGLStreamException()
+POGLInitializationException::~POGLInitializationException()
 {
 }
 
@@ -127,13 +115,8 @@ const POGL_DEVICE_INFO* POGLDevice::GetDeviceInfo()
 	return &mDeviceInfo;
 }
 
-bool POGLDevice::Initialize()
+IPOGLDeferredDeviceContext* POGLDevice::CreateDeferredDeviceContext()
 {
-	return true;
-}
-
-POGL_UINT8 POGLDevice::GetMaxRenderContexts() const
-{
-	const POGL_UINT8 result = mDeviceInfo.maxRenderContexts == 0 ? POGL_DEFAULT_MAX_RENDER_CONTEXTS : mDeviceInfo.maxRenderContexts - 1;
-	return result > POGL_TOTAL_MAX_RENDER_CONTEXTS ? POGL_TOTAL_MAX_RENDER_CONTEXTS : result;
+	POGLDeferredDeviceContext* context = new POGLDeferredDeviceContext(this);
+	return context;
 }

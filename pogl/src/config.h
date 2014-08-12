@@ -13,12 +13,6 @@
 
 #include "glext.h"
 
-#ifdef WIN32
-#define THREAD_LOCAL __declspec(thread)
-#else
-#define THREAD_LOCAL thread_local
-#endif
-
 #ifdef __GNUC__
 #include <ext/hash_map>
 namespace std { using namespace __gnu_cxx; }

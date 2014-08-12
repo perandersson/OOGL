@@ -11,8 +11,8 @@ namespace {
 	}
 }
 
-POGLIndexBuffer::POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device)
-: mRefCount(1), mUID(GenIndexBufferUID()), mBufferID(bufferID), mTypeSize(typeSize), mNumIndices(numIndices), mType(type), mBufferUsage(bufferUsage), mSyncObject(syncObject), mDevice(device)
+POGLIndexBuffer::POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, IPOGLDevice* device)
+: mRefCount(1), mUID(GenIndexBufferUID()), mBufferID(bufferID), mTypeSize(typeSize), mNumIndices(numIndices), mType(type), mBufferUsage(bufferUsage), mDevice(device)
 {
 
 }
@@ -35,10 +35,6 @@ void POGLIndexBuffer::Release()
 			context->Release();
 			mBufferID = 0;
 		}
-		if (mSyncObject != nullptr) {
-			delete mSyncObject;
-			mSyncObject = nullptr;
-		}
 		delete this;
 	}
 }
@@ -53,26 +49,26 @@ POGL_HANDLE POGLIndexBuffer::GetHandlePtr()
 {
 	return this;
 }
-
-void POGLIndexBuffer::WaitSyncDriver(IPOGLDeviceContext* context)
-{
-	mSyncObject->WaitSyncDriver(static_cast<POGLDeviceContext*>(context));
-}
-
-void POGLIndexBuffer::WaitSyncClient(IPOGLDeviceContext* context)
-{
-	mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context));
-}
-
-bool POGLIndexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout)
-{
-	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout);
-}
-
-bool POGLIndexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
-{
-	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout, job);
-}
+//
+//void POGLIndexBuffer::WaitSyncDriver(IPOGLDeviceContext* context)
+//{
+//	mSyncObject->WaitSyncDriver(static_cast<POGLDeviceContext*>(context));
+//}
+//
+//void POGLIndexBuffer::WaitSyncClient(IPOGLDeviceContext* context)
+//{
+//	mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context));
+//}
+//
+//bool POGLIndexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout)
+//{
+//	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout);
+//}
+//
+//bool POGLIndexBuffer::WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job)
+//{
+//	return mSyncObject->WaitSyncClient(static_cast<POGLDeviceContext*>(context), timeout, job);
+//}
 
 POGL_UINT32 POGLIndexBuffer::GetNumElements() const
 {
@@ -81,14 +77,14 @@ POGL_UINT32 POGLIndexBuffer::GetNumElements() const
 
 void POGLIndexBuffer::Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex)
 {
-	mSyncObject->WaitSyncDriver(context);
+//	mSyncObject->WaitSyncDriver(context);
 	const GLvoid* indices = (const GLvoid*)(startIndex * mTypeSize);
 	glDrawElements(primitiveType, mNumIndices, mType, indices);
 }
 
 void POGLIndexBuffer::Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count)
 {
-	mSyncObject->WaitSyncDriver(context);
+//	mSyncObject->WaitSyncDriver(context);
 	const GLvoid* indices = (const GLvoid*)(startIndex * mTypeSize);
 	glDrawElements(primitiveType, count, mType, indices);
 }

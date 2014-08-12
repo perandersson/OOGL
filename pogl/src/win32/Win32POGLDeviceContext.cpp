@@ -38,12 +38,12 @@ void Win32POGLDeviceContext::Release()
 	assert_with_message(mRefCount > 0, "You are calling Release more often than to AddRef");
 
 	if (--mRefCount == 0) {
-		const BOOL current = wglMakeCurrent(nullptr, nullptr);
-		if (current == FALSE) {
+		if (!wglMakeCurrent(nullptr, nullptr)) {
 			const DWORD error = GetLastError();
 			THROW_EXCEPTION(POGLException, "Could not unbind the OpenGL 3.3 render context. Reason: 0x%x", error);
 		}
-		static_cast<Win32POGLDevice*>(mDevice)->ReleaseRenderContext(this);
+
+		delete this;
 	}
 }
 

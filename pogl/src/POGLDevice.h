@@ -13,17 +13,9 @@ public:
 	*/
 	const POGL_DEVICE_INFO* GetDeviceInfo();
 
-	/*!
-		\brief Initialize the windows implementation of the IPOLDevice interface
-
-		\param info
-	*/
-	virtual bool Initialize();
-	
-	/*!
-		\brief Retrieves the maximum amount of render contexts
-	*/
-	POGL_UINT8 GetMaxRenderContexts() const;
+// IPOGLDevice
+public:
+	virtual IPOGLDeferredDeviceContext* CreateDeferredDeviceContext();
 
 protected:
 	POGL_DEVICE_INFO mDeviceInfo;

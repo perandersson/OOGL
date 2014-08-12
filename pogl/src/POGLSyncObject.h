@@ -10,10 +10,10 @@ public:
 	POGLSyncObject(GLsync initSync, IPOGLDevice* device);
 	~POGLSyncObject();
 
-	void WaitSyncDriver(POGLDeviceContext* context);
-	void WaitSyncClient(POGLDeviceContext* context);
-	bool WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout);
-	bool WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
+	//void WaitSyncDriver(POGLDeviceContext* context);
+	//void WaitSyncClient(POGLDeviceContext* context);
+	//bool WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout);
+	//bool WaitSyncClient(POGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	/*!
 		\brief Lock CPU access to this instance from other threads

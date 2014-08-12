@@ -9,7 +9,7 @@ class POGLVertexBuffer;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
-	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, POGLSyncObject* syncObject, IPOGLDevice* device);
+	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, IPOGLDevice* device);
 	~POGLIndexBuffer();
 	
 	/*!
@@ -55,13 +55,6 @@ public:
 		return mType;
 	}
 	
-	/*!
-		\brief Retrieves the object responsible for synchronizing this object between contexts
-	*/
-	inline POGLSyncObject* GetSyncObject() {
-		return mSyncObject;
-	}
-	
 	void Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex);
 	void Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count);
 
@@ -74,10 +67,6 @@ public:
 public:
 	IPOGLDevice* GetDevice();
 	POGL_HANDLE GetHandlePtr();
-	void WaitSyncDriver(IPOGLDeviceContext* context);
-	void WaitSyncClient(IPOGLDeviceContext* context);
-	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
-	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 // IPOGLIndexBuffer
 public:
@@ -91,6 +80,5 @@ private:
 	POGL_UINT32 mTypeSize;
 	GLenum mType;
 	GLenum mBufferUsage;
-	POGLSyncObject* mSyncObject;
 	IPOGLDevice* mDevice;
 };

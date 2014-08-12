@@ -2,20 +2,14 @@
 #include "config.h"
 #include <gl/pogl.h>
 
-class POGLSyncObject;
 class POGLTextureResource : public IPOGLInterface
 {
 public:
-	POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format, POGLSyncObject* syncObject, IPOGLDevice* device);
+	POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format, IPOGLDevice* device);
 	virtual ~POGLTextureResource();
 
 	void AddRef();
 	void Release();
-
-	void WaitSyncDriver(IPOGLDeviceContext* context);
-	void WaitSyncClient(IPOGLDeviceContext* context);
-	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
-	bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
 
 	POGL_UINT32 GetUID() const;
 	GLuint GetTextureID() const;
@@ -28,6 +22,5 @@ private:
 	GLuint mTextureID;
 	GLenum mTextureTarget;
 	POGLTextureFormat::Enum mTextureFormat;
-	POGLSyncObject* mSyncObject;
 	IPOGLDevice* mDevice;
 };

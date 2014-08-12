@@ -39,13 +39,11 @@
 class IPOGLInterface;
 class IPOGLResource;
 
-class IPOGLResourceStream;
-
-class IPOGLWaitSyncJob;
-
 class IPOGLDevice;
 class IPOGLDeviceContext;
 class IPOGLRenderState;
+
+class IPOGLDeferredDeviceContext;
 
 class IPOGLVertexBuffer;
 class IPOGLIndexBuffer;
@@ -655,16 +653,7 @@ struct POGL_DEVICE_INFO
 
 	/* Extra flags for the device info, for example: DEBUG mode */
 	POGL_UINT8 flags;
-
-	/* Max render contexts. If 0 then default is used, which is POGL_DEFAULT_MAX_RENDER_CONTEXTS */
-	POGL_UINT8 maxRenderContexts;
 };
-
-/* The default maximum amount of render-contexts. */
-static const POGL_UINT8 POGL_DEFAULT_MAX_RENDER_CONTEXTS = 6;
-
-/* The maximum limit of render contexts we are allowing in total */
-static const POGL_UINT8 POGL_TOTAL_MAX_RENDER_CONTEXTS = 36;
 
 /*!
 	\brief
@@ -804,75 +793,9 @@ public:
 	virtual IPOGLDevice* GetDevice() = 0;
 
 	/*!
-		\brief Retrieves a handle for this resource
+		\brief Retrieves the internal handle for this resource
 	*/
 	virtual POGL_HANDLE GetHandlePtr() = 0;
-
-	/*!
-		\brief Wait for the supplied fence type to complete
-
-		This method will put a "Wait Sync" marker on the rendering queue, making sure that
-		resources from multiple threads are called in the appropriate order
-
-		\remark This method waits a very long time
-
-		\param e
-	*/
-	virtual void WaitSyncDriver(IPOGLDeviceContext* context) = 0;
-
-	/*!
-		\brief Wait for the supplied fence type to complete
-
-		This method will not return until the supplied fence type is marked as signaled
-
-		\remark This method waits a very long time
-
-		\param e
-	*/
-	virtual void WaitSyncClient(IPOGLDeviceContext* context) = 0;
-	
-	/*!
-		\brief Wait for the supplied fence type to complete
-
-		This method will not return until the supplied fence type is marked as signaled or if the 
-		supplied timeout has been reached
-
-		\param e
-		\param timeout
-	*/
-	virtual bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout) = 0;
-	
-	/*!
-		\brief Wait for the supplied fence type to complete
-
-		
-		This method will not return until the supplied fence type is marked as signaled. If the timeout is not reached
-		then the supplied job will be invoked and completed until it retries again. 
-
-		\remark This method waits a very long time
-
-		\param e
-		\param timeout
-		\param job
-	*/
-	virtual bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job) = 0;
-};
-
-/*!
-
-*/
-class IPOGLWaitSyncJob
-{
-public:
-	virtual ~IPOGLWaitSyncJob() {}
-
-	/*!
-		\brief Method called if the synchronization for the IPOGLResource has reached it's timeout.
-
-		\param context
-		\param failCount
-	*/
-	virtual bool Execute(IPOGLDeviceContext* context, POGL_UINT32 failCount);
 };
 
 /*!
@@ -882,14 +805,24 @@ class IPOGLDevice : public IPOGLInterface
 {
 public:
 	/*!
-		\brief Retrieves a device context for the current thread
+		\brief Creates a new device context
 
-		If no device context is bound to the current thread then one is created and initialized for you
+		You use the device context to draw the geometry onto the screen
 
 		\return A device context
 	*/
 	virtual IPOGLDeviceContext* GetDeviceContext() = 0;
 	
+	/*!
+		\brief Creates a new deferred device context
+
+		A deferred device context is esentially a command queue implementation for the IPOGLDeviceContext interface. You invoke it as you normally would and
+		then supply it to be rendered in the main thread when it's done
+
+		\return A device context
+	*/
+	virtual IPOGLDeferredDeviceContext* CreateDeferredDeviceContext() = 0;
+
 	/*!
 		\brief Swap buffers
 	*/
@@ -1023,80 +956,9 @@ public:
 	virtual IPOGLRenderState* Apply(IPOGLEffect* effect) = 0;
 
 	/*!
-		\brief Open a memory stream for the supplied resource
-
-		You are only allowed to have one stream active per context at a time. Trying to open more than one stream will result in a POGLStreamException.
-
-		There are also performance that you have to be aware of. POGL will ensure synchronizity for the resource between all the active contexts, but
-		to ensure data-integrity, a client-wide lock is needed for the supplied resource over the same memory area. 
-		
-		The performance impact for the lock is minimal if you don't write to the same resource from multiple threads at the same time.
-
-		\param resource
-				The resource we want to open a stream to
-		\param e
-				What type of stream are we opening
-		\return
-				An opened stream. Remember to IPOGLResourceStream::Close the stream when you are done with it
-	*/
-	virtual IPOGLResourceStream* OpenStream(IPOGLVertexBuffer* resource, POGLResourceStreamType::Enum e) = 0;
-
-	/*!
-		\brief Open a memory stream for the supplied resource
-
-		You are only allowed to have one stream active per context at a time. Trying to open more than one stream will result in a POGLStreamException.
-
-		There are also performance that you have to be aware of. POGL will ensure synchronizity for the resource between all the active contexts, but
-		to ensure data-integrity, a client-wide lock is needed for the supplied resource over the same memory area. 
-		
-		The performance impact for the lock is minimal if you don't write to the same resource from multiple threads at the same time.
-
-		\param resource
-				The resource we want to open a stream to
-		\param e
-				What type of stream are we opening
-		\return
-				An opened stream. Remember to IPOGLResourceStream::Close the stream when you are done with it
-	*/
-	virtual IPOGLResourceStream* OpenStream(IPOGLIndexBuffer* resource, POGLResourceStreamType::Enum e) = 0;
-};
-
-/*!
-	\brief A stream to the data of a resource
-*/
-class IPOGLResourceStream
-{
-public:
-	virtual ~IPOGLResourceStream() {}
-
-	/*!
-		\brief Update the entire original buffer. 
-		
-		This might orphan the original buffer data, depending on the implementation
-		
-		\param size
-				The size of the data buffer
-		\param data
-				The new data we want to put into the buffer
-	*/
-	virtual void Update(POGL_UINT32 size, const void* data) = 0;
-
-	/*!
-		\brief Update parts of the original buffer
-		
-		\param offset
-				The offset, in bytes, where we want to start saving the data
-		\param size
-				The size of the data buffer
-		\param data
-				The new data we want to put into the buffer
-	*/
-	virtual void UpdateRange(POGL_UINT32 offset, POGL_UINT32 size, const void* data) = 0;
-
-	/*!
 		\brief Map the data to a memory location and return a pointer to it
 	*/
-	virtual void* Map() = 0;
+	virtual void* Map(IPOGLResource* resource, POGLResourceStreamType::Enum e) = 0;
 	
 	/*!
 		\brief Map parts of the data to a memory location and return a pointer to it
@@ -1106,7 +968,7 @@ public:
 		\param size
 				The size of the data buffer we want to map
 	*/
-	virtual void* Map(POGL_UINT32 offset, POGL_UINT32 size) = 0;
+	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 size, POGLResourceStreamType::Enum e) = 0;
 
 	/*!
 		\brief Close the stream
@@ -1114,7 +976,29 @@ public:
 		This must be done after all the operations have been completed. This unmaps potentially mapped resources and
 		update your objects synchronization status so that any future rending operations will get the correct buffer data.
 	*/
-	virtual void Close() = 0;
+	virtual void Unmap(IPOGLResource* resource) = 0;
+};
+
+/*!
+
+*/
+class IPOGLDeferredDeviceContext : public IPOGLDeviceContext
+{
+public:
+	/*!
+		\brief Execute the commands generated by this context and clears the command queue
+
+		\param context
+	*/
+	virtual void ExecuteCommands(IPOGLDeviceContext* context) = 0;
+
+	/*!
+		\brief Execute the commands generated by this device context
+
+		\param context
+		\param clearCommands
+	*/
+	virtual void ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands) = 0;
 };
 
 /*!
@@ -1213,7 +1097,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLShaderProgram : public IPOGLInterface
+class IPOGLShaderProgram : public IPOGLResource
 {
 public:
 };
@@ -1221,7 +1105,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLEffect : public IPOGLInterface
+class IPOGLEffect : public IPOGLResource
 {
 public:
 	/*!
@@ -1521,6 +1405,15 @@ protected:
 /*!
 	\brief Exception thrown if a resource generation has failed
 */
+class POGLInitializationException : public POGLException {
+public:
+	POGLInitializationException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLInitializationException();
+};
+
+/*!
+	\brief Exception thrown if a resource generation has failed
+*/
 class POGLResourceException : public POGLException {
 public:
 	POGLResourceException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
@@ -1552,15 +1445,6 @@ class POGLSyncException : public POGLException {
 public:
 	POGLSyncException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLSyncException();
-};
-
-/*!
-	\brief Excepton thrown if you are using the streaming functionality in a way that's not compatible.
-*/
-class POGLStreamException : public POGLException {
-public:
-	POGLStreamException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLStreamException();
 };
 
 #include <cstdarg>

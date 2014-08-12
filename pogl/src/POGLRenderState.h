@@ -119,10 +119,8 @@ private:
 
 	IPOGLVertexBuffer *mVertexBuffer;
 	POGL_UINT32 mVertexBufferUID;
-	bool mVertexAttributeLocations[MAX_VERTEX_LAYOUT_FIELD_SIZE];
 	IPOGLIndexBuffer* mIndexBuffer;
 	POGL_UINT32 mIndexBufferUID;
-	GLuint mVertexArrayID;
 
 	//
 	// Properties

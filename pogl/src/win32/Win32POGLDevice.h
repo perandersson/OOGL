@@ -11,39 +11,32 @@ public:
 	Win32POGLDevice(const POGL_DEVICE_INFO* info);
 	~Win32POGLDevice();
 
-	void AddRef();
-	void Release();
-	IPOGLDeviceContext* GetDeviceContext();
-	void EndFrame();
-	bool Initialize();
-	
 	/*!
-		\brief Release the supplied render context and return it to the free RenderContext's list.
+		Initializes this device
 	*/
-	void ReleaseRenderContext(Win32POGLDeviceContext* renderContext);
+	void Initialize();
+	
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
 
+// IPOGLDevice
+public:
+	virtual IPOGLDeviceContext* GetDeviceContext();
+	virtual void EndFrame();
+	
 private:
 	/*!
-		\brief Retrieve a free render context. 
-
-		This method creates a render context if no free render context is found
-
-		\return A render context
+		\brief Creates a new render OpenGL 3.3 RenderContext
 	*/
-	Win32POGLDeviceContext* TryGetRenderContext();
-
-	/*!
-		\brief Creates a new render context
-	*/
-	Win32POGLDeviceContext* CreateRenderContext(HGLRC parent);
+	Win32POGLDeviceContext* CreateRenderContext();
 
 private:
 	POGL_UINT32 mRefCount;
 	bool mReleasing;
-	HWND mWindowHandle;
-	HDC mDeviceContext;
+	HWND mHWND;
+	HDC mDC;
 	
-	std::vector<Win32POGLDeviceContext*> mDeviceContexts;
-	std::list<Win32POGLDeviceContext*> mFreeDeviceContexts;
-	std::recursive_mutex mDeviceContextsMutex;
+	Win32POGLDeviceContext* mDeviceContext;
 };

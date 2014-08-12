@@ -38,6 +38,17 @@ void POGLShaderProgram::Release()
 	}
 }
 
+IPOGLDevice* POGLShaderProgram::GetDevice()
+{
+	mDevice->AddRef();
+	return mDevice;
+}
+
+POGL_HANDLE POGLShaderProgram::GetHandlePtr()
+{
+	return nullptr;
+}
+
 POGL_UINT32 POGLShaderProgram::GetUID() const
 {
 	return mUID;

@@ -10,7 +10,7 @@
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
-mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0), mVertexArrayID(0),
+mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false),
 mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
@@ -19,12 +19,6 @@ mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
 	mTextureUID.resize(mMaxActiveTextures, 0);
 	mTextures.resize(mMaxActiveTextures, nullptr);
 	mSamplerObjectUID.resize(mMaxActiveTextures, 0);
-
-	for (POGL_UINT32 i = 0; i < MAX_VERTEX_LAYOUT_FIELD_SIZE; ++i)
-		mVertexAttributeLocations[i] = false;
-
-	mVertexArrayID = context->GenVertexArray();
-	context->BindVertexArray(mVertexArrayID);
 }
 
 POGLRenderState::~POGLRenderState()
@@ -62,12 +56,6 @@ void POGLRenderState::Release()
 				mTextures[i]->Release();
 				mTextures[i] = nullptr;
 			}
-		}
-
-		if (mVertexArrayID != 0) {
-			mDeviceContext->BindVertexArray(0);
-			mDeviceContext->DeleteVertexArray(mVertexArrayID);
-			mVertexArrayID = 0;
 		}
 
 		// Clear all effect states
@@ -369,62 +357,8 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 	}
 	mVertexBuffer = buffer;
 	mVertexBuffer->AddRef();
-	mDeviceContext->BindBuffer(GL_ARRAY_BUFFER, buffer->GetBufferID());
-	CHECK_GL("Could not bind the supplied vertex buffer");
-
-	const POGL_VERTEX_LAYOUT* layout = buffer->GetLayout();
-	POGL_UINT32 offset = 0;
-	for (POGL_UINT32 i = 0; i < MAX_VERTEX_LAYOUT_FIELD_SIZE; ++i) {
-		const POGL_VERTEX_LAYOUT_FIELD& field = layout->fields[i];
-		if (field.fieldSize == 0) {
-			// Disable vertex attribute location if neccessary
-			if (mVertexAttributeLocations[i]) {
-				mDeviceContext->DisableVertexAttribArray(i);
-				mVertexAttributeLocations[i] = false;
-				CHECK_GL("Could not disable vertex attrib locations for the vertex array object");
-			}
-			continue;
-		}
-
-		// Enable vertex attribute location if neccessary
-		if (!mVertexAttributeLocations[i]) {
-			mDeviceContext->EnableVertexAttribArray(i);
-			mVertexAttributeLocations[i] = true;
-		}
-
-		static const POGL_UINT32 TYPE_SIZE[POGLVertexType::COUNT] = {
-			sizeof(POGL_INT8),
-			sizeof(POGL_UINT8),
-			sizeof(POGL_INT16),
-			sizeof(POGL_UINT16),
-			sizeof(POGL_INT32),
-			sizeof(POGL_UINT32),
-			sizeof(POGL_FLOAT),
-			sizeof(POGL_DOUBLE)
-		};
-
-		const GLint numElementsInField = field.fieldSize / TYPE_SIZE[(POGL_UINT32)field.type];
-		const auto type = field.type;
-		switch (type) {
-		case POGLVertexType::BYTE:
-		case POGLVertexType::UNSIGNED_BYTE:
-		case POGLVertexType::SHORT:
-		case POGLVertexType::UNSIGNED_SHORT:
-		case POGLVertexType::INT:
-		case POGLVertexType::UNSIGNED_INT:
-			mDeviceContext->VertexAttribIPointer(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
-			break;
-		case POGLVertexType::FLOAT:
-			mDeviceContext->VertexAttribPointer(i, numElementsInField, POGLEnum::Convert(type), field.normalize ? GL_TRUE : GL_FALSE, layout->vertexSize, OFFSET(offset));
-			break;
-		case POGLVertexType::DOUBLE:
-			mDeviceContext->VertexAttribLPointer(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
-			break;
-		}
-
-		CHECK_GL("Could not set vertex attrib location for the vertex array object");
-		offset += field.fieldSize;
-	}
+	mDeviceContext->BindVertexArray(buffer->GetVertexArrayObjectID());
+	CHECK_GL("Could not bind the supplied vertex array object");
 
 	mVertexBufferUID = uid;
 }
@@ -468,9 +402,9 @@ void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UI
 		CHECK_GL("Could not set active texture index");
 	}
 
-	// Make sure to wait for this resource before continuing to use
-	if (resource != nullptr)
-		resource->WaitSyncDriver(mDeviceContext);
+	//// Make sure to wait for this resource before continuing to use
+	//if (resource != nullptr)
+	//	resource->WaitSyncDriver(mDeviceContext);
 
 	const POGL_UINT32 uid = resource != nullptr ? resource->GetUID() : 0;
 

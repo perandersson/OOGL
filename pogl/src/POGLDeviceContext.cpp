@@ -15,7 +15,7 @@
 #include <algorithm>
 
 POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
-: mRenderState(nullptr), mResourceStream(nullptr), mDevice(device)
+: mRenderState(nullptr), mDevice(device)
 {
 }
 
@@ -25,12 +25,6 @@ POGLDeviceContext::~POGLDeviceContext()
 
 void POGLDeviceContext::Destroy()
 {
-	if (mResourceStream != nullptr) {
-		if (mResourceStream->IsOpen())
-			mResourceStream->Close();
-		delete mResourceStream;
-		mResourceStream = nullptr;
-	}
 	if (mRenderState != nullptr) {
 		mRenderState->Release();
 		mRenderState = nullptr;
@@ -188,9 +182,7 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: 0x%x", status);
 	}
 
-	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	glFlush();
-	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, new POGLSyncObject(sync, mDevice), mDevice);
+	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, mDevice);
 	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetHandlePtr());
 	return texture;
 }
@@ -208,23 +200,74 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
 	const GLuint bufferID = GenBufferID();
+	const GLuint vaoID = GenVertexArray();
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
+
+	(*glBindVertexArray)(vaoID);
+	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	// 
 	// Fill the buffer with data
 	//
 
-	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 	glBufferData(GL_ARRAY_BUFFER, memorySize, memory, usage);
+
+	//
+	// Define how the vertex attributes are located
+	//
+
+	POGL_UINT32 offset = 0;
+	for (POGL_UINT32 i = 0; i < MAX_VERTEX_LAYOUT_FIELD_SIZE; ++i) {
+		const POGL_VERTEX_LAYOUT_FIELD& field = layout->fields[i];
+		if (field.fieldSize == 0) {
+			continue;
+		}
+
+		// Enable vertex attribute location if neccessary
+		(*glEnableVertexAttribArray)(i);
+		CHECK_GL("Could not enable vertex attrib location for the vertex array object");
+
+		static const POGL_UINT32 TYPE_SIZE[POGLVertexType::COUNT] = {
+			sizeof(POGL_INT8),
+			sizeof(POGL_UINT8),
+			sizeof(POGL_INT16),
+			sizeof(POGL_UINT16),
+			sizeof(POGL_INT32),
+			sizeof(POGL_UINT32),
+			sizeof(POGL_FLOAT),
+			sizeof(POGL_DOUBLE)
+		};
+
+		const GLint numElementsInField = field.fieldSize / TYPE_SIZE[(POGL_UINT32)field.type];
+		const auto type = field.type;
+		switch (type) {
+		case POGLVertexType::BYTE:
+		case POGLVertexType::UNSIGNED_BYTE:
+		case POGLVertexType::SHORT:
+		case POGLVertexType::UNSIGNED_SHORT:
+		case POGLVertexType::INT:
+		case POGLVertexType::UNSIGNED_INT:
+			(*glVertexAttribIPointer)(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
+			break;
+		case POGLVertexType::FLOAT:
+			(*glVertexAttribPointer)(i, numElementsInField, POGLEnum::Convert(type), field.normalize ? GL_TRUE : GL_FALSE, layout->vertexSize, OFFSET(offset));
+			break;
+		case POGLVertexType::DOUBLE:
+			(*glVertexAttribLPointer)(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
+			break;
+		}
+
+		CHECK_GL("Could not set vertex attrib location for the vertex array object");
+		offset += field.fieldSize;
+	}
+
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
-	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	glFlush();
-	return new POGLVertexBuffer(bufferID, layout, numVertices, type, usage, new POGLSyncObject(sync, mDevice), mDevice);
+	return new POGLVertexBuffer(bufferID, vaoID, layout, numVertices, type, usage, mDevice);
 }
 
 IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -276,9 +319,7 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	if (error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
-	GLsync sync = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	glFlush();
-	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, new POGLSyncObject(sync, mDevice), mDevice);
+	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, mDevice);
 }
 
 IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
@@ -286,32 +327,21 @@ IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 	return mRenderState->Apply(effect);
 }
 
-IPOGLResourceStream* POGLDeviceContext::OpenStream(IPOGLVertexBuffer* resource, POGLResourceStreamType::Enum e)
+void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::Enum e)
 {
-	if (mResourceStream == nullptr)
-		mResourceStream = new POGLBufferResourceStream(this);
-
-	if (mResourceStream->IsOpen())
-		THROW_EXCEPTION(POGLStreamException, "You cannot have multiple streams opened at the same time on the same context");
-
-	POGLVertexBuffer* buffer = static_cast<POGLVertexBuffer*>(resource);
-	mRenderState->BindVertexBuffer(buffer);
-	mResourceStream->Open(resource, buffer->GetSyncObject(), GL_ARRAY_BUFFER, buffer->GetBufferUsage(), e);
-	return mResourceStream;
+	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+	return nullptr;
 }
 
-IPOGLResourceStream* POGLDeviceContext::OpenStream(IPOGLIndexBuffer* resource, POGLResourceStreamType::Enum e)
+void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 size, POGLResourceStreamType::Enum e)
 {
-	if (mResourceStream == nullptr)
-		mResourceStream = new POGLBufferResourceStream(this);
+	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+	return nullptr;
+}
 
-	if (mResourceStream->IsOpen())
-		THROW_EXCEPTION(POGLStreamException, "You cannot have multiple streams opened at the same time on the same context");
-
-	POGLIndexBuffer* buffer = static_cast<POGLIndexBuffer*>(resource);
-	mRenderState->BindIndexBuffer(buffer);
-	mResourceStream->Open(resource, buffer->GetSyncObject(), GL_ELEMENT_ARRAY_BUFFER, buffer->GetBufferUsage(), e);
-	return mResourceStream;
+void POGLDeviceContext::Unmap(IPOGLResource* resource)
+{
+	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
 }
 
 void POGLDeviceContext::InitializeRenderState()
@@ -670,9 +700,9 @@ GLuint POGLDeviceContext::GenTextureID()
 
 	Example:
 	{@code
-		std::shared_ptr<byte> bytes(new byte[10], TDeleteArray<byte>());
+	std::shared_ptr<byte> bytes(new byte[10], TDeleteArray<byte>());
 	}
-*/
+	*/
 template<typename T>
 struct TDeleteArray
 {

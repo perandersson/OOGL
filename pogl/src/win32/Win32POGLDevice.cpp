@@ -3,9 +3,6 @@
 #include "Win32POGLDeviceContext.h"
 #include <algorithm>
 
-/* Thread local container for the device context */
-THREAD_LOCAL Win32POGLDeviceContext* tDeviceContext = nullptr;
-
 /* Memory Leak Detection */
 int gPOGDebugFlag;
 
@@ -21,7 +18,7 @@ void POGLEnableMemoryLeakDetection()
 
 Win32POGLDevice::Win32POGLDevice(const POGL_DEVICE_INFO* info)
 : POGLDevice(info), mRefCount(1), mReleasing(false),
-mWindowHandle(nullptr), mDeviceContext(nullptr)
+mHWND(nullptr), mDC(nullptr), mDeviceContext(nullptr)
 {
 
 }
@@ -40,28 +37,16 @@ void Win32POGLDevice::Release()
 	if (--mRefCount == 0 && !mReleasing) {
 		mReleasing = true;
 		
-		//
-		// Destroy the render contexts created by this device. Destroy the main render context last
-		//
-		
-		int size = mDeviceContexts.size();
-		for (int i = size - 1; i >= 0; --i) {
-			mDeviceContexts[i]->Destroy();
-			auto it = std::find(mFreeDeviceContexts.begin(), mFreeDeviceContexts.end(), mDeviceContexts[i]);
-			if (it != mFreeDeviceContexts.end())
-				mFreeDeviceContexts.erase(it);
-			if (i == 0) 
-				mDeviceContexts[i]->Release();
-			delete mDeviceContexts[i];
-			mDeviceContexts[i] = nullptr;
-		}
-		mDeviceContexts.clear();
-		mFreeDeviceContexts.clear();
-
 		if (mDeviceContext != nullptr) {
-			ReleaseDC(mWindowHandle, mDeviceContext);
+			mDeviceContext->Destroy();
+			mDeviceContext->Release();
 			mDeviceContext = nullptr;
-			mWindowHandle = nullptr;
+		}
+		
+		if (mDC != nullptr && mHWND != nullptr) {
+			ReleaseDC(mHWND, mDC);
+			mDC = nullptr;
+			mHWND = nullptr;
 		}
 
 		delete this;
@@ -70,38 +55,32 @@ void Win32POGLDevice::Release()
 
 IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 {
-	if (tDeviceContext == nullptr) {
-		Win32POGLDeviceContext* context = TryGetRenderContext();
-		tDeviceContext = context;
-	}
-	tDeviceContext->AddRef();
-	return tDeviceContext;
-}
-
-void Win32POGLDevice::ReleaseRenderContext(Win32POGLDeviceContext* renderContext)
-{
-	std::lock_guard<std::recursive_mutex> lock(mDeviceContextsMutex);
-	mFreeDeviceContexts.push_back(renderContext);
-	tDeviceContext = nullptr;
+	mDeviceContext->AddRef();
+	return mDeviceContext;
 }
 
 void Win32POGLDevice::EndFrame()
 {
-	::SwapBuffers(mDeviceContext);
+	if (!SwapBuffers(mDC)) {
+		const DWORD error = GetLastError();
+		THROW_EXCEPTION(POGLException, "Could not swap buffers. Reason: 0x%x", error);
+	}
 
 	CHECK_GL("Could not swap buffers");
 }
 
-bool Win32POGLDevice::Initialize()
+void Win32POGLDevice::Initialize()
 {
 	static const BYTE PIXELTYPES[POGLPixelFormat::COUNT] = {
 		PFD_TYPE_RGBA
 	};
 
-	mWindowHandle = (HWND)mDeviceInfo.windowHandle;
-	mDeviceContext = GetDC(mWindowHandle);
-	if (mDeviceContext == nullptr)
-		return false;
+	mHWND = (HWND)mDeviceInfo.windowHandle;
+	mDC = GetDC(mHWND);
+	if (mDC == nullptr) {
+		const DWORD error = GetLastError();
+		THROW_EXCEPTION(POGLInitializationException, "Could not retrieve windows device context handle. Reason: 0x%x", error);		
+	}
 
 	PIXELFORMATDESCRIPTOR pfd = { 0 };
 	pfd.nSize = sizeof(PIXELFORMATDESCRIPTOR);
@@ -112,57 +91,41 @@ bool Win32POGLDevice::Initialize()
 	pfd.cDepthBits = (BYTE)mDeviceInfo.depthBits;
 	pfd.iLayerType = PFD_MAIN_PLANE;
 
-	const int format = ChoosePixelFormat(mDeviceContext, &pfd);
-	if (!format)
-		return false;
+	const int format = ChoosePixelFormat(mDC, &pfd);
+	if (!format) {
+		const DWORD error = GetLastError();
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLInitializationException, "Could not choose pixel format. Reason: 0x%x", error);
+	}
 
-	if (!SetPixelFormat(mDeviceContext, format, &pfd))
-		return false;
+	if (!SetPixelFormat(mDC, format, &pfd)) {
+		const DWORD error = GetLastError();
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLInitializationException, "Could not set pixel format. Reason: 0x%x", error);
+	}
 
 	// Create a legacy render context, used so that we can load the neccessary extensions 
-	HGLRC legacyRenderContext = wglCreateContext(mDeviceContext);
-	if (!legacyRenderContext)
-		return false;
-
-	BOOL current = wglMakeCurrent(mDeviceContext, legacyRenderContext);
-	if (current == FALSE) {
+	HGLRC legacyRenderContext = wglCreateContext(mDC);
+	if (!legacyRenderContext) {
 		const DWORD error = GetLastError();
-		THROW_EXCEPTION(POGLException, "Could not bind the legacy render context. Reason: 0x%x", error);
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLInitializationException, "Could not create legacy OpenGL render context. Reason: 0x%x", error);
 	}
 
-	Win32POGLDeviceContext* mainRenderContext = CreateRenderContext(nullptr);
-	mainRenderContext->AddRef();
-	if (current == FALSE) {
+	// Make the legacy render context current so that we can load the neccessary OpenGL extensions
+	if (!wglMakeCurrent(mDC, legacyRenderContext)) {
 		const DWORD error = GetLastError();
-		THROW_EXCEPTION(POGLException, "Could not bind the new OpenGL 3.3 render context. Reason: 0x%x", error);
+		wglDeleteContext(legacyRenderContext); legacyRenderContext = nullptr;
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLInitializationException, "Could not bind the legacy render context. Reason: 0x%x", error);
 	}
-	mFreeDeviceContexts.push_back(mainRenderContext);
 
-	// Create render contexts that share resources with the main render context
-	const POGL_UINT8 count = GetMaxRenderContexts();
-	HGLRC parent = mainRenderContext->GetHGLRC();
-	for (POGL_UINT8 i = 0; i < count - 1; ++i) {
-		Win32POGLDeviceContext* ctx = CreateRenderContext(parent);
-		mFreeDeviceContexts.push_back(ctx);
-	}
+	mDeviceContext = CreateRenderContext();
+	mDeviceContext->AddRef();
 	wglDeleteContext(legacyRenderContext);
-	return POGLDevice::Initialize();
 }
 
-Win32POGLDeviceContext* Win32POGLDevice::TryGetRenderContext()
-{
-	std::lock_guard<std::recursive_mutex> lock(mDeviceContextsMutex);
-	if (mFreeDeviceContexts.empty()) {
-		THROW_EXCEPTION(POGLResourceException, "There are no more free render contexts available.\
-											   \nThe render context count is now: %d. Increase the maximum amount of render contexts and try again", GetMaxRenderContexts());
-	}
-
-	auto it = (*mFreeDeviceContexts.begin());
-	mFreeDeviceContexts.pop_front();
-	return it;
-}
-
-Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext(HGLRC parent)
+Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext()
 {
 	//
 	// Activate the legacy render context (which is supplied in the constructor) so 
@@ -190,15 +153,13 @@ Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext(HGLRC parent)
 	// Create an OpenGL 3.3 render context
 	//
 
-	HGLRC renderContext = (*wglCreateContextAttribsARB)(mDeviceContext, parent, &attributes[0]);
+	HGLRC renderContext = (*wglCreateContextAttribsARB)(mDC, nullptr, &attributes[0]);
 	if (renderContext == nullptr) {
 		const DWORD error = GetLastError();
 		THROW_EXCEPTION(POGLException, "Failed to create an OpenGL 3.3 render context. Reason: 0x%x", error);
 	}
 
-	Win32POGLDeviceContext* context = new Win32POGLDeviceContext(this, mDeviceContext, renderContext);
-	mDeviceContexts.push_back(context);
-	return context;
+	return new Win32POGLDeviceContext(this, mDC, renderContext);
 }
 
 //

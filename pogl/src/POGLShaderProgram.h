@@ -9,8 +9,11 @@ public:
 	POGLShaderProgram(GLuint shaderID, IPOGLDevice* device, POGLShaderProgramType::Enum type);
 	~POGLShaderProgram();
 	
-	void AddRef();
-	void Release();
+	virtual void AddRef();
+	virtual void Release();
+
+	virtual IPOGLDevice* GetDevice();
+	virtual POGL_HANDLE GetHandlePtr();
 
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer
