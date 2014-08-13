@@ -16,6 +16,13 @@ public:
 	*/
 	void Destroy();
 
+	/*!
+		\brief Retrieves the render state
+	*/
+	inline POGLRenderState* GetRenderState() {
+		return mRenderState;
+	}
+
 	virtual IPOGLDevice* GetDevice();
 	virtual IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type);
 	virtual IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);

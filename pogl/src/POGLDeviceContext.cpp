@@ -355,7 +355,7 @@ void POGLDeviceContext::InitializeRenderState()
 GLuint POGLDeviceContext::GenVertexArray()
 {
 	GLuint id = 0;
-	(*glGenVertexArrays)(1, &id);
+	glGenVertexArrays(1, &id);
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
@@ -367,7 +367,7 @@ GLuint POGLDeviceContext::GenVertexArray()
 GLuint POGLDeviceContext::GenSamplerID()
 {
 	GLuint id = 0;
-	(*glGenSamplers)(1, &id);
+	glGenSamplers(1, &id);
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)
@@ -379,7 +379,7 @@ GLuint POGLDeviceContext::GenSamplerID()
 GLuint POGLDeviceContext::GenBufferID()
 {
 	GLuint id = 0;
-	(*glGenBuffers)(1, &id);
+	glGenBuffers(1, &id);
 
 	const GLenum error = glGetError();
 	if (id == 0 || error != GL_NO_ERROR)

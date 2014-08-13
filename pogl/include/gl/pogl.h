@@ -976,10 +976,10 @@ public:
 		
 		\param offset
 				The offset, in bytes, where we want to start saving the data
-		\param size
-				The size of the data buffer we want to map
+		\param length
+				The length of the data buffer we want to map
 	*/
-	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 size, POGLResourceStreamType::Enum e) = 0;
+	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e) = 0;
 
 	/*!
 		\brief Close the stream

@@ -14,10 +14,10 @@ public:
 		return mRenderContext;
 	}
 
-	void AddRef();
-	void Release();
-
-	void* GetProcAddress(const char* functionName);
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
 
 private:
 	POGL_UINT32 mRefCount;

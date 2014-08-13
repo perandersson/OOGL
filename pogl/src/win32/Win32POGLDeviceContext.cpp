@@ -41,8 +41,3 @@ void Win32POGLDeviceContext::Release()
 		delete this;
 	}
 }
-
-void* Win32POGLDeviceContext::GetProcAddress(const char* functionName)
-{
-	return wglGetProcAddress(functionName);
-}

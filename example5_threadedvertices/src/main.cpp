@@ -1,5 +1,7 @@
 ﻿#include <gl/pogl.h>
 #include <thread>
+#include <mutex>
+#include <condition_variable>
 #include <atomic>
 #include <vector>
 #include <cmath>
@@ -83,8 +85,11 @@ int main()
 		//
 
 		IPOGLDeferredDeviceContext* t1context = device->CreateDeferredDeviceContext();
-		std::thread t1([&t1context, &vertexBuffer, &running, &totalTime] {
+		std::condition_variable t1cond;
+		std::thread t1([&t1context, &vertexBuffer, &running, &totalTime, &t1cond] {
 			try {
+				std::mutex mutex;
+				std::unique_lock<std::mutex> lock(mutex);
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
 
@@ -116,6 +121,14 @@ int main()
 					//
 
 					t1context->Unmap(vertexBuffer);
+
+					//
+					// Wait until the commands have been executed. Otherwise the deferred context will start allocating a lot of memory.
+					// The reason for this happening is because this thread will be executed much much faster than the main thread because of all
+					// OpenGL commands. We allocate variables faster than we can release them.
+					//
+
+					t1cond.wait(lock);
 				}
 			}
 			catch (POGLException e) {
@@ -124,8 +137,11 @@ int main()
 		});
 
 		IPOGLDeferredDeviceContext* t2context = device->CreateDeferredDeviceContext();
-		std::thread t2([&t2context, &vertexBuffer, &running, &totalTime] {
+		std::condition_variable t2cond;
+		std::thread t2([&t2context, &vertexBuffer, &running, &totalTime, &t2cond] {
 			try {
+				std::mutex mutex;
+				std::unique_lock<std::mutex> lock(mutex);
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
 
@@ -157,6 +173,14 @@ int main()
 					//
 
 					t2context->Unmap(vertexBuffer);
+
+					//
+					// Wait until the commands have been executed. Otherwise the deferred context will start allocating a lot of memory.
+					// The reason for this happening is because this thread will be executed much much faster than the main thread because of all
+					// OpenGL commands. We allocate variables faster than we can release them.
+					//
+
+					t2cond.wait(lock);
 				}
 			}
 			catch (POGLException e) {
@@ -174,7 +198,9 @@ int main()
 			//
 
 			t1context->ExecuteCommands(context);
+			t1cond.notify_one();
 			t2context->ExecuteCommands(context);
+			t2cond.notify_one();
 
 			//
 			// Draw the vertex buffer using the "simple effect"
@@ -193,6 +219,8 @@ int main()
 		}
 
 		running.store(false);
+		t1cond.notify_one();
+		t2cond.notify_one();
 		t1.join();
 		t2.join();
 
