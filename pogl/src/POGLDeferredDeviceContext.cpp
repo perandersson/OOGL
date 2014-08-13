@@ -6,7 +6,12 @@
 #include "POGLDeviceContext.h"
 
 POGLDeferredDeviceContext::POGLDeferredDeviceContext(IPOGLDevice* device)
-: mRefCount(1), mDevice(device), mCommandsToExecuteHead(nullptr), mCommandsToExecuteTail(nullptr), mFreeCommands(nullptr), mReleasedCommands(nullptr), mMap(nullptr)
+: mRefCount(1), mDevice(device), 
+mCommandsToExecuteHead(nullptr), mCommandsToExecuteTail(nullptr), 
+mFlushedCommandsHead(nullptr),
+mFreeCommands(nullptr), mReleasedCommands(nullptr), 
+mMap(nullptr),
+mMapMemoryPool(nullptr), mMapMemoryPoolSize(0), mMapMemoryPoolOffset(0)
 {
 }
 
@@ -22,19 +27,43 @@ void POGLDeferredDeviceContext::AddRef()
 void POGLDeferredDeviceContext::Release()
 {
 	if (--mRefCount == 0) {
-		auto command = mReleasedCommands;
+		auto command = mFlushedCommandsHead;
 		while (command != nullptr) {
 			auto next = command->tail;
-			(*command->releaseFunction)(this, command);
 			free(command);
 			command = next;
 		}
+		mFlushedCommandsHead = nullptr;
+
+		command = mReleasedCommands;
+		while (command != nullptr) {
+			auto next = command->tail;
+			free(command);
+			command = next;
+		}
+		mReleasedCommands = nullptr;
 
 		command = mFreeCommands;
 		while (command != nullptr) {
 			auto next = command->tail;
 			free(command);
 			command = next;
+		}
+		mFreeCommands = nullptr;
+
+		command = mCommandsToExecuteHead;
+		while (command != nullptr) {
+			auto next = command->tail;
+			free(command);
+			command = next;
+		}
+		mCommandsToExecuteHead = mCommandsToExecuteTail = nullptr;
+
+		if (mMapMemoryPool != nullptr) {
+			free(mMapMemoryPool);
+			mMapMemoryPool = nullptr;
+			mMapMemoryPoolOffset = 0;
+			mMapMemoryPoolSize = 0;
 		}
 
 		delete this;
@@ -83,52 +112,31 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 	return nullptr;
 }
 
-void POGLCreateVertexBuffer_Command(POGLRenderState* state, POGLDeferredCommand* command)
+void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredCreateVertexBufferCommand* cmd = (POGLDeferredCreateVertexBufferCommand*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	memcpy(map, cmd->memory, cmd->size);
+	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void POGLCreateVertexBuffer_Release(class POGLDeferredDeviceContext*, struct POGLDeferredCommand* command)
-{
-	POGLDeferredCreateVertexBufferCommand* cmd = (POGLDeferredCreateVertexBufferCommand*)command;
-	// TODO: Add memory pool
-	free(cmd->memory);
-}
-
-void POGLMapVertexBuffer_Command(POGLRenderState* state, POGLDeferredCommand* command)
+void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredMapVertexBufferCommand* cmd = (POGLDeferredMapVertexBufferCommand*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	memcpy(map, cmd->memory, cmd->size);
+	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void POGLMapVertexBuffer_Release(class POGLDeferredDeviceContext*, struct POGLDeferredCommand* command)
-{
-	POGLDeferredMapVertexBufferCommand* cmd = (POGLDeferredMapVertexBufferCommand*)command;
-	// TODO: Add memory pool
-	free(cmd->memory);
-}
-
-void POGLMapRangeVertexBuffer_Command(POGLRenderState* state, POGLDeferredCommand* command)
+void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredMapRangeVertexBufferCommand* cmd = (POGLDeferredMapRangeVertexBufferCommand*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, cmd->offset, cmd->length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	memcpy(map, cmd->memory, cmd->length);
+	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->length);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
-}
-
-void POGLMapRangeVertexBuffer_Release(class POGLDeferredDeviceContext*, struct POGLDeferredCommand* command)
-{
-	POGLDeferredMapRangeVertexBufferCommand* cmd = (POGLDeferredMapRangeVertexBufferCommand*)command;
-	// TODO: Add memory pool
-	free(cmd->memory);
 }
 
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -138,9 +146,10 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* mem
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
 	POGLVertexBuffer* vb = new POGLVertexBuffer(0, numVertices, 0, layout, type, bufferUsage);
-	POGLDeferredCreateVertexBufferCommand* command = (POGLDeferredCreateVertexBufferCommand*)AllocCommand(&POGLCreateVertexBuffer_Command, &POGLCreateVertexBuffer_Release);
+	POGLDeferredCreateVertexBufferCommand* command = (POGLDeferredCreateVertexBufferCommand*)AllocCommand(&POGLCreateVertexBuffer_Command);
 	command->vertexBuffer = vb;
-	command->memory = malloc(memorySize); memcpy(command->memory, memory, memorySize);
+	command->memoryPoolOffset = GetMapOffset(memorySize);
+	memcpy(GetMapPointer(command->memoryPoolOffset), memory, memorySize);
 	command->size = memorySize;
 	AddCommand((POGLDeferredCommand*)command);
 	return vb;
@@ -182,12 +191,12 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStream
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 
-		POGLDeferredMapVertexBufferCommand* map = (POGLDeferredMapVertexBufferCommand*)AllocCommand(&POGLMapVertexBuffer_Command, &POGLMapVertexBuffer_Release);
+		POGLDeferredMapVertexBufferCommand* map = (POGLDeferredMapVertexBufferCommand*)AllocCommand(&POGLMapVertexBuffer_Command);
 		map->size = vb->GetCount() * vb->GetLayout()->vertexSize;
-		map->memory = malloc(map->size);
+		map->memoryPoolOffset = GetMapOffset(map->size);
 		map->vertexBuffer = vb;
 		mMap = (POGLDeferredCommand*)map;
-		return map->memory;
+		return ((char*)mMapMemoryPool + map->memoryPoolOffset);
 	}
 
 	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
@@ -206,13 +215,13 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		if (offset + length > memorySize)
 			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 
-		POGLDeferredMapRangeVertexBufferCommand* map = (POGLDeferredMapRangeVertexBufferCommand*)AllocCommand(&POGLMapRangeVertexBuffer_Command, &POGLMapRangeVertexBuffer_Release);
+		POGLDeferredMapRangeVertexBufferCommand* map = (POGLDeferredMapRangeVertexBufferCommand*)AllocCommand(&POGLMapRangeVertexBuffer_Command);
 		map->offset = offset;
 		map->length = length;
-		map->memory = malloc(length);
+		map->memoryPoolOffset = GetMapOffset(memorySize);
 		map->vertexBuffer = vb;
 		mMap = (POGLDeferredCommand*)map;
-		return map->memory;
+		return ((char*)mMapMemoryPool + map->memoryPoolOffset);
 	}
 
 
@@ -235,36 +244,31 @@ void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
 }
 
-POGLDeferredCommand* POGLDeferredDeviceContext::AllocCommand(POGLCommandFuncPtr function, POGLReleaseCommandFuncPtr releaseFunction)
+POGLDeferredCommand* POGLDeferredDeviceContext::AllocCommand(POGLCommandFuncPtr function)
 {
 	POGLDeferredCommand* command = nullptr;
-	mFreeMutex.lock();
 	command = mFreeCommands;
 	if (command == nullptr) {
 		command = (POGLDeferredCommand*)malloc(sizeof(POGLDeferredCommand));
 		memset(command, 0, sizeof(POGLDeferredCommand));
 		command->function = function;
-		command->releaseFunction = releaseFunction;
 	}
 	mFreeCommands = command->tail;
-	command->tail = nullptr; // Detach the command from the linked list
-	mFreeMutex.unlock();
+
+	//
+	// Detach the command from the linked list before returning it
+	//
+
+	command->tail = nullptr;
 	return command;
 }
 
 void POGLDeferredDeviceContext::AddCommand(POGLDeferredCommand* command)
 {
 	//
-	// Release any commands if any exists
-	//
-
-	ReleaseCommands();
-
-	//
 	// Add the commands to the "to be executed" queue
 	//
 
-	mCommandsMutex.lock();
 	if (mCommandsToExecuteHead == nullptr) {
 		mCommandsToExecuteHead = command;
 	}
@@ -276,7 +280,6 @@ void POGLDeferredDeviceContext::AddCommand(POGLDeferredCommand* command)
 		mCommandsToExecuteTail->tail = command;
 		mCommandsToExecuteTail = command;
 	}
-	mCommandsMutex.unlock();
 }
 
 void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context)
@@ -284,24 +287,27 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context)
 	ExecuteCommands(context, true);
 }
 
-POGLDeferredCommand* POGLDeferredDeviceContext::GetCommands()
+POGLDeferredCommand* POGLDeferredDeviceContext::GetFlushedCommands()
 {
 	POGLDeferredCommand* commandList = nullptr;
-	mCommandsMutex.lock();
-	commandList = mCommandsToExecuteHead;
-	mCommandsToExecuteHead = mCommandsToExecuteTail = nullptr;
-	mCommandsMutex.unlock();
+	mFlushedCommandsMutex.lock();
+	commandList = mFlushedCommandsHead;
+	mFlushedCommandsMutex.unlock();
 	return commandList;
 }
 
 void POGLDeferredDeviceContext::FreeCommands(POGLDeferredCommand* commands)
 {
-	mFreeMutex.lock();
+	mFlushedCommandsMutex.lock();
+	mFlushedCommandsHead = nullptr;
+	mFlushedCommandsMutex.unlock();
+
+	mReleasedCommandsMutex.lock();
 	if (mReleasedCommands != nullptr)
 		mReleasedCommands->tail = commands;
 	else
 		mReleasedCommands = commands;
-	mFreeMutex.unlock();
+	mReleasedCommandsMutex.unlock();
 }
 
 void POGLDeferredDeviceContext::ReleaseCommands()
@@ -313,31 +319,44 @@ void POGLDeferredDeviceContext::ReleaseCommands()
 	// Get the commands to be released
 	//
 
-	mFreeMutex.lock();
+	mReleasedCommandsMutex.lock();
 	POGLDeferredCommand* commands = mReleasedCommands;
 	mReleasedCommands = nullptr;
-	mFreeMutex.unlock();
+	mReleasedCommandsMutex.unlock();
 
 	//
 	// Release all commands
 	//
 
-	POGLDeferredCommand* command = commands;
-	while (command != nullptr) {
-		(*command->releaseFunction)(this, command);
-		command = command->tail;
-	}
+	mMapMemoryPoolOffset = 0;
 
 	//
 	// Put the released commands back to the queue
 	//
 
-	mFreeMutex.lock();
 	if (mFreeCommands != nullptr)
 		mFreeCommands->tail = commands;
 	else
 		mFreeCommands = commands;
-	mFreeMutex.unlock();
+}
+
+POGL_UINT32 POGLDeferredDeviceContext::GetMapOffset(POGL_UINT32 size)
+{
+	POGL_UINT32 memoryLeft = mMapMemoryPoolSize - mMapMemoryPoolOffset;
+	if (memoryLeft < size) {
+		mMapMemoryPoolSize += size;
+		mMapMemoryPool = realloc(mMapMemoryPool, mMapMemoryPoolSize);
+	}
+
+	POGL_UINT32 offset = mMapMemoryPoolOffset;
+	mMapMemoryPoolOffset += size;
+	return offset;
+
+}
+
+POGL_HANDLE POGLDeferredDeviceContext::GetMapPointer(POGL_UINT32 offset)
+{
+	return (char*)mMapMemoryPool + offset;
 }
 
 void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands)
@@ -349,10 +368,10 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	// Execute the commands
 	//
 
-	POGLDeferredCommand* commands = GetCommands();
+	POGLDeferredCommand* commands = GetFlushedCommands();
 	POGLDeferredCommand* command = commands;
 	while (command != nullptr) {
-		(*command->function)(renderState, command);
+		(*command->function)(this, renderState, command);
 		command = command->tail;
 	}
 
@@ -361,5 +380,30 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	//
 
 	FreeCommands(commands);
-	mBeginEndCondition.notify_all();
+}
+
+void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
+{
+	//
+	// Move the commands to the flushed commands lst
+	//
+
+	mFlushedCommandsMutex.lock();
+	mFlushedCommandsHead = mCommandsToExecuteHead;
+	mCommandsToExecuteHead = nullptr;
+	mCommandsToExecuteTail = nullptr;
+	mFlushedCommandsMutex.unlock();
+
+	//
+	// Wait for the next frame
+	//
+
+	std::unique_lock<std::mutex> lock(mWaitMutex);
+	condition.wait(lock);
+
+	//
+	// Release commands and put them into the free commands list
+	//
+
+	ReleaseCommands();
 }

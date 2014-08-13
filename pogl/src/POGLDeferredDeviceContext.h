@@ -4,17 +4,15 @@
 #include <mutex>
 #include <condition_variable>
 
-typedef void(*POGLCommandFuncPtr)(class POGLRenderState*, struct POGLDeferredCommand*);
-typedef void(*POGLReleaseCommandFuncPtr)(class POGLDeferredDeviceContext*, struct POGLDeferredCommand*);
+typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
 
 struct POGLDeferredCommand
 {
 	POGLDeferredCommand* tail;
 	POGLCommandFuncPtr function;
-	POGLReleaseCommandFuncPtr releaseFunction;
 
 	// Extra
-	POGL_HANDLE extra[10];
+	POGL_HANDLE extra[6];
 };
 
 struct POGLDeferredCreateVertexBufferCommand
@@ -24,10 +22,9 @@ struct POGLDeferredCreateVertexBufferCommand
 		struct {
 			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
-			POGLReleaseCommandFuncPtr releaseFunction;
 
 			class POGLVertexBuffer* vertexBuffer;
-			void* memory;
+			POGL_UINT32 memoryPoolOffset;
 			POGL_SIZE size;
 		};
 	};
@@ -40,10 +37,9 @@ struct POGLDeferredMapVertexBufferCommand
 		struct {
 			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
-			POGLReleaseCommandFuncPtr releaseFunction;
 
 			class POGLVertexBuffer* vertexBuffer;
-			void* memory;
+			POGL_UINT32 memoryPoolOffset;
 			POGL_SIZE size;
 		};
 	};
@@ -56,10 +52,9 @@ struct POGLDeferredMapRangeVertexBufferCommand
 		struct {
 			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
-			POGLReleaseCommandFuncPtr releaseFunction;
 
 			class POGLVertexBuffer* vertexBuffer;
-			void* memory;
+			POGL_UINT32 memoryPoolOffset;
 			POGL_SIZE offset;
 			POGL_SIZE length;
 		};
@@ -71,6 +66,11 @@ class POGLDeferredDeviceContext : public IPOGLDeferredDeviceContext
 public:
 	POGLDeferredDeviceContext(IPOGLDevice* device);
 	~POGLDeferredDeviceContext();
+	
+	/*!
+	
+	*/
+	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
 
 // IPOGLInterface
 public:
@@ -98,39 +98,89 @@ public:
 
 // IPOGLDeferredDeviceContext
 public:
+	virtual void FlushAndWait(std::condition_variable& condition);
 	virtual void ExecuteCommands(IPOGLDeviceContext* context);
 	virtual void ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands);
 
 private:
-	POGLDeferredCommand* AllocCommand(POGLCommandFuncPtr function, POGLReleaseCommandFuncPtr releaseFunction);
+	/*!
+		\brief Retrieve a command to be executed
+
+		If no commands are available on the memory pool then create a new one
+
+		\param function
+		\param releaseFunction
+	*/
+	POGLDeferredCommand* AllocCommand(POGLCommandFuncPtr function);
+
+	/*!
+		\brief Add a command to be executed after the flush
+
+		\param command
+	*/
 	void AddCommand(POGLDeferredCommand* command);
-	POGLDeferredCommand* GetCommands();
+
+	/*!
+		\brief Retreive the flushed commands
+	*/
+	POGLDeferredCommand* GetFlushedCommands();
+
+	/*!
+		\brief Free the supplied commands
+
+		\param commands
+	*/
 	void FreeCommands(POGLDeferredCommand* commands);
+
+	/*!
+		\brief Execute the release function on all the "commands to be relesed"
+	*/
 	void ReleaseCommands();
+
+	/*!
+		\brief 
+	*/
+	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
 
 protected:
 	POGL_UINT32 mRefCount;
 	IPOGLDevice* mDevice;
 
-	std::mutex mBeginEndMutex;
-	std::condition_variable mBeginEndCondition;
+	/* Mutex used to prevent this device context from being executed during the Wait phase */
+	std::mutex mWaitMutex;
 
 	//
-	// The commands generated inside the thread
+	// The commands generated inside the thread (before performing a flush)
 	//
 
-	std::mutex mCommandsMutex;
 	POGLDeferredCommand* mCommandsToExecuteHead;
 	POGLDeferredCommand* mCommandsToExecuteTail;
 
-	std::mutex mFreeMutex;
+	//
+	// Flushed commands, which will be rendered by the main thread
+	//
+
+	std::mutex mFlushedCommandsMutex;
+	POGLDeferredCommand* mFlushedCommandsHead;
+
+	//
+	// Commands that's finished executing (that can be reused)
+	//
+
 	POGLDeferredCommand* mFreeCommands;
+
+	std::mutex mReleasedCommandsMutex;
 	POGLDeferredCommand* mReleasedCommands;
 
 	/* Keep track of the vertex mapping */
 	POGLDeferredCommand* mMap;
 
-	// Map memory
-	void* mMapMemory;
-	POGL_UINT32 mMapMemoryOffset;
+	/* Memory used when mapping */
+	void* mMapMemoryPool;
+
+	/* The size of the memory pool */
+	POGL_UINT32 mMapMemoryPoolSize;
+
+	/* The offset to the next free memory pool byte */
+	POGL_UINT32 mMapMemoryPoolOffset;
 };

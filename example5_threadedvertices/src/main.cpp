@@ -88,8 +88,6 @@ int main()
 		std::condition_variable t1cond;
 		std::thread t1([&t1context, &vertexBuffer, &running, &totalTime, &t1cond] {
 			try {
-				std::mutex mutex;
-				std::unique_lock<std::mutex> lock(mutex);
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
 
@@ -123,12 +121,12 @@ int main()
 					t1context->Unmap(vertexBuffer);
 
 					//
-					// Wait until the commands have been executed. Otherwise the deferred context will start allocating a lot of memory.
+					// Wait until the commands have been executed. Otherwise the deferred context will start allocating memory faster then it will be released.
 					// The reason for this happening is because this thread will be executed much much faster than the main thread because of all
 					// OpenGL commands. We allocate variables faster than we can release them.
 					//
 
-					t1cond.wait(lock);
+					t1context->FlushAndWait(t1cond);
 				}
 			}
 			catch (POGLException e) {
@@ -140,8 +138,6 @@ int main()
 		std::condition_variable t2cond;
 		std::thread t2([&t2context, &vertexBuffer, &running, &totalTime, &t2cond] {
 			try {
-				std::mutex mutex;
-				std::unique_lock<std::mutex> lock(mutex);
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
 
@@ -175,12 +171,12 @@ int main()
 					t2context->Unmap(vertexBuffer);
 
 					//
-					// Wait until the commands have been executed. Otherwise the deferred context will start allocating a lot of memory.
+					// Wait until the commands have been executed. Otherwise the deferred context will start allocating memory faster then it will be released.
 					// The reason for this happening is because this thread will be executed much much faster than the main thread because of all
 					// OpenGL commands. We allocate variables faster than we can release them.
 					//
 
-					t2cond.wait(lock);
+					t2context->FlushAndWait(t2cond);
 				}
 			}
 			catch (POGLException e) {

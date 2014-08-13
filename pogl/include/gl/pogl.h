@@ -3,9 +3,10 @@
 #define _POGL_H_
 
 #include <exception>
+#include <condition_variable>
 
 #ifndef OFFSET
-#define OFFSET(x) ((char *)NULL + x)
+#define OFFSET(x) ((char *)0 + x)
 #endif
 
 #ifndef BIT
@@ -1010,6 +1011,15 @@ public:
 		\param clearCommands
 	*/
 	virtual void ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands) = 0;
+
+	/*!
+		\brief Flush the commands queue and put the current thread to sleep and wait until the supplied condition have been met
+
+		This method will flush the commands from the internal buffer so that they can be executed by IPOGLDeferredDeviceContext::ExecuteCommands method.
+
+		\param condition
+	*/
+	virtual void FlushAndWait(std::condition_variable& condition) = 0;
 };
 
 /*!
