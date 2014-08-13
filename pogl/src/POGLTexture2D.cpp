@@ -1,7 +1,5 @@
 #include "MemCheck.h"
 #include "POGLTexture2D.h"
-#include "POGLDeviceContext.h"
-#include <atomic>
 namespace {
 	std::atomic<POGL_UINT32> uid;
 	POGL_UINT32 GenTextureUID() {
@@ -9,10 +7,10 @@ namespace {
 	}
 }
 
-POGLTexture2D::POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format, IPOGLDevice* device)
-: mRefCount(1), mDevice(device), mInternalResource(nullptr), mSize(size)
+POGLTexture2D::POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format)
+: mRefCount(1), mResourcePtr(nullptr), mSize(size)
 {
-	mInternalResource = new POGLTextureResource(textureID, GL_TEXTURE_2D, format, device);
+	mResourcePtr = new POGLTextureResource(textureID, GL_TEXTURE_2D, format);
 }
 
 POGLTexture2D::~POGLTexture2D()
@@ -27,28 +25,22 @@ void POGLTexture2D::AddRef()
 void POGLTexture2D::Release()
 {
 	if (--mRefCount == 0) {
-		if (mInternalResource != nullptr) {
-			mInternalResource->Release();
-			mInternalResource = nullptr;
+		if (mResourcePtr != nullptr) {
+			mResourcePtr->Release();
+			mResourcePtr = nullptr;
 		}
 		delete this;
 	}
 }
 
-IPOGLDevice* POGLTexture2D::GetDevice()
+POGLResourceType::Enum POGLTexture2D::GetResourceType() const
 {
-	mDevice->AddRef();
-	return mDevice;
-}
-
-POGL_HANDLE POGLTexture2D::GetHandlePtr()
-{
-	return mInternalResource;
+	return POGLResourceType::TEXTURE2D;
 }
 
 POGLTextureFormat::Enum POGLTexture2D::GetTextureFormat() const
 {
-	return mInternalResource->GetTextureFormat();
+	return mResourcePtr->GetTextureFormat();
 }
 
 const POGL_SIZEI& POGLTexture2D::GetSize() const

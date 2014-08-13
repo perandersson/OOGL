@@ -1,16 +1,11 @@
 #pragma once
 #include "config.h"
-#include <gl/pogl.h>
-#include <atomic>
 
 class POGLIndexBuffer;
-class POGLSyncObject; 
-class POGLDeviceContext;
-class POGLRenderState;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
 public:
-	POGLVertexBuffer(GLuint bufferID, GLuint vaoID, const POGL_VERTEX_LAYOUT* layout, POGL_UINT32 numVertices, GLenum primitiveType, GLenum bufferUsage, IPOGLDevice* device);
+	POGLVertexBuffer(GLuint bufferID, POGL_UINT32 count, GLuint vaoID, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage);
 	~POGLVertexBuffer();
 	
 	/*!
@@ -19,19 +14,19 @@ public:
 	inline POGL_UINT32 GetUID() const {
 		return mUID;
 	}
-
+	
 	/*!
-		\brief Retrieves the OpenGL Buffer ID
+		\brief Retrieves the OpenGL Buffer ID for this object
 	*/
 	inline GLuint GetBufferID() const {
 		return mBufferID;
 	}
-
+	
 	/*!
-		\brief Retrieves the vertex array object ID for this buffer
+		\brief Retrieves the OpenGL Vertex Array Object ID for this object
 	*/
-	inline GLuint GetVertexArrayObjectID() const {
-		return mVertexArrayObject;
+	inline GLuint GetVAOID() const {
+		return mVAOID;
 	}
 
 	/*!
@@ -41,65 +36,55 @@ public:
 		return mBufferUsage;
 	}
 
-	///*!
-	//	\brief Retrieves the object responsible for synchronizing this object between contexts
-	//*/
-	//inline POGLSyncObject* GetSyncObject() {
-	//	return mSyncObject;
-	//}
+	/*!
+		\brief Draw this vertex buffer
+	*/
+	void Draw(POGL_UINT32 startIndex);
 	
 	/*!
 		\brief Draw this vertex buffer
 	*/
-	void Draw(POGLDeviceContext* context, POGL_UINT32 startIndex);
+	void Draw(POGL_UINT32 startIndex, POGL_UINT32 count);
 	
 	/*!
 		\brief Draw this vertex buffer
 	*/
-	void Draw(POGLDeviceContext* context, POGL_UINT32 startIndex, POGL_UINT32 count);
-	
-	/*!
-		\brief Draw this vertex buffer
-	*/
-	void Draw(POGLDeviceContext* context, POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
+	void Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
 
 	/*!
 		\brief Draw this vertex buffer
 	*/
-	void Draw(POGLDeviceContext* context, POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
+	void Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
+
+	/*!
+		\brief Set buffer-, count and vertex array object after the construction is complete.
+
+		This method is called if this object is created in another thread and we want, after the command queue has been executed, to put the
+		values into this buffer.
+	*/
+	void PostConstruct(GLuint bufferID, GLuint vaoID);
 
 // IPOGLInterface
 public:
-	void AddRef();
-	void Release();
+	virtual void AddRef();
+	virtual void Release();
 
 // IPOGLResource
 public:
-	IPOGLDevice* GetDevice();
-	POGL_HANDLE GetHandlePtr();
-	//void WaitSyncDriver(IPOGLDeviceContext* context);
-	//void WaitSyncClient(IPOGLDeviceContext* context);
-	//bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout);
-	//bool WaitSyncClient(IPOGLDeviceContext* context, POGL_UINT64 timeout, IPOGLWaitSyncJob* job);
-	//POGLResourceType::Enum GetResourceType() const;
+	virtual POGLResourceType::Enum GetResourceType() const;
 
 // IPOGLVertexBuffer
 public:
-	inline const POGL_VERTEX_LAYOUT* GetLayout() const {
-		return mLayout;
-	}
-
-	POGL_UINT32 GetNumVertices() const;
+	virtual const POGL_VERTEX_LAYOUT* GetLayout() const;
+	virtual POGL_UINT32 GetCount() const;
 
 private:
 	POGL_UINT32 mRefCount;
 	POGL_UINT32 mUID;
-	GLuint mVertexArrayObject;
 	GLuint mBufferID;
+	POGL_UINT32 mCount;
+	GLuint mVAOID;
 	const POGL_VERTEX_LAYOUT* mLayout;
-	POGL_UINT32 mNumVertices;
 	GLenum mPrimitiveType;
 	GLenum mBufferUsage;
-	//POGLSyncObject* mSyncObject;
-	IPOGLDevice* mDevice;
 };

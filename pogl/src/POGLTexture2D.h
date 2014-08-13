@@ -6,22 +6,28 @@
 class POGLTexture2D : public IPOGLTexture2D
 {
 public:
-	POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format, IPOGLDevice* device);
+	POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format);
 	~POGLTexture2D();
+
+	/*!
+		\brief 
+	*/
+	inline POGLTextureResource* GetResourcePtr() const {
+		return mResourcePtr;
+	}
 
 // IPOGLInterface
 public:
-	void AddRef();
-	void Release();
+	virtual void AddRef();
+	virtual void Release();
 	
 // IPOGLResource
 public:
-	IPOGLDevice* GetDevice();
-	POGL_HANDLE GetHandlePtr();
+	virtual POGLResourceType::Enum GetResourceType() const;
 
 // IPOGLTexture
 public:
-	POGLTextureFormat::Enum GetTextureFormat() const;
+	virtual POGLTextureFormat::Enum GetTextureFormat() const;
 
 // IPOGLTexture2D
 public:
@@ -29,7 +35,6 @@ public:
 
 private:
 	POGL_UINT32 mRefCount;
-	IPOGLDevice* mDevice;
-	POGLTextureResource* mInternalResource;
+	POGLTextureResource* mResourcePtr;
 	POGL_SIZEI mSize;
 };

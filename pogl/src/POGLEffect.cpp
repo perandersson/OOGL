@@ -1,9 +1,6 @@
 #include "MemCheck.h"
 #include "POGLEffect.h"
 #include "POGLEffectData.h"
-#include "POGLDeviceContext.h"
-#include "POGLSyncObject.h"
-#include <atomic>
 
 namespace {
 	std::atomic<POGL_UINT32> ids;
@@ -12,16 +9,14 @@ namespace {
 	}
 }
 
-POGLEffect::POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, IPOGLDevice* device)
-: mRefCount(1), mProgramID(programID), mDevice(device), mUID(GenEffectUID()), mData(data), mUniforms(uniforms)
+POGLEffect::POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms)
+: mRefCount(1), mProgramID(programID), mUID(GenEffectUID()), mData(data), mUniforms(uniforms)
 {
 	assert_not_null(data);
 }
 
 POGLEffect::~POGLEffect()
 {
-	delete mData;
-	mData = nullptr;
 
 }
 
@@ -34,24 +29,20 @@ void POGLEffect::Release()
 {
 	if (--mRefCount == 0) {
 		if (mProgramID != 0) {
-			IPOGLDeviceContext* context = mDevice->GetDeviceContext();
-			static_cast<POGLDeviceContext*>(context)->DeleteProgram(mProgramID);
-			context->Release();
+			glDeleteProgram(mProgramID);
 			mProgramID = 0;
+		}
+		if (mData != nullptr) {
+			delete mData;
+			mData = nullptr;
 		}
 		delete this;
 	}
 }
 
-IPOGLDevice* POGLEffect::GetDevice()
+POGLResourceType::Enum POGLEffect::GetResourceType() const
 {
-	mDevice->AddRef();
-	return mDevice;
-}
-
-POGL_HANDLE POGLEffect::GetHandlePtr()
-{
-	return nullptr;
+	return POGLResourceType::EFFECT;
 }
 
 bool POGLEffect::GetDepthTest()
@@ -133,19 +124,4 @@ void POGLEffect::CopyEffectData(POGLEffectData* in)
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	// Copy!!
 	*in = *mData;
-}
-
-POGL_UINT32 POGLEffect::GetUID() const
-{
-	return mUID;
-}
-
-GLuint POGLEffect::GetProgramID() const
-{
-	return mProgramID;
-}
-
-const POGLEffectData* POGLEffect::GetData() const
-{
-	return mData;
 }

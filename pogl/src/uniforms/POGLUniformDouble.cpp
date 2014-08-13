@@ -28,13 +28,13 @@ void POGLUniformDouble::Apply()
 		mValuesSet[0] = mValues[0];
 		mValuesSet[1] = mValues[1];
 		mValuesSet[2] = mValues[2];
-		mDeviceContext->Uniform3dv(mComponentID, 1, mValues);
+		glUniform3dv(mComponentID, 1, mValues);
 		break;
 	case 2:
 		if (DBL_EQ(mValuesSet[0], mValues[0]) && DBL_EQ(mValuesSet[1], mValues[1])) return;
 		mValuesSet[0] = mValues[0];
 		mValuesSet[1] = mValues[1];
-		mDeviceContext->Uniform2dv(mComponentID, 1, mValues);
+		glUniform2dv(mComponentID, 1, mValues);
 		break;
 	case 4:
 		if (DBL_EQ(mValuesSet[0], mValues[0]) && DBL_EQ(mValuesSet[1], mValues[1]) && DBL_EQ(mValuesSet[2], mValues[2]) && DBL_EQ(mValuesSet[3], mValues[3])) return;
@@ -42,12 +42,12 @@ void POGLUniformDouble::Apply()
 		mValuesSet[1] = mValues[1];
 		mValuesSet[2] = mValues[2];
 		mValuesSet[3] = mValues[3];
-		mDeviceContext->Uniform4dv(mComponentID, 1, mValues);
+		glUniform4dv(mComponentID, 1, mValues);
 		break;
 	case 1:
 		if (DBL_EQ(mValuesSet[0], mValues[0])) return;
 		mValuesSet[0] = mValues[0];
-		mDeviceContext->Uniform1dv(mComponentID, 1, mValues);
+		glUniform1dv(mComponentID, 1, mValues);
 		break;
 	default:
 		return;

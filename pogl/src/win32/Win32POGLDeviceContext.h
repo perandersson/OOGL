@@ -23,5 +23,4 @@ private:
 	POGL_UINT32 mRefCount;
 	HDC mDeviceContext;
 	HGLRC mRenderContext;
-	bool mInitialized;
 };

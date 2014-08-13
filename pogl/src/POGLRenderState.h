@@ -76,6 +76,20 @@ public:
 	void SetTextureResource(POGLTextureResource* texture);
 
 	/*!
+		\brief Set the currently bound vertex buffer
+
+		\param vertexBuffer
+	*/
+	void SetVertexBuffer(POGLVertexBuffer* vertexBuffer);
+	
+	/*!
+		\brief Set the currently bound vertex buffer
+
+		\param vertexBuffer
+	*/
+	void SetIndexBuffer(POGLIndexBuffer* indexBuffer);
+
+	/*!
 		\brief Retrieves the next active texture for this render state.
 	*/
 	POGL_UINT32 NextActiveTexture();

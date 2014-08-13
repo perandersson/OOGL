@@ -1,23 +1,52 @@
 #pragma once
 #include "config.h"
-#include <gl/pogl.h>
 #include <mutex>
 #include <memory>
 
 struct POGLEffectData;
 struct POGLUniformProperty; 
-class POGLSyncObject;
 class POGLEffect : public IPOGLEffect
 {
 public:
-	POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms, IPOGLDevice* device);
+	POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms);
 	~POGLEffect();
+	
+	/*!
+		\brief Retrieves a unique ID for this effect
 
-	virtual void AddRef();
-	virtual void Release();
+		\return The unique ID
+	*/
+	inline POGL_UINT32 GetUID() const {
+		return mUID;
+	}
 
-	virtual IPOGLDevice* GetDevice();
-	virtual POGL_HANDLE GetHandlePtr();
+	/*!
+		\brief Retrieves the OpenGL program ID
+	*/
+	inline GLuint GetProgramID() const {
+		return mProgramID;
+	}
+	
+	/*!
+		\brief Copy the effect data to the supplied instance
+	*/
+	void CopyEffectData(POGLEffectData* in);
+
+	/*!
+		\brief Retrieves the data
+
+		\return
+	*/
+	inline const POGLEffectData* GetData() const {
+		return mData;
+	}
+	
+	/*!
+		\brief Retrieves the uniforms for this effect
+	*/
+	inline std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>>& GetUniforms() {
+		return mUniforms;
+	}
 
 	bool GetDepthTest();
 	void SetDepthTest(bool b);
@@ -32,37 +61,15 @@ public:
 	void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
 	void SetBlend(bool b);
 
-	/*!
-		\brief Retrieves the uniforms for this effect
-	*/
-	inline std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>>& GetUniforms() {
-		return mUniforms;
-	}
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
 
-	/*!
-		\brief Copy the effect data to the supplied instance
-	*/
-	void CopyEffectData(POGLEffectData* in);
+// IPOGLResource
+public:
+	virtual POGLResourceType::Enum GetResourceType() const;
 
-	/*!
-		\brief Retrieves a unique ID for this effect
-
-		\return The unique ID
-	*/
-	POGL_UINT32 GetUID() const;
-
-	/*!
-		\brief Retrieves the OpenGL program ID
-	*/
-	GLuint GetProgramID() const;
-	
-	/*!
-		\brief Retrieves the data
-
-		\return
-	*/
-	const POGLEffectData* GetData() const;
-	
 private:
 	POGL_UINT32 mRefCount;
 	GLuint mProgramID;

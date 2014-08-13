@@ -1,39 +1,45 @@
 #pragma once
 #include "config.h"
-#include <gl/pogl.h>
 
-class POGLSyncObject;
 class POGLShaderProgram : public IPOGLShaderProgram
 {
 public:
-	POGLShaderProgram(GLuint shaderID, IPOGLDevice* device, POGLShaderProgramType::Enum type);
+	POGLShaderProgram(GLuint shaderID, POGLShaderProgramType::Enum type);
 	~POGLShaderProgram();
 	
-	virtual void AddRef();
-	virtual void Release();
-
-	virtual IPOGLDevice* GetDevice();
-	virtual POGL_HANDLE GetHandlePtr();
-
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer
 	*/
-	POGL_UINT32 GetUID() const;
+	inline POGL_UINT32 GetUID() const {
+		return mUID;
+	}
 
 	/*!
 		\brief Retrieves the OpenGL Shader ID
 	*/
-	GLuint GetShaderID() const;
+	inline GLuint GetShaderID() const {
+		return mShaderID;
+	}
 
 	/*!
 		\brief Retrieves this programs type
 	*/
-	POGLShaderProgramType::Enum GetType() const;
+	inline POGLShaderProgramType::Enum GetType() const {
+		return mType;
+	}
 	
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
+
+// IPOGLResource
+public:
+	virtual POGLResourceType::Enum GetResourceType() const;
+
 private:
 	POGL_UINT32 mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mShaderID;
-	IPOGLDevice* mDevice;
 	POGLShaderProgramType::Enum mType;
 };

@@ -28,13 +28,13 @@ void POGLUniformUInt32::Apply()
 		mValuesSet[0] = mValues[0];
 		mValuesSet[1] = mValues[1];
 		mValuesSet[2] = mValues[2];
-		mDeviceContext->Uniform3uiv(mComponentID, 1, mValues);
+		glUniform3uiv(mComponentID, 1, mValues);
 		break;
 	case 2:
 		if (mValuesSet[0] == mValues[0] && mValuesSet[1] == mValues[1]) return;
 		mValuesSet[0] = mValues[0];
 		mValuesSet[1] = mValues[1];
-		mDeviceContext->Uniform2uiv(mComponentID, 1, mValues);
+		glUniform2uiv(mComponentID, 1, mValues);
 		break;
 	case 4:
 		if (mValuesSet[0] == mValues[0] && mValuesSet[1] == mValues[1] && mValuesSet[2] == mValues[2] && mValuesSet[3] == mValues[3]) return;
@@ -42,12 +42,12 @@ void POGLUniformUInt32::Apply()
 		mValuesSet[1] = mValues[1];
 		mValuesSet[2] = mValues[2];
 		mValuesSet[3] = mValues[3];
-		mDeviceContext->Uniform4uiv(mComponentID, 1, mValues);
+		glUniform4uiv(mComponentID, 1, mValues);
 		break;
 	case 1:
 		if (mValuesSet[0] == mValues[0]) return;
 		mValuesSet[0] = mValues[0];
-		mDeviceContext->Uniform1uiv(mComponentID, 1, mValues);
+		glUniform1uiv(mComponentID, 1, mValues);
 		break;
 	default:
 		return;

@@ -28,13 +28,13 @@ void POGLUniformFloat::Apply()
 		mValuesSet[0] = mValues[0];
 		mValuesSet[1] = mValues[1];
 		mValuesSet[2] = mValues[2];
-		mDeviceContext->Uniform3fv(mComponentID, 1, mValues);
+		glUniform3fv(mComponentID, 1, mValues);
 		break;
 	case 2:
 		if (FLT_EQ(mValuesSet[0], mValues[0]) && FLT_EQ(mValuesSet[1], mValues[1])) return;
 		mValuesSet[0] = mValues[0];
 		mValuesSet[1] = mValues[1];
-		mDeviceContext->Uniform2fv(mComponentID, 1, mValues);
+		glUniform2fv(mComponentID, 1, mValues);
 		break;
 	case 4:
 		if (FLT_EQ(mValuesSet[0], mValues[0]) && FLT_EQ(mValuesSet[1], mValues[1]) && FLT_EQ(mValuesSet[2], mValues[2]) && FLT_EQ(mValuesSet[3], mValues[3])) return;
@@ -42,12 +42,12 @@ void POGLUniformFloat::Apply()
 		mValuesSet[1] = mValues[1];
 		mValuesSet[2] = mValues[2];
 		mValuesSet[3] = mValues[3];
-		mDeviceContext->Uniform4fv(mComponentID, 1, mValues);
+		glUniform4fv(mComponentID, 1, mValues);
 		break;
 	case 1:
 		if (FLT_EQ(mValuesSet[0], mValues[0])) return;
 		mValuesSet[0] = mValues[0];
-		mDeviceContext->Uniform1fv(mComponentID, 1, mValues);
+		glUniform1fv(mComponentID, 1, mValues);
 		break;
 	default:
 		return;

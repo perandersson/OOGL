@@ -5,7 +5,7 @@
 class POGLTextureResource : public IPOGLInterface
 {
 public:
-	POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format, IPOGLDevice* device);
+	POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format);
 	virtual ~POGLTextureResource();
 
 	void AddRef();
@@ -22,5 +22,4 @@ private:
 	GLuint mTextureID;
 	GLenum mTextureTarget;
 	POGLTextureFormat::Enum mTextureFormat;
-	IPOGLDevice* mDevice;
 };

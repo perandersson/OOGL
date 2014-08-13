@@ -9,8 +9,6 @@
 #include "POGLShaderProgram.h"
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
-#include "POGLSyncObject.h"
-#include "POGLBufferResourceStream.h"
 #include <gl/poglext.h>
 #include <algorithm>
 
@@ -72,7 +70,7 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 		}
 	}
 
-	return new POGLShaderProgram(shaderID, mDevice, type);
+	return new POGLShaderProgram(shaderID, type);
 }
 
 IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
@@ -148,7 +146,7 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 		uniforms.insert(std::make_pair(p->name, p));
 	}
 
-	return new POGLEffect(programID, data, uniforms, mDevice);
+	return new POGLEffect(programID, data, uniforms);
 }
 
 IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
@@ -182,8 +180,8 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: 0x%x", status);
 	}
 
-	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format, mDevice);
-	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetHandlePtr());
+	POGLTexture2D* texture = new POGLTexture2D(textureID, size, format);
+	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetResourcePtr());
 	return texture;
 }
 
@@ -199,12 +197,12 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 	assert_not_null(layout);
 
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
-	const GLuint bufferID = GenBufferID();
-	const GLuint vaoID = GenVertexArray();
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
+	const GLuint bufferID = GenBufferID();
+	const GLuint vaoID = GenVertexArray();
 
-	(*glBindVertexArray)(vaoID);
+	glBindVertexArray(vaoID);
 	glBindBuffer(GL_ARRAY_BUFFER, bufferID);
 
 	// 
@@ -225,7 +223,7 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 		}
 
 		// Enable vertex attribute location if neccessary
-		(*glEnableVertexAttribArray)(i);
+		glEnableVertexAttribArray(i);
 		CHECK_GL("Could not enable vertex attrib location for the vertex array object");
 
 		static const POGL_UINT32 TYPE_SIZE[POGLVertexType::COUNT] = {
@@ -248,13 +246,13 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 		case POGLVertexType::UNSIGNED_SHORT:
 		case POGLVertexType::INT:
 		case POGLVertexType::UNSIGNED_INT:
-			(*glVertexAttribIPointer)(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
+			glVertexAttribIPointer(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
 			break;
 		case POGLVertexType::FLOAT:
-			(*glVertexAttribPointer)(i, numElementsInField, POGLEnum::Convert(type), field.normalize ? GL_TRUE : GL_FALSE, layout->vertexSize, OFFSET(offset));
+			glVertexAttribPointer(i, numElementsInField, POGLEnum::Convert(type), field.normalize ? GL_TRUE : GL_FALSE, layout->vertexSize, OFFSET(offset));
 			break;
 		case POGLVertexType::DOUBLE:
-			(*glVertexAttribLPointer)(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
+			glVertexAttribLPointer(i, numElementsInField, POGLEnum::Convert(type), layout->vertexSize, OFFSET(offset));
 			break;
 		}
 
@@ -262,12 +260,13 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 		offset += field.fieldSize;
 	}
 
-
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
-	return new POGLVertexBuffer(bufferID, vaoID, layout, numVertices, type, usage, mDevice);
+	POGLVertexBuffer* vb = new POGLVertexBuffer(bufferID, numVertices, vaoID, layout, type, usage);
+	mRenderState->SetVertexBuffer(vb);
+	return vb;
 }
 
 IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -319,7 +318,9 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	if (error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 
-	return new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage, mDevice);
+	POGLIndexBuffer* ib = new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage);
+	mRenderState->SetIndexBuffer(ib);
+	return ib;
 }
 
 IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
@@ -351,241 +352,6 @@ void POGLDeviceContext::InitializeRenderState()
 	}
 }
 
-void POGLDeviceContext::LoadExtensions()
-{
-	SET_EXTENSION_FUNC(PFNGLGENBUFFERSPROC, glGenBuffers);
-	SET_EXTENSION_FUNC(PFNGLDELETEBUFFERSPROC, glDeleteBuffers);
-	SET_EXTENSION_FUNC(PFNGLBINDBUFFERPROC, glBindBuffer);
-	SET_EXTENSION_FUNC(PFNGLBUFFERDATAPROC, glBufferData);
-	SET_EXTENSION_FUNC(PFNGLMAPBUFFERPROC, glMapBuffer);
-	SET_EXTENSION_FUNC(PFNGLMAPBUFFERRANGEPROC, glMapBufferRange);
-	SET_EXTENSION_FUNC(PFNGLUNMAPBUFFERPROC, glUnmapBuffer);
-
-	SET_EXTENSION_FUNC(PFNGLUSEPROGRAMPROC, glUseProgram);
-
-	SET_EXTENSION_FUNC(PFNGLUNIFORM1IPROC, glUniform1i);
-
-	SET_EXTENSION_FUNC(PFNGLUNIFORM1IVPROC, glUniform1iv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM2IVPROC, glUniform2iv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM3IVPROC, glUniform3iv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM4IVPROC, glUniform4iv);
-
-	SET_EXTENSION_FUNC(PFNGLUNIFORM1UIVPROC, glUniform1uiv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM2UIVPROC, glUniform2uiv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM3UIVPROC, glUniform3uiv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM4UIVPROC, glUniform4uiv);
-
-	SET_EXTENSION_FUNC(PFNGLUNIFORM1FVPROC, glUniform1fv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM2FVPROC, glUniform2fv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM3FVPROC, glUniform3fv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM4FVPROC, glUniform4fv);
-
-	SET_EXTENSION_FUNC(PFNGLUNIFORM1DVPROC, glUniform1dv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM2DVPROC, glUniform2dv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM3DVPROC, glUniform3dv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORM4DVPROC, glUniform4dv);
-
-	SET_EXTENSION_FUNC(PFNGLUNIFORMMATRIX4FVPROC, glUniformMatrix4fv);
-	SET_EXTENSION_FUNC(PFNGLUNIFORMMATRIX4DVPROC, glUniformMatrix4dv);
-
-	SET_EXTENSION_FUNC(PFNGLCLIENTWAITSYNCPROC, glClientWaitSync);
-	SET_EXTENSION_FUNC(PFNGLWAITSYNCPROC, glWaitSync);
-	SET_EXTENSION_FUNC(PFNGLFENCESYNCPROC, glFenceSync);
-	SET_EXTENSION_FUNC(PFNGLDELETESYNCPROC, glDeleteSync);
-
-	SET_EXTENSION_FUNC(PFNGLGENVERTEXARRAYSPROC, glGenVertexArrays);
-	SET_EXTENSION_FUNC(PFNGLBINDVERTEXARRAYPROC, glBindVertexArray);
-	SET_EXTENSION_FUNC(PFNGLDELETEVERTEXARRAYSPROC, glDeleteVertexArrays);
-
-	SET_EXTENSION_FUNC(PFNGLENABLEVERTEXATTRIBARRAYPROC, glEnableVertexAttribArray);
-	SET_EXTENSION_FUNC(PFNGLDISABLEVERTEXATTRIBARRAYPROC, glDisableVertexAttribArray);
-
-	SET_EXTENSION_FUNC(PFNGLVERTEXATTRIBIPOINTERPROC, glVertexAttribIPointer);
-	SET_EXTENSION_FUNC(PFNGLVERTEXATTRIBPOINTERPROC, glVertexAttribPointer);
-	SET_EXTENSION_FUNC(PFNGLVERTEXATTRIBLPOINTERPROC, glVertexAttribLPointer);
-
-	SET_EXTENSION_FUNC(PFNGLACTIVETEXTUREPROC, glActiveTexture);
-
-	SET_EXTENSION_FUNC(PFNGLBINDSAMPLERPROC, glBindSampler);
-	SET_EXTENSION_FUNC(PFNGLGENSAMPLERSPROC, glGenSamplers);
-	SET_EXTENSION_FUNC(PFNGLDELETESAMPLERSPROC, glDeleteSamplers);
-	SET_EXTENSION_FUNC(PFNGLSAMPLERPARAMETERIPROC, glSamplerParameteri);
-
-	SET_EXTENSION_FUNC(PFNGLATTACHSHADERPROC, glAttachShader);
-	SET_EXTENSION_FUNC(PFNGLCOMPILESHADERPROC, glCompileShader);
-	SET_EXTENSION_FUNC(PFNGLCREATEPROGRAMPROC, glCreateProgram);
-	SET_EXTENSION_FUNC(PFNGLCREATESHADERPROC, glCreateShader);
-	SET_EXTENSION_FUNC(PFNGLDELETEPROGRAMPROC, glDeleteProgram);
-	SET_EXTENSION_FUNC(PFNGLDELETESHADERPROC, glDeleteShader);
-	SET_EXTENSION_FUNC(PFNGLDETACHSHADERPROC, glDetachShader);
-	SET_EXTENSION_FUNC(PFNGLSHADERSOURCEPROC, glShaderSource);
-	SET_EXTENSION_FUNC(PFNGLGETSHADERIVPROC, glGetShaderiv);
-	SET_EXTENSION_FUNC(PFNGLGETSHADERINFOLOGPROC, glGetShaderInfoLog);
-	SET_EXTENSION_FUNC(PFNGLLINKPROGRAMPROC, glLinkProgram);
-	SET_EXTENSION_FUNC(PFNGLGETPROGRAMIVPROC, glGetProgramiv);
-	SET_EXTENSION_FUNC(PFNGLGETPROGRAMINFOLOGPROC, glGetProgramInfoLog);
-	SET_EXTENSION_FUNC(PFNGLGETACTIVEUNIFORMPROC, glGetActiveUniform);
-	SET_EXTENSION_FUNC(PFNGLGETUNIFORMLOCATIONPROC, glGetUniformLocation);
-}
-
-void POGLDeviceContext::BindBuffer(GLenum target, GLuint bufferID)
-{
-	(*glBindBuffer)(target, bufferID);
-}
-
-void POGLDeviceContext::BufferData(GLenum target, GLsizeiptr size, const void *data, GLenum usage)
-{
-	(*glBufferData)(target, size, data, usage);
-}
-
-void POGLDeviceContext::DeleteBuffer(GLuint bufferID)
-{
-	if (bufferID == 0)
-		return;
-
-	(*glDeleteBuffers)(1, &bufferID);
-}
-
-void* POGLDeviceContext::MapBuffer(GLenum target, GLenum access)
-{
-	return (*glMapBuffer)(target, access);
-}
-
-void* POGLDeviceContext::MapBufferRange(GLenum target, GLintptr offset, GLsizeiptr length, GLbitfield access)
-{
-	return (*glMapBufferRange)(target, offset, length, access);
-}
-
-GLboolean POGLDeviceContext::UnmapBuffer(GLenum target)
-{
-	return (*glUnmapBuffer)(target);
-}
-
-void POGLDeviceContext::UseProgram(GLuint programID)
-{
-	(*glUseProgram)(programID);
-}
-
-void POGLDeviceContext::Uniform1i(GLint location, GLint v0)
-{
-	(*glUniform1i)(location, v0);
-}
-
-void POGLDeviceContext::Uniform1iv(GLint location, GLsizei count, const GLint *value)
-{
-	(*glUniform1iv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform2iv(GLint location, GLsizei count, const GLint *value)
-{
-	(*glUniform2iv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform3iv(GLint location, GLsizei count, const GLint *value)
-{
-	(*glUniform3iv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform4iv(GLint location, GLsizei count, const GLint *value)
-{
-	(*glUniform4iv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform1uiv(GLint location, GLsizei count, const GLuint *value)
-{
-	(*glUniform1uiv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform2uiv(GLint location, GLsizei count, const GLuint *value)
-{
-	(*glUniform2uiv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform3uiv(GLint location, GLsizei count, const GLuint *value)
-{
-	(*glUniform3uiv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform4uiv(GLint location, GLsizei count, const GLuint *value)
-{
-	(*glUniform4uiv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform1fv(GLint location, GLsizei count, const GLfloat *value)
-{
-	(*glUniform1fv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform2fv(GLint location, GLsizei count, const GLfloat *value)
-{
-	(*glUniform2fv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform3fv(GLint location, GLsizei count, const GLfloat *value)
-{
-	(*glUniform3fv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform4fv(GLint location, GLsizei count, const GLfloat *value)
-{
-	(*glUniform4fv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform1dv(GLint location, GLsizei count, const GLdouble *value)
-{
-	(*glUniform1dv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform2dv(GLint location, GLsizei count, const GLdouble *value)
-{
-	(*glUniform2dv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform3dv(GLint location, GLsizei count, const GLdouble *value)
-{
-	(*glUniform3dv)(location, count, value);
-}
-
-void POGLDeviceContext::Uniform4dv(GLint location, GLsizei count, const GLdouble *value)
-{
-	(*glUniform4dv)(location, count, value);
-}
-
-void POGLDeviceContext::UniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat* value)
-{
-	(*glUniformMatrix4fv)(location, count, transpose, value);
-}
-
-void POGLDeviceContext::UniformMatrix4dv(GLint location, GLsizei count, GLboolean transpose, const GLdouble* value)
-{
-	(*glUniformMatrix4dv)(location, count, transpose, value);
-}
-
-void POGLDeviceContext::EnableVertexAttribArray(GLuint index)
-{
-	(*glEnableVertexAttribArray)(index);
-}
-
-void POGLDeviceContext::DisableVertexAttribArray(GLuint index)
-{
-	(*glDisableVertexAttribArray)(index);
-}
-
-void POGLDeviceContext::VertexAttribIPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void* pointer)
-{
-	(*glVertexAttribIPointer)(index, size, type, stride, pointer);
-}
-
-void POGLDeviceContext::VertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void* pointer)
-{
-	(*glVertexAttribPointer)(index, size, type, normalized, stride, pointer);
-}
-
-void POGLDeviceContext::VertexAttribLPointer(GLuint index, GLint size, GLenum type, GLsizei stride, const void* pointer)
-{
-	(*glVertexAttribLPointer)(index, size, type, stride, pointer);
-}
-
 GLuint POGLDeviceContext::GenVertexArray()
 {
 	GLuint id = 0;
@@ -596,21 +362,6 @@ GLuint POGLDeviceContext::GenVertexArray()
 		THROW_EXCEPTION(POGLResourceException, "Could not generate VertexArray ID");
 
 	return id;
-}
-
-void POGLDeviceContext::BindVertexArray(GLuint id)
-{
-	(*glBindVertexArray)(id);
-}
-
-void POGLDeviceContext::DeleteVertexArray(GLuint id)
-{
-	(*glDeleteVertexArrays)(1, &id);
-}
-
-void POGLDeviceContext::ActiveTexture(GLenum texture)
-{
-	(*glActiveTexture)(texture);
 }
 
 GLuint POGLDeviceContext::GenSamplerID()
@@ -625,31 +376,6 @@ GLuint POGLDeviceContext::GenSamplerID()
 	return id;
 }
 
-void POGLDeviceContext::BindSampler(GLuint unit, GLuint sampler)
-{
-	(*glBindSampler)(unit, sampler);
-}
-
-void POGLDeviceContext::DeleteSampler(GLuint samplerObject)
-{
-	(*glDeleteSamplers)(1, &samplerObject);
-}
-
-void POGLDeviceContext::SamplerParameteri(GLuint sampler, GLenum pname, GLint param)
-{
-	(*glSamplerParameteri)(sampler, pname, param);
-}
-
-void POGLDeviceContext::DeleteShader(GLuint shader)
-{
-	(*glDeleteShader)(shader);
-}
-
-void POGLDeviceContext::DeleteProgram(GLuint program)
-{
-	(*glDeleteProgram)(program);
-}
-
 GLuint POGLDeviceContext::GenBufferID()
 {
 	GLuint id = 0;
@@ -660,26 +386,6 @@ GLuint POGLDeviceContext::GenBufferID()
 		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
 
 	return id;
-}
-
-void POGLDeviceContext::WaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
-{
-	(*glWaitSync)(sync, flags, timeout);
-}
-
-GLenum POGLDeviceContext::ClientWaitSync(GLsync sync, GLbitfield flags, GLuint64 timeout)
-{
-	return (*glClientWaitSync)(sync, flags, timeout);
-}
-
-GLsync POGLDeviceContext::FenceSync(GLenum condition, GLbitfield flags)
-{
-	return (*glFenceSync)(condition, flags);
-}
-
-void POGLDeviceContext::DeleteSync(GLsync sync)
-{
-	(*glDeleteSync)(sync);
 }
 
 GLuint POGLDeviceContext::GenTextureID()

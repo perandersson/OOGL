@@ -1,8 +1,6 @@
 #include "MemCheck.h"
 #include "POGLTextureResource.h"
-#include "POGLDeviceContext.h"
-#include "POGLSyncObject.h"
-#include <atomic>
+
 namespace {
 	std::atomic<POGL_UINT32> uid;
 	POGL_UINT32 GenTextureUID() {
@@ -10,8 +8,8 @@ namespace {
 	}
 }
 
-POGLTextureResource::POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format, IPOGLDevice* device)
-: mRefCount(1), mUID(GenTextureUID()), mTextureID(textureID), mTextureTarget(textureTarget), mTextureFormat(format), mDevice(device)
+POGLTextureResource::POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format)
+: mRefCount(1), mUID(GenTextureUID()), mTextureID(textureID), mTextureTarget(textureTarget), mTextureFormat(format)
 {
 
 }

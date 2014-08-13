@@ -1,5 +1,7 @@
 #include "MemCheck.h"
 #include "POGLDeferredDeviceContext.h"
+#include "POGLVertexBuffer.h"
+#include "POGLEnum.h"
 
 POGLDeferredDeviceContext::POGLDeferredDeviceContext(IPOGLDevice* device)
 : mRefCount(1), mDevice(device)
@@ -65,8 +67,13 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
+	const GLenum usage = POGLEnum::Convert(bufferUsage);
+	const GLenum type = POGLEnum::Convert(primitiveType);
+
+	POGLVertexBuffer* vb = new POGLVertexBuffer(0, numVertices, 0, layout, type, bufferUsage);
+	// Put a message on the command queue
+	return vb;
 }
 
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)

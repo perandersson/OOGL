@@ -20,9 +20,7 @@ POGLSamplerObject::POGLSamplerObject(GLuint samplerID, POGLRenderState* renderSt
 POGLSamplerObject::~POGLSamplerObject()
 {
 	if (mSamplerID != 0) {
-		IPOGLDeviceContext* context = mRenderState->GetDeviceContext();
-		static_cast<POGLDeviceContext*>(context)->DeleteSampler(mSamplerID);
-		context->Release();
+		glDeleteSamplers(1, &mSamplerID);
 		mSamplerID = 0;
 	}
 }

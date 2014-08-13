@@ -120,9 +120,9 @@ void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* in
 	BindBuffers(vbo, ibo);
 
 	if (ibo == nullptr)
-		vbo->Draw(mDeviceContext, startIndex);
+		vbo->Draw(startIndex);
 	else
-		vbo->Draw(mDeviceContext, ibo, startIndex);
+		vbo->Draw(ibo, startIndex);
 
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
@@ -136,9 +136,9 @@ void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* in
 	BindBuffers(vbo, ibo);
 
 	if (ibo == nullptr)
-		vbo->Draw(mDeviceContext, startIndex, count);
+		vbo->Draw(startIndex, count);
 	else
-		vbo->Draw(mDeviceContext, ibo, startIndex, count);
+		vbo->Draw(ibo, startIndex, count);
 
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
@@ -298,7 +298,7 @@ void POGLRenderState::BindSamplerObject(POGLSamplerObject* samplerObject, POGL_U
 		return;
 
 	const GLuint samplerID = samplerObject != nullptr ? samplerObject->GetSamplerID() : 0;
-	mDeviceContext->BindSampler(idx, samplerID);
+	glBindSampler(idx, samplerID);
 	mSamplerObjectUID[idx] = uid;
 	CHECK_GL("Cannot bind sampler ID");
 }
@@ -320,7 +320,7 @@ void POGLRenderState::BindEffect(POGLEffect* effect)
 	mEffect = effect;
 	mEffect->AddRef();
 	mEffectUID = effect->GetUID();
-	mDeviceContext->UseProgram(effect->GetProgramID());
+	glUseProgram(effect->GetProgramID());
 	mCurrentEffectState = GetEffectState(effect);
 	mApplyCurrentEffectState = true;
 
@@ -357,7 +357,8 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 	}
 	mVertexBuffer = buffer;
 	mVertexBuffer->AddRef();
-	mDeviceContext->BindVertexArray(buffer->GetVertexArrayObjectID());
+
+	glBindVertexArray(buffer->GetVAOID());
 	CHECK_GL("Could not bind the supplied vertex array object");
 
 	mVertexBufferUID = uid;
@@ -383,7 +384,7 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 	}
 
 	const GLuint bufferID = buffer != nullptr ? buffer->GetBufferID() : 0;
-	mDeviceContext->BindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 
 	CHECK_GL("Could not bind the supplied index buffer");
 	mIndexBufferUID = uid;
@@ -397,7 +398,7 @@ void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UI
 	}
 
 	if (mActiveTextureIndex != idx) {
-		mDeviceContext->ActiveTexture(GL_TEXTURE0 + idx);
+		glActiveTexture(GL_TEXTURE0 + idx);
 		mActiveTextureIndex = idx;
 		CHECK_GL("Could not set active texture index");
 	}
@@ -440,6 +441,26 @@ void POGLRenderState::SetTextureResource(POGLTextureResource* texture)
 	mTextureUID[mActiveTextureIndex] = texture->GetUID();
 	mTextures[mActiveTextureIndex] = texture;
 	texture->AddRef();
+}
+
+void POGLRenderState::SetVertexBuffer(POGLVertexBuffer* vertexBuffer)
+{
+	if (mVertexBuffer != nullptr)
+		mVertexBuffer->Release();
+
+	mVertexBuffer = vertexBuffer;
+	mVertexBuffer->AddRef();
+	mVertexBufferUID = vertexBuffer->GetUID();
+}
+
+void POGLRenderState::SetIndexBuffer(POGLIndexBuffer* indexBuffer)
+{
+	if (mIndexBuffer != nullptr)
+		mIndexBuffer->Release();
+
+	mIndexBuffer = indexBuffer;
+	mIndexBuffer->AddRef();
+	mIndexBufferUID = indexBuffer->GetUID();
 }
 
 POGL_UINT32 POGLRenderState::NextActiveTexture()

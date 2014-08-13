@@ -2,20 +2,15 @@
 #include "config.h"
 #include <gl/pogl.h>
 
-class POGLSyncObject;
-class POGLDeviceContext;
-class POGLRenderState;
 class POGLVertexBuffer;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
-	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage, IPOGLDevice* device);
+	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage);
 	~POGLIndexBuffer();
 	
 	/*!
 		\brief Retrieves a unique ID for this object
-
-		\return
 	*/
 	inline POGL_UINT32 GetUID() const {
 		return mUID;
@@ -23,8 +18,6 @@ public:
 
 	/*!
 		\brief Retrieves the OpenGL Buffer ID for this object
-
-		\return
 	*/
 	inline GLuint GetBufferID() const {
 		return mBufferID;
@@ -55,22 +48,21 @@ public:
 		return mType;
 	}
 	
-	void Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex);
-	void Draw(POGLDeviceContext* context, POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count);
+	void Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex);
+	void Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count);
 
 // IPOGLInterface
 public:
-	void AddRef();
-	void Release();
+	virtual void AddRef();
+	virtual void Release();
 
 // IPOGLResource
 public:
-	IPOGLDevice* GetDevice();
-	POGL_HANDLE GetHandlePtr();
+	virtual POGLResourceType::Enum GetResourceType() const;
 
 // IPOGLIndexBuffer
 public:
-	POGL_UINT32 GetNumElements() const;
+	virtual POGL_UINT32 GetCount() const;
 
 private:
 	POGL_UINT32 mRefCount;
@@ -80,5 +72,4 @@ private:
 	POGL_UINT32 mTypeSize;
 	GLenum mType;
 	GLenum mBufferUsage;
-	IPOGLDevice* mDevice;
 };

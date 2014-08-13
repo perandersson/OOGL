@@ -113,13 +113,13 @@ POGLSamplerObject* POGLEffectState::GenSamplerObject(POGLRenderState* renderStat
 	const GLuint samplerID = mDeviceContext->GenSamplerID();
 	POGLSamplerObject* samplerObject = new POGLSamplerObject(samplerID, renderState);
 
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(uniformProperty->minFilter));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(uniformProperty->magFilter));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(uniformProperty->wrap[0]));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(uniformProperty->wrap[1]));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_R, POGLEnum::Convert(uniformProperty->wrap[2]));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(uniformProperty->compareFunc));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(uniformProperty->compareMode));
+	glSamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(uniformProperty->minFilter));
+	glSamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(uniformProperty->magFilter));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(uniformProperty->wrap[0]));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(uniformProperty->wrap[1]));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_R, POGLEnum::Convert(uniformProperty->wrap[2]));
+	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(uniformProperty->compareFunc));
+	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(uniformProperty->compareMode));
 
 	CHECK_GL("Could not set sampler parameters");
 	return samplerObject;

@@ -3,7 +3,7 @@
 #include "POGLDeviceContext.h"
 #include "POGLRenderState.h"
 #include "POGLSamplerObject.h"
-#include "POGLTextureResource.h"
+#include "POGLTexture2D.h"
 #include "POGLEnum.h"
 
 POGLUniformSampler2D::POGLUniformSampler2D(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
@@ -34,7 +34,7 @@ void POGLUniformSampler2D::Apply()
 
 	mRenderState->BindTextureResource(mTextureResource, mActiveTexture);
 	mRenderState->BindSamplerObject(mSamplerObject, mActiveTexture);
-	mDeviceContext->Uniform1i(mComponentID, mActiveTexture);
+	glUniform1i(mComponentID, mActiveTexture);
 
 	CHECK_GL("Could not assign sampler2D uniform values");
 }
@@ -43,39 +43,42 @@ void POGLUniformSampler2D::SetTexture(IPOGLTexture* texture)
 {
 	if (texture == nullptr)
 		SetTextureResource(nullptr);
-	else
-		SetTextureResource(reinterpret_cast<POGLTextureResource*>(texture->GetHandlePtr()));
+	else {
+		auto type = texture->GetResourceType();
+		if (type == POGLResourceType::TEXTURE2D)
+			SetTextureResource(reinterpret_cast<POGLTexture2D*>(texture)->GetResourcePtr());
+	}
 }
 
 void POGLUniformSampler2D::SetMinFilter(POGLMinFilter::Enum minFilter)
 {
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(minFilter));
+	glSamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(minFilter));
 }
 
 void POGLUniformSampler2D::SetMagFilter(POGLMagFilter::Enum magFilter)
 {
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(magFilter));
+	glSamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(magFilter));
 }
 
 void POGLUniformSampler2D::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
 {
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(s));
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(t));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(s));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(t));
 }
 
 void POGLUniformSampler2D::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
 {
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(compareFunc));
+	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(compareFunc));
 }
 
 void POGLUniformSampler2D::SetCompareMode(POGLCompareMode::Enum compareMode)
 {
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
-	mDeviceContext->SamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(compareMode));
+	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(compareMode));
 }
 
 void POGLUniformSampler2D::SetTextureResource(POGLTextureResource* texture)

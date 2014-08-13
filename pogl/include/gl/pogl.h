@@ -422,6 +422,22 @@ struct POGLResourceStreamType
 	};
 };
 
+/*!
+	\brief Resource type enum
+*/
+struct POGLResourceType
+{
+	enum Enum {
+		VERTEXBUFFER = 0,
+		INDEXBUFFER,
+		TEXTURE1D,
+		TEXTURE2D,
+		TEXTURE3D,
+		SHADER,
+		EFFECT
+	};
+};
+
 //
 // Structs
 //
@@ -788,14 +804,9 @@ class IPOGLResource : public IPOGLInterface
 {
 public:
 	/*!
-		\brief Retrieves the device 
+		\brief Retrieves the resource type
 	*/
-	virtual IPOGLDevice* GetDevice() = 0;
-
-	/*!
-		\brief Retrieves the internal handle for this resource
-	*/
-	virtual POGL_HANDLE GetHandlePtr() = 0;
+	virtual POGLResourceType::Enum GetResourceType() const = 0;
 };
 
 /*!
@@ -1357,7 +1368,7 @@ public:
 	/*!
 		\brief Retrieves the number of vertices located in this buffer
 	*/
-	virtual POGL_UINT32 GetNumVertices() const = 0;
+	virtual POGL_UINT32 GetCount() const = 0;
 };
 
 /*!
@@ -1369,7 +1380,7 @@ public:
 	/*!
 		\brief Retrieves the number of elements found in this buffer
 	*/
-	virtual POGL_UINT32 GetNumElements() const = 0;
+	virtual POGL_UINT32 GetCount() const = 0;
 };
 
 /*!

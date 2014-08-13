@@ -4,7 +4,7 @@
 #include <vector>
 
 Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext)
-: POGLDeviceContext(device), mRefCount(0), mDeviceContext(deviceContext), mRenderContext(renderContext), mInitialized(false)
+: POGLDeviceContext(device), mRefCount(0), mDeviceContext(deviceContext), mRenderContext(renderContext)
 {
 
 }
@@ -24,11 +24,6 @@ void Win32POGLDeviceContext::AddRef()
 		if (current == FALSE) {
 			const DWORD error = GetLastError();
 			THROW_EXCEPTION(POGLException, "Could not bind the OpenGL 3.3 render context. Reason: 0x%x", error);
-		}
-		if (!mInitialized) {
-			mInitialized = true;
-			LoadExtensions();
-			InitializeRenderState();
 		}
 	}
 }

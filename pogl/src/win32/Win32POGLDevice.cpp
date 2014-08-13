@@ -115,27 +115,34 @@ void Win32POGLDevice::Initialize()
 	// Make the legacy render context current so that we can load the neccessary OpenGL extensions
 	if (!wglMakeCurrent(mDC, legacyRenderContext)) {
 		const DWORD error = GetLastError();
-		wglDeleteContext(legacyRenderContext); legacyRenderContext = nullptr;
+		wglDeleteContext(legacyRenderContext);
 		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
 		THROW_EXCEPTION(POGLInitializationException, "Could not bind the legacy render context. Reason: 0x%x", error);
 	}
 
+	// Load extensions
+	if (!POGLLoadExtensions()) {
+		wglDeleteContext(legacyRenderContext);
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLInitializationException, "Could not load OpenGL extensions");
+	}
+
+	// Legacy Render context is no longer needed
+	wglDeleteContext(legacyRenderContext);
+
+	// Verify OpenGL 3.3
+	if (wglCreateContextAttribsARB == nullptr) {
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLException, "Your computer does not support OpenGL 3.3. Make sure that you have the latest graphics-card drivers installed");
+	}
+
 	mDeviceContext = CreateRenderContext();
 	mDeviceContext->AddRef();
-	wglDeleteContext(legacyRenderContext);
+	mDeviceContext->InitializeRenderState();
 }
 
 Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext()
 {
-	//
-	// Activate the legacy render context (which is supplied in the constructor) so 
-	// that we can retrieve the necessary extensions
-	//
-	
-	PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
-	if (wglCreateContextAttribsARB == nullptr)
-		THROW_EXCEPTION(POGLException, "Your computer does not support OpenGL 3.3. Make sure that you have the latest graphics-card drivers installed");
-
 	//
 	// Set neccessary attributes so that we get an OpenGL 3.3 render context
 	//
@@ -153,7 +160,7 @@ Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext()
 	// Create an OpenGL 3.3 render context
 	//
 
-	HGLRC renderContext = (*wglCreateContextAttribsARB)(mDC, nullptr, &attributes[0]);
+	HGLRC renderContext = wglCreateContextAttribsARB(mDC, nullptr, &attributes[0]);
 	if (renderContext == nullptr) {
 		const DWORD error = GetLastError();
 		THROW_EXCEPTION(POGLException, "Failed to create an OpenGL 3.3 render context. Reason: 0x%x", error);

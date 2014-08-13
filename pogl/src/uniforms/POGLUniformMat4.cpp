@@ -18,7 +18,7 @@ POGLUniformMat4::~POGLUniformMat4()
 
 void POGLUniformMat4::Apply()
 {
-	mDeviceContext->UniformMatrix4dv(mComponentID, 1, GL_FALSE, mValue.vec);
+	glUniformMatrix4dv(mComponentID, 1, GL_FALSE, mValue.vec);
 
 	CHECK_GL("Could not assign mat4 uniform values");
 }
