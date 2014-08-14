@@ -1,6 +1,5 @@
 #pragma once
 #include "config.h"
-#include <gl/pogl.h>
 #include <mutex>
 #include <condition_variable>
 
@@ -8,7 +7,6 @@ typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRe
 
 struct POGLDeferredCommand
 {
-	POGLDeferredCommand* tail;
 	POGLCommandFuncPtr function;
 	IPOGLResource* resource;
 
@@ -21,7 +19,6 @@ struct POGLDeferredCreateVertexBufferCommand
 	union {
 		POGLDeferredCommand command;
 		struct {
-			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
 			class POGLVertexBuffer* vertexBuffer;
 
@@ -36,7 +33,6 @@ struct POGLDeferredMapVertexBufferCommand
 	union {
 		POGLDeferredCommand command;
 		struct {
-			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
 			class POGLVertexBuffer* vertexBuffer;
 
@@ -51,7 +47,6 @@ struct POGLDeferredMapRangeVertexBufferCommand
 	union {
 		POGLDeferredCommand command;
 		struct {
-			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
 			class POGLVertexBuffer* vertexBuffer;
 
@@ -105,41 +100,17 @@ public:
 
 private:
 	/*!
-		\brief Retrieve a command to be executed
+		\brief Add a new command to be executed and put it onto the queue
 
 		If no commands are available on the memory pool then create a new one
 
 		\param function
 		\param releaseFunction
 	*/
-	POGLDeferredCommand* AllocCommand(POGLCommandFuncPtr function);
+	POGLDeferredCommand* AddCommand(POGLCommandFuncPtr function);
 
 	/*!
-		\brief Add a command to be executed after the flush
-
-		\param command
-	*/
-	void AddCommand(POGLDeferredCommand* command);
-
-	/*!
-		\brief Retreive the flushed commands
-	*/
-	POGLDeferredCommand* GetFlushedCommands();
-
-	/*!
-		\brief Free the supplied commands
-
-		\param commands
-	*/
-	void FreeCommands(POGLDeferredCommand* commands);
-
-	/*!
-		\brief Execute the release function on all the "commands to be relesed"
-	*/
-	void ReleaseCommands();
-
-	/*!
-		\brief 
+		\brief Retrieves the next offset position for the supplied vertex buffer size
 	*/
 	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
 
@@ -148,40 +119,28 @@ protected:
 	IPOGLDevice* mDevice;
 
 	/* Mutex used to prevent this device context from being executed during the Wait phase */
-	std::mutex mWaitMutex;
+	std::mutex mFlushAndWaitMutex;
 
 	//
-	// The commands generated inside the thread (before performing a flush)
+	// Commands to be flushed
 	//
 
-	POGLDeferredCommand* mCommandsToExecuteHead;
-	POGLDeferredCommand* mCommandsToExecuteTail;
+	POGLDeferredCommand* mCommands;
+	POGL_UINT32 mCommandsSize;
+	POGL_UINT32 mCommandsOffset;
 
 	//
-	// Flushed commands, which will be rendered by the main thread
+	// Flushed commands
 	//
-
 	std::mutex mFlushedCommandsMutex;
-	POGLDeferredCommand* mFlushedCommandsHead;
-
-	//
-	// Commands that's finished executing (that can be reused)
-	//
-
-	POGLDeferredCommand* mFreeCommands;
-
-	std::mutex mReleasedCommandsMutex;
-	POGLDeferredCommand* mReleasedCommands;
+	POGLDeferredCommand* mFlushedCommands;
+	POGL_UINT32 mFlushedCommandsSize;
 
 	/* Keep track of the vertex mapping */
 	POGLDeferredCommand* mMap;
 
 	/* Memory used when mapping */
 	void* mMapMemoryPool;
-
-	/* The size of the memory pool */
 	POGL_UINT32 mMapMemoryPoolSize;
-
-	/* The offset to the next free memory pool byte */
 	POGL_UINT32 mMapMemoryPoolOffset;
 };

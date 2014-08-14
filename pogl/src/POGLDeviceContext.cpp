@@ -247,18 +247,7 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	assert_with_message(memorySize > 0, "You cannot create a index buffer of no size");
 	assert_with_message(type != POGLVertexType::FLOAT && type != POGLVertexType::DOUBLE, "You are not allowed to create an index buffer of a decimal type");
 
-	static const POGL_UINT32 TYPE_SIZE[POGLVertexType::COUNT] = {
-		sizeof(POGL_INT8),
-		sizeof(POGL_UINT8),
-		sizeof(POGL_INT16),
-		sizeof(POGL_UINT16),
-		sizeof(POGL_INT32),
-		sizeof(POGL_UINT32),
-		sizeof(POGL_FLOAT),
-		sizeof(POGL_DOUBLE),
-	};
-
-	const POGL_UINT32 typeSize = (POGL_UINT32)TYPE_SIZE[type];
+	const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(type);
 	const POGL_UINT32 numIndices = memorySize / typeSize;
 	const GLuint bufferID = POGLFactory::GenBufferID();
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
@@ -291,14 +280,31 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::En
 	return nullptr;
 }
 
-void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 size, POGLResourceStreamType::Enum e)
+void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e)
 {
+	auto type = resource->GetResourceType();
+	if (type == POGLResourceType::VERTEXBUFFER) {
+		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
+		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
+		if (offset + length > memorySize)
+			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
+
+		mRenderState->BindVertexBuffer(vb);
+		void* map = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		return map;
+	}
+
 	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
 	return nullptr;
 }
 
 void POGLDeviceContext::Unmap(IPOGLResource* resource)
 {
+	auto type = resource->GetResourceType();
+	if (type == POGLResourceType::VERTEXBUFFER) {
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+		return;
+	}
 	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
 }
 

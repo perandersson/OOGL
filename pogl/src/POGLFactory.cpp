@@ -73,18 +73,8 @@ GLuint POGLFactory::GenVertexArrayObjectID(GLuint bufferID, const POGL_VERTEX_LA
 		glEnableVertexAttribArray(i);
 		CHECK_GL("Could not enable vertex attrib location for the vertex array object");
 
-		static const POGL_UINT32 TYPE_SIZE[POGLVertexType::COUNT] = {
-			sizeof(POGL_INT8),
-			sizeof(POGL_UINT8),
-			sizeof(POGL_INT16),
-			sizeof(POGL_UINT16),
-			sizeof(POGL_INT32),
-			sizeof(POGL_UINT32),
-			sizeof(POGL_FLOAT),
-			sizeof(POGL_DOUBLE)
-		};
-
-		const GLint numElementsInField = field.fieldSize / TYPE_SIZE[(POGL_UINT32)field.type];
+		const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(field.type);
+		const GLint numElementsInField = field.fieldSize / typeSize;
 		const auto type = field.type;
 		switch (type) {
 		case POGLVertexType::BYTE:

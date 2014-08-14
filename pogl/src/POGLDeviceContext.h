@@ -37,7 +37,7 @@ public:
 	virtual IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage);
 	virtual IPOGLRenderState* Apply(IPOGLEffect* effect);
 	virtual void* Map(IPOGLResource* resource, POGLResourceStreamType::Enum e);
-	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 size, POGLResourceStreamType::Enum e);
+	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e);
 	virtual void Unmap(IPOGLResource* resource);
 
 	/*!

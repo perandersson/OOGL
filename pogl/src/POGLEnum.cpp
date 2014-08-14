@@ -385,3 +385,19 @@ GLenum POGLEnum::ConvertToInternalTextureFormatEnum(POGLTextureFormat::Enum form
 	}
 	return _internalFormat;
 }
+
+POGL_UINT32 POGLEnum::VertexTypeSize(POGLVertexType::Enum e)
+{
+	static const POGL_UINT32 sizes[POGLVertexType::COUNT] = {
+		sizeof(POGL_INT8),
+		sizeof(POGL_UINT8),
+		sizeof(POGL_INT16),
+		sizeof(POGL_UINT16),
+		sizeof(POGL_INT32),
+		sizeof(POGL_UINT32),
+		sizeof(POGL_FLOAT),
+		sizeof(POGL_DOUBLE),
+	};
+
+	return sizes[(POGL_UINT32)e];
+}
