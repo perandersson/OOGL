@@ -53,6 +53,7 @@ class IPOGLTexture;
 class IPOGLTexture1D;
 class IPOGLTexture2D;
 class IPOGLTexture3D;
+class IPOGLFramebuffer;
 
 class IPOGLShaderProgram;
 class IPOGLEffect;
@@ -435,7 +436,8 @@ struct POGLResourceType
 		TEXTURE2D,
 		TEXTURE3D,
 		SHADER,
-		EFFECT
+		EFFECT,
+		FRAMEBUFFER
 	};
 };
 
@@ -896,6 +898,10 @@ public:
 
 	/*!
 		\brief Creates a 2D texture
+
+		\param size
+		\param format
+		\param bytes
 	*/
 	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes) = 0;
 
@@ -903,7 +909,24 @@ public:
 		\brief Creates a 3D texture
 	*/
 	virtual IPOGLTexture3D* CreateTexture3D() = 0;
+
+	/*!
+		\brief Creates a framebuffer that renders to the supplied textures
+
+		\param textures
+		\param numTextures
+	*/
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures) = 0;
 	
+	/*!
+		\brief Creates a framebuffer that renders to the supplied textures
+
+		\param textures
+		\param numTextures
+		\param depthTexture
+	*/
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture) = 0;
+
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
 
@@ -1369,6 +1392,28 @@ class IPOGLTexture3D : public IPOGLTexture
 public:
 	virtual POGL_UINT32 GetDepth() const = 0;
 	virtual const POGL_SIZEI& GetSize() const = 0;
+};
+
+/*!
+	\brief
+*/
+class IPOGLFramebuffer : public IPOGLResource
+{
+public:
+	/*!
+		\brief Retrieve the texture bound at the supplied index
+
+		\param idx
+		\return
+	*/
+	virtual IPOGLTexture* GetTexture(POGL_UINT32 idx) = 0;
+
+	/*!
+		\brief Retrieves a depth- and/or stencil texture
+
+		\return
+	*/
+	virtual IPOGLTexture* GetDepthStencilTexture() = 0;
 };
 
 /*!

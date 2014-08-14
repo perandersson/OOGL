@@ -80,6 +80,11 @@ extern PFNGLGETPROGRAMIVPROC _poglGetProgramiv;
 extern PFNGLGETPROGRAMINFOLOGPROC _poglGetProgramInfoLog;
 extern PFNGLGETACTIVEUNIFORMPROC _poglGetActiveUniform;
 extern PFNGLGETUNIFORMLOCATIONPROC _poglGetUniformLocation;
+extern PFNGLBINDFRAMEBUFFERPROC _poglBindFramebuffer;
+extern PFNGLBINDRENDERBUFFERPROC _poglBindRenderbuffer;
+extern PFNGLGENFRAMEBUFFERSPROC _poglGenFramebuffers;
+extern PFNGLDELETERENDERBUFFERSPROC _poglDeleteRenderbuffers;
+extern PFNGLDELETEFRAMEBUFFERSPROC _poglDeleteFramebuffers;
 
 #define glGenBuffers _poglGenBuffers
 #define glDeleteBuffers _poglDeleteBuffers
@@ -140,6 +145,11 @@ extern PFNGLGETUNIFORMLOCATIONPROC _poglGetUniformLocation;
 #define glGetProgramInfoLog _poglGetProgramInfoLog
 #define glGetActiveUniform _poglGetActiveUniform
 #define glGetUniformLocation _poglGetUniformLocation
+#define glBindFramebuffer _poglBindFramebuffer
+#define glBindRenderbuffer _poglBindRenderbuffer
+#define glGenFramebuffers _poglGenFramebuffers
+#define glDeleteRenderbuffers _poglDeleteRenderbuffers
+#define glDeleteFramebuffers _poglDeleteFramebuffers
 
 #ifdef WIN32
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC _powglCreateContextAttribsARB;

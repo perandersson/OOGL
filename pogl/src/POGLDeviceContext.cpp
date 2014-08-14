@@ -10,6 +10,7 @@
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
 #include "POGLFactory.h"
+#include "POGLFramebuffer.h"
 #include <gl/poglext.h>
 #include <algorithm>
 
@@ -188,6 +189,17 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 
 IPOGLTexture3D* POGLDeviceContext::CreateTexture3D()
 {
+	return nullptr;
+}
+
+IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures)
+{
+	return CreateFramebuffer(textures, numTextures, nullptr);
+}
+
+IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture)
+{
+	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
 	return nullptr;
 }
 

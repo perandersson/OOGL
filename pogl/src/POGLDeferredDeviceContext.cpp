@@ -94,6 +94,18 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 	return nullptr;
 }
 
+IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures)
+{
+	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+	return nullptr;
+}
+
+IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture)
+{
+	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+	return nullptr;
+}
+
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
