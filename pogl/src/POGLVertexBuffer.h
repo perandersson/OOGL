@@ -5,7 +5,7 @@ class POGLIndexBuffer;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
 public:
-	POGLVertexBuffer(GLuint bufferID, POGL_UINT32 count, GLuint vaoID, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage);
+	POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage);
 	~POGLVertexBuffer();
 	
 	/*!
@@ -62,7 +62,7 @@ public:
 		This method is called if this object is created in another thread and we want, after the command queue has been executed, to put the
 		values into this buffer.
 	*/
-	void PostConstruct(GLuint bufferID);
+	void PostConstruct(GLuint bufferID, GLuint vaoID);
 
 // IPOGLInterface
 public:

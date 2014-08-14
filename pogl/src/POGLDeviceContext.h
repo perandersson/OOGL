@@ -45,21 +45,6 @@ public:
 	*/
 	void InitializeRenderState();
 
-	/*!
-		\brief Generate a new sampler ID
-	*/
-	GLuint GenSamplerID();
-
-	/*!
-		\brief Generate a new bufferID
-	*/
-	GLuint GenBufferID();
-
-	/*!
-		\brief Generate a new texture ID
-	*/
-	GLuint GenTextureID();
-
 protected:
 	IPOGLDevice* mDevice;
 	POGLRenderState* mRenderState;

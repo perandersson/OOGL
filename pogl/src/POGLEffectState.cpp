@@ -13,6 +13,7 @@
 #include "POGLSamplerObject.h"
 #include "POGLEffectData.h"
 #include "POGLEnum.h"
+#include "POGLFactory.h"
 
 POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderState, POGLDeviceContext* context)
 : mEffect(effect), mDeviceContext(context)
@@ -110,7 +111,7 @@ void POGLEffectState::ApplyUniforms()
 
 POGLSamplerObject* POGLEffectState::GenSamplerObject(POGLRenderState* renderState, const POGLUniformProperty* uniformProperty)
 {
-	const GLuint samplerID = mDeviceContext->GenSamplerID();
+	const GLuint samplerID = POGLFactory::GenSamplerID();
 	POGLSamplerObject* samplerObject = new POGLSamplerObject(samplerID, renderState);
 
 	glSamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(uniformProperty->minFilter));

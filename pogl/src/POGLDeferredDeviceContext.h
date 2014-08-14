@@ -73,11 +73,6 @@ public:
 	*/
 	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
 
-	/*!
-		\brief Generate a new bufferID
-	*/
-	GLuint GenBufferID();
-
 // IPOGLInterface
 public:
 	virtual void AddRef();

@@ -2,6 +2,7 @@
 #include "POGLDeferredDeviceContext.h"
 #include "POGLVertexBuffer.h"
 #include "POGLEnum.h"
+#include "POGLFactory.h"
 #include "POGLRenderState.h"
 #include "POGLDeviceContext.h"
 
@@ -118,11 +119,33 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredCreateVertexBufferCommand* cmd = (POGLDeferredCreateVertexBufferCommand*)command;
-	cmd->vertexBuffer->PostConstruct(context->GenBufferID());
+
+	//
+	// Generate buffers and attach the vertex buffers layout to it
+	//
+
+	const GLuint bufferID = POGLFactory::GenBufferID();
+	const GLuint vaoID = POGLFactory::GenVertexArrayObjectID(bufferID, cmd->vertexBuffer->GetLayout());
+	cmd->vertexBuffer->PostConstruct(bufferID, vaoID);
+
+	//
+	// Set the vertex buffer as the "current buffer" on the render state
+	//
+
 	state->SetVertexBuffer(cmd->vertexBuffer);
+
+	//
+	// Map the data
+	//
+
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	//
+	// Release the vertex buffer
+	//
+
 	cmd->vertexBuffer->Release();
 }
 
@@ -152,7 +175,7 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* mem
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
-	POGLVertexBuffer* vb = new POGLVertexBuffer(0, numVertices, 0, layout, type, bufferUsage);
+	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage);
 	POGLDeferredCreateVertexBufferCommand* command = (POGLDeferredCreateVertexBufferCommand*)AllocCommand(&POGLCreateVertexBuffer_Command);
 	command->vertexBuffer = vb;
 	vb->AddRef();
@@ -417,16 +440,4 @@ void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
 	//
 
 	ReleaseCommands();
-}
-
-GLuint POGLDeferredDeviceContext::GenBufferID()
-{
-	GLuint id = 0;
-	glGenBuffers(1, &id);
-
-	const GLenum error = glGetError();
-	if (id == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
-
-	return id;
 }

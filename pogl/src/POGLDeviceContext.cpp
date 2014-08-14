@@ -9,6 +9,7 @@
 #include "POGLShaderProgram.h"
 #include "POGLEffectData.h"
 #include "POGLStringUtils.h"
+#include "POGLFactory.h"
 #include <gl/poglext.h>
 #include <algorithm>
 
@@ -166,7 +167,7 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLT
 	const GLenum magFilter = POGLEnum::Convert(POGLMagFilter::DEFAULT);
 	const GLenum textureWrap = POGLEnum::Convert(POGLTextureWrap::DEFAULT);
 
-	const GLuint textureID = GenTextureID();
+	const GLuint textureID = POGLFactory::GenTextureID();
 	glBindTexture(GL_TEXTURE_2D, textureID);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, size.width, size.height, 0, _format, GL_UNSIGNED_BYTE, bytes);
@@ -199,13 +200,15 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
+	const GLuint bufferID = POGLFactory::GenBufferID();
+	const GLuint vaoID = POGLFactory::GenVertexArrayObjectID(bufferID, layout);
 
 	//
 	// Create the object
 	//
 
-	POGLVertexBuffer* vb = new POGLVertexBuffer(0, numVertices, 0, layout, type, usage);
-	vb->PostConstruct(GenBufferID());
+	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, usage);
+	vb->PostConstruct(bufferID, vaoID);
 	
 	// 
 	// Fill the buffer with data
@@ -257,7 +260,7 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 
 	const POGL_UINT32 typeSize = (POGL_UINT32)TYPE_SIZE[type];
 	const POGL_UINT32 numIndices = memorySize / typeSize;
-	const GLuint bufferID = GenBufferID();
+	const GLuint bufferID = POGLFactory::GenBufferID();
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum indiceType = POGLEnum::Convert(type);
 
@@ -304,42 +307,6 @@ void POGLDeviceContext::InitializeRenderState()
 	if (mRenderState == nullptr) {
 		mRenderState = new POGLRenderState(this);
 	}
-}
-
-GLuint POGLDeviceContext::GenSamplerID()
-{
-	GLuint id = 0;
-	glGenSamplers(1, &id);
-
-	const GLenum error = glGetError();
-	if (id == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate sampler ID");
-
-	return id;
-}
-
-GLuint POGLDeviceContext::GenBufferID()
-{
-	GLuint id = 0;
-	glGenBuffers(1, &id);
-
-	const GLenum error = glGetError();
-	if (id == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
-
-	return id;
-}
-
-GLuint POGLDeviceContext::GenTextureID()
-{
-	GLuint id = 0;
-	glGenTextures(1, &id);
-
-	const GLenum error = glGetError();
-	if (id == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate texture ID. Reason: 0x%x", error);
-
-	return id;
 }
 
 ////////////////////////
