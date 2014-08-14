@@ -71,7 +71,7 @@ public:
 	virtual POGLResourceType::Enum GetResourceType() const;
 
 private:
-	POGL_UINT32 mRefCount;
+	std::atomic<POGL_UINT32> mRefCount;
 	GLuint mProgramID;
 	IPOGLDevice* mDevice;
 	POGL_UINT32 mUID;

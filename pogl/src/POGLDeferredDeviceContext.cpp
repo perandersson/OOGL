@@ -30,6 +30,7 @@ void POGLDeferredDeviceContext::Release()
 		auto command = mFlushedCommandsHead;
 		while (command != nullptr) {
 			auto next = command->tail;
+			command->resource->Release();
 			free(command);
 			command = next;
 		}
@@ -38,6 +39,7 @@ void POGLDeferredDeviceContext::Release()
 		command = mReleasedCommands;
 		while (command != nullptr) {
 			auto next = command->tail;
+			command->resource->Release();
 			free(command);
 			command = next;
 		}
@@ -54,6 +56,7 @@ void POGLDeferredDeviceContext::Release()
 		command = mCommandsToExecuteHead;
 		while (command != nullptr) {
 			auto next = command->tail;
+			command->resource->Release();
 			free(command);
 			command = next;
 		}
@@ -115,10 +118,12 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredCreateVertexBufferCommand* cmd = (POGLDeferredCreateVertexBufferCommand*)command;
-	state->BindVertexBuffer(cmd->vertexBuffer);
+	cmd->vertexBuffer->PostConstruct(context->GenBufferID());
+	state->SetVertexBuffer(cmd->vertexBuffer);
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+	cmd->vertexBuffer->Release();
 }
 
 void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -128,6 +133,7 @@ void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLR
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+	cmd->vertexBuffer->Release();
 }
 
 void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -137,6 +143,7 @@ void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, 
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, cmd->offset, cmd->length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->length);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+	cmd->vertexBuffer->Release();
 }
 
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -148,6 +155,7 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* mem
 	POGLVertexBuffer* vb = new POGLVertexBuffer(0, numVertices, 0, layout, type, bufferUsage);
 	POGLDeferredCreateVertexBufferCommand* command = (POGLDeferredCreateVertexBufferCommand*)AllocCommand(&POGLCreateVertexBuffer_Command);
 	command->vertexBuffer = vb;
+	vb->AddRef();
 	command->memoryPoolOffset = GetMapOffset(memorySize);
 	memcpy(GetMapPointer(command->memoryPoolOffset), memory, memorySize);
 	command->size = memorySize;
@@ -190,6 +198,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStream
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
+		vb->AddRef();
 
 		POGLDeferredMapVertexBufferCommand* map = (POGLDeferredMapVertexBufferCommand*)AllocCommand(&POGLMapVertexBuffer_Command);
 		map->size = vb->GetCount() * vb->GetLayout()->vertexSize;
@@ -214,7 +223,8 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
 		if (offset + length > memorySize)
 			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
-
+		
+		vb->AddRef();
 		POGLDeferredMapRangeVertexBufferCommand* map = (POGLDeferredMapRangeVertexBufferCommand*)AllocCommand(&POGLMapRangeVertexBuffer_Command);
 		map->offset = offset;
 		map->length = length;
@@ -379,7 +389,8 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	// Free the commands
 	//
 
-	FreeCommands(commands);
+	if (clearCommands)
+		FreeCommands(commands);
 }
 
 void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
@@ -406,4 +417,16 @@ void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
 	//
 
 	ReleaseCommands();
+}
+
+GLuint POGLDeferredDeviceContext::GenBufferID()
+{
+	GLuint id = 0;
+	glGenBuffers(1, &id);
+
+	const GLenum error = glGetError();
+	if (id == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
+
+	return id;
 }

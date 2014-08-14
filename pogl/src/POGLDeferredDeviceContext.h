@@ -10,6 +10,7 @@ struct POGLDeferredCommand
 {
 	POGLDeferredCommand* tail;
 	POGLCommandFuncPtr function;
+	IPOGLResource* resource;
 
 	// Extra
 	POGL_HANDLE extra[6];
@@ -22,8 +23,8 @@ struct POGLDeferredCreateVertexBufferCommand
 		struct {
 			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
-
 			class POGLVertexBuffer* vertexBuffer;
+
 			POGL_UINT32 memoryPoolOffset;
 			POGL_SIZE size;
 		};
@@ -37,8 +38,8 @@ struct POGLDeferredMapVertexBufferCommand
 		struct {
 			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
-
 			class POGLVertexBuffer* vertexBuffer;
+
 			POGL_UINT32 memoryPoolOffset;
 			POGL_SIZE size;
 		};
@@ -52,8 +53,8 @@ struct POGLDeferredMapRangeVertexBufferCommand
 		struct {
 			POGLDeferredCommand* tail;
 			POGLCommandFuncPtr function;
-
 			class POGLVertexBuffer* vertexBuffer;
+
 			POGL_UINT32 memoryPoolOffset;
 			POGL_SIZE offset;
 			POGL_SIZE length;
@@ -71,6 +72,11 @@ public:
 	
 	*/
 	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
+
+	/*!
+		\brief Generate a new bufferID
+	*/
+	GLuint GenBufferID();
 
 // IPOGLInterface
 public:

@@ -214,7 +214,7 @@ int main()
 			device->EndFrame();
 		}
 
-		running.store(false);
+		running = false;
 		t1cond.notify_one();
 		t2cond.notify_one();
 		t1.join();

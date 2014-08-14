@@ -62,7 +62,7 @@ public:
 		This method is called if this object is created in another thread and we want, after the command queue has been executed, to put the
 		values into this buffer.
 	*/
-	void PostConstruct(GLuint bufferID, GLuint vaoID);
+	void PostConstruct(GLuint bufferID);
 
 // IPOGLInterface
 public:
@@ -79,7 +79,7 @@ public:
 	virtual POGL_UINT32 GetCount() const;
 
 private:
-	POGL_UINT32 mRefCount;
+	std::atomic<POGL_UINT32> mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mBufferID;
 	POGL_UINT32 mCount;

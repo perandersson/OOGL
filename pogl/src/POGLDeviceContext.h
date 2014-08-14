@@ -44,11 +44,6 @@ public:
 		\brief 
 	*/
 	void InitializeRenderState();
-	
-	/*!
-		\brief Creates a vertex array ID
-	*/
-	GLuint GenVertexArray();
 
 	/*!
 		\brief Generate a new sampler ID
