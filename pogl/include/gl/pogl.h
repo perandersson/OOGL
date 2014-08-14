@@ -59,8 +59,6 @@ class IPOGLShaderProgram;
 class IPOGLEffect;
 class IPOGLUniform;
 
-class IPOGLFrameBuffer;
-
 //
 // typedefs
 //
@@ -923,9 +921,9 @@ public:
 
 		\param textures
 		\param numTextures
-		\param depthTexture
+		\param depthStencilTexture
 	*/
-	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture) = 0;
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthStencilTexture) = 0;
 
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
@@ -1275,6 +1273,11 @@ public:
 		\brief 
 	*/
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name) = 0;
+
+	/*!
+		\brief Set the framebuffer used when render to this frame
+	*/
+	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer) = 0;
 
 	/*!
 		\brief Draw the entire vertex buffer

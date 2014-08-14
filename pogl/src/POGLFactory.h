@@ -20,6 +20,11 @@ public:
 	static GLuint GenTextureID();
 
 	/*!
+		\brief Generate a new framebuffer ID
+	*/
+	static GLuint GenFramebufferID();
+
+	/*!
 		\brief Generate a vertex array object ID for the supplied buffer and layout
 
 		\param bufferID

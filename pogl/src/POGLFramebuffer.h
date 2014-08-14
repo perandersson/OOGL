@@ -5,8 +5,22 @@
 class POGLFramebuffer : public IPOGLFramebuffer
 {
 public:
-	POGLFramebuffer(GLuint framebufferID);
+	POGLFramebuffer(GLuint framebufferID, std::vector<IPOGLTexture*>& textures, IPOGLTexture* depthStencilTexture);
 	virtual ~POGLFramebuffer();
+
+	/*!
+		\brief Retrieve a unique id for this resource
+	*/
+	inline POGL_UINT32 GetUID() const {
+		return mUID;
+	}
+
+	/*!
+		\brief Retrieves the OpenGL framebuffer resource ID
+	*/
+	inline GLuint GetFramebufferID() const {
+		return mFramebufferID;
+	}
 
 // IPOGLInterface
 public:
@@ -24,6 +38,7 @@ public:
 
 private:
 	std::atomic<POGL_UINT32> mRefCount;
+	POGL_UINT32 mUID;
 	GLuint mFramebufferID;
 	std::vector<IPOGLTexture*> mTextures;
 	IPOGLTexture* mDepthStencilTexture;

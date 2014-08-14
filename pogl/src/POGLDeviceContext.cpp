@@ -197,10 +197,104 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 	return CreateFramebuffer(textures, numTextures, nullptr);
 }
 
-IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture)
+IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthStencilTexture)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	const GLuint framebufferID = POGLFactory::GenFramebufferID();
+	std::vector<IPOGLTexture*> texturesVector;
+
+	//
+	// Bind the textures to the framebuffer
+	//
+
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+	if (textures != nullptr && numTextures > 0) {
+		for (POGL_UINT32 i = 0; i < numTextures; ++i) {
+			IPOGLTexture* texture = textures[i];
+			texturesVector.push_back(texture);
+			const POGLResourceType::Enum type = texture->GetResourceType();
+			if (type == POGLResourceType::TEXTURE2D) {
+				POGLTexture2D* t2d = static_cast<POGLTexture2D*>(texture);
+				POGLTextureResource* resource = t2d->GetResourcePtr();
+				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, resource->GetTextureID(), 0);
+			}
+			else {
+				THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+			}
+		}
+	}
+
+	//
+	// Bind depth texture if found
+	//
+
+	if (depthStencilTexture != nullptr) {
+		const POGLResourceType::Enum type = depthStencilTexture->GetResourceType();
+		if (type == POGLResourceType::TEXTURE2D) {
+			POGLTexture2D* t2d = static_cast<POGLTexture2D*>(depthStencilTexture);
+			POGLTextureResource* resource = t2d->GetResourcePtr();
+			GLenum attachmentType = GL_DEPTH_ATTACHMENT;
+			switch (resource->GetTextureFormat()) {
+			case POGLTextureFormat::DEPTH24:
+			case POGLTextureFormat::DEPTH32F:
+				attachmentType = GL_DEPTH_ATTACHMENT;
+				break;
+			case POGLTextureFormat::DEPTH24_STENCIL8:
+			case POGLTextureFormat::DEPTH32F_STENCIL8:
+				attachmentType = GL_DEPTH_STENCIL_ATTACHMENT;
+				break;
+			default:
+				THROW_EXCEPTION(POGLResourceException, "You cannot bind a non-depth-stencil texture as a depth buffer");
+			}
+			glFramebufferTexture(GL_FRAMEBUFFER, attachmentType, resource->GetTextureID(), 0);
+
+		}
+		else {
+			THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+		}
+	}
+
+	//
+	// Build framebuffer
+	//
+
+	const GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	switch (status)
+	{
+	case GL_FRAMEBUFFER_COMPLETE_EXT:
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_ATTACHMENT_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Framebuffer incomplete: Attachment is NOT complete.");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_MISSING_ATTACHMENT_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Framebuffer incomplete: No image is attached to FBO.");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DIMENSIONS_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Framebuffer incomplete: Attached images have different dimensions");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_FORMATS_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Framebuffer incomplete: Color attached images have different internal formats");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_DRAW_BUFFER_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Framebuffer incomplete: Draw buffer");
+		break;
+	case GL_FRAMEBUFFER_INCOMPLETE_READ_BUFFER_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Framebuffer incomplete: Read buffer");
+		break;
+	case GL_FRAMEBUFFER_UNSUPPORTED_EXT:
+		THROW_EXCEPTION(POGLResourceException, "Unsupported by FBO implementation");
+		break;
+	default:
+		THROW_EXCEPTION(POGLResourceException, "Unknow error");
+		break;
+	}
+
+	//
+	// Create the object
+	//
+
+	POGLFramebuffer* framebuffer = new POGLFramebuffer(framebufferID, texturesVector, depthStencilTexture);
+	mRenderState->SetFramebuffer(framebuffer);
+	return framebuffer;
 }
 
 IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)

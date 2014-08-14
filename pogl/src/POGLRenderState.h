@@ -7,6 +7,7 @@ class POGLVertexBuffer;
 class POGLIndexBuffer;
 class POGLTextureResource;
 class POGLSamplerObject;
+class POGLFramebuffer;
 class POGLRenderState : public IPOGLRenderState
 {
 	typedef std::hash_map<POGL_UINT32, std::shared_ptr<POGLEffectState>> EffectStates;
@@ -15,13 +16,18 @@ public:
 	POGLRenderState(POGLDeviceContext* context);
 	~POGLRenderState();
 
-	void AddRef();
-	void Release();	
-	IPOGLDevice* GetDevice();
-	IPOGLDeviceContext* GetDeviceContext();
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
 
+// IPOGLRenderState
+public:
+	virtual IPOGLDevice* GetDevice();
+	virtual IPOGLDeviceContext* GetDeviceContext();
 	void Clear(POGL_UINT32 clearBits);
 	IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
+	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);
 	void Draw(IPOGLVertexBuffer* vertexBuffer);
 	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
 	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
@@ -88,6 +94,13 @@ public:
 		\param vertexBuffer
 	*/
 	void SetIndexBuffer(POGLIndexBuffer* indexBuffer);
+
+	/*!
+		\brief Set the currently bound framebuffer
+
+		\param framebuffer
+	*/
+	void SetFramebuffer(POGLFramebuffer* framebuffer);
 
 	/*!
 		\brief Retrieves the next active texture for this render state.
@@ -159,4 +172,10 @@ private:
 	std::vector<POGLTextureResource*> mTextures;
 	std::vector<POGL_UINT32> mSamplerObjectUID;
 	POGL_UINT32 mActiveTextureIndex;
+
+	//
+	// Framebuffer
+	//
+	POGLFramebuffer* mFramebuffer;
+	POGL_UINT32 mFramebufferUID;
 };

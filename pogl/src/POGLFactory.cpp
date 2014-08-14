@@ -38,6 +38,18 @@ GLuint POGLFactory::GenTextureID()
 	return id;
 }
 
+GLuint POGLFactory::GenFramebufferID()
+{
+	GLuint id = 0;
+	glGenFramebuffers(1, &id);
+
+	const GLenum error = glGetError();
+	if (id == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate framebuffer ID. Reason: 0x%x", error);
+
+	return id;
+}
+
 GLuint POGLFactory::GenVertexArrayObjectID(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout)
 {
 	//

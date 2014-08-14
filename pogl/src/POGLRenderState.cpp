@@ -7,13 +7,15 @@
 #include "POGLEnum.h"
 #include "POGLTextureResource.h"
 #include "POGLSamplerObject.h"
+#include "POGLFramebuffer.h"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false),
-mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0)
+mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0),
+mFramebuffer(nullptr), mFramebufferUID(0)
 {
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxActiveTextures);
 	mTextureUID.resize(mMaxActiveTextures, 0);
@@ -97,6 +99,29 @@ void POGLRenderState::Clear(POGL_UINT32 clearBits)
 IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_CHAR* name)
 {
 	return mCurrentEffectState->FindUniformByName(POGL_STRING(name));
+}
+
+void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
+{
+	POGLFramebuffer* fb = static_cast<POGLFramebuffer*>(framebuffer);
+	const POGL_UINT32 uid = framebuffer != nullptr ? fb->GetUID() : 0;
+	if (mFramebufferUID == uid) {
+		if (mFramebuffer == nullptr && fb != nullptr) {
+			mFramebuffer = fb;
+			mFramebuffer->AddRef();
+		}
+		return;
+	}
+
+	const GLuint framebufferID = framebuffer != nullptr ? fb->GetFramebufferID() : 0;
+	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+	if (mFramebuffer != nullptr) {
+		mFramebuffer->Release();
+	}
+	mFramebuffer = fb;
+	if (mFramebuffer != nullptr) {
+		mFramebuffer->AddRef();
+	}
 }
 
 void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer)
@@ -461,6 +486,16 @@ void POGLRenderState::SetIndexBuffer(POGLIndexBuffer* indexBuffer)
 	mIndexBuffer = indexBuffer;
 	mIndexBuffer->AddRef();
 	mIndexBufferUID = indexBuffer->GetUID();
+}
+
+void POGLRenderState::SetFramebuffer(POGLFramebuffer* framebuffer)
+{
+	if (mFramebuffer != nullptr)
+		mFramebuffer->Release();
+
+	mFramebuffer = framebuffer;
+	mFramebuffer->AddRef();
+	mFramebufferUID = framebuffer->GetUID();
 }
 
 POGL_UINT32 POGLRenderState::NextActiveTexture()

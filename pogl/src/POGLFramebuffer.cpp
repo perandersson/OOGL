@@ -7,8 +7,8 @@ namespace {
 	}
 }
 
-POGLFramebuffer::POGLFramebuffer(GLuint framebufferID)
-: mRefCount(1), mFramebufferID(framebufferID), mDepthStencilTexture(nullptr)
+POGLFramebuffer::POGLFramebuffer(GLuint framebufferID, std::vector<IPOGLTexture*>& textures, IPOGLTexture* depthStencilTexture)
+: mRefCount(1), mUID(GenFramebufferID()), mFramebufferID(framebufferID), mTextures(textures), mDepthStencilTexture(depthStencilTexture)
 {
 }
 
