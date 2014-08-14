@@ -24,6 +24,7 @@ public:
 // IPOGLDevice
 public:
 	virtual IPOGLDeviceContext* GetDeviceContext();
+	virtual IPOGLDeferredDeviceContext* CreateDeferredDeviceContext();
 	virtual void EndFrame();
 	
 private:
@@ -39,4 +40,5 @@ private:
 	HDC mDC;
 	
 	Win32POGLDeviceContext* mDeviceContext;
+	std::vector<IPOGLDeferredDeviceContext*> mDeferredDeviceContexts;
 };

@@ -1,6 +1,7 @@
 #include "MemCheck.h"
 #include "Win32POGLDevice.h"
 #include "Win32POGLDeviceContext.h"
+#include "POGLDeferredDeviceContext.h"
 #include <algorithm>
 
 /* Memory Leak Detection */
@@ -36,6 +37,12 @@ void Win32POGLDevice::Release()
 {
 	if (--mRefCount == 0 && !mReleasing) {
 		mReleasing = true;
+
+		POGL_UINT32 size = mDeferredDeviceContexts.size();
+		for (POGL_UINT32 i = 0; i < size; ++i) {
+			mDeferredDeviceContexts[i]->Release();
+		}
+		mDeferredDeviceContexts.clear();
 		
 		if (mDeviceContext != nullptr) {
 			mDeviceContext->Destroy();
@@ -57,6 +64,14 @@ IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 {
 	mDeviceContext->AddRef();
 	return mDeviceContext;
+}
+
+IPOGLDeferredDeviceContext* Win32POGLDevice::CreateDeferredDeviceContext()
+{
+	POGLDeferredDeviceContext* context = new POGLDeferredDeviceContext(this);
+	context->AddRef();
+	mDeferredDeviceContexts.push_back(context);
+	return context;
 }
 
 void Win32POGLDevice::EndFrame()

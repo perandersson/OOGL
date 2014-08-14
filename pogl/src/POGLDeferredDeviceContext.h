@@ -63,7 +63,7 @@ private:
 	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
 
 protected:
-	POGL_UINT32 mRefCount;
+	std::atomic<POGL_UINT32> mRefCount;
 	IPOGLDevice* mDevice;
 
 	/* Mutex used to prevent this device context from being executed during the Wait phase */

@@ -1,6 +1,5 @@
 #include "MemCheck.h"
 #include "POGLDevice.h"
-#include "POGLDeferredDeviceContext.h"
 
 // 
 // Exceptions
@@ -113,10 +112,4 @@ POGLDevice::~POGLDevice()
 const POGL_DEVICE_INFO* POGLDevice::GetDeviceInfo()
 {
 	return &mDeviceInfo;
-}
-
-IPOGLDeferredDeviceContext* POGLDevice::CreateDeferredDeviceContext()
-{
-	POGLDeferredDeviceContext* context = new POGLDeferredDeviceContext(this);
-	return context;
 }
