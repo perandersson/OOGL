@@ -1,61 +1,8 @@
 #pragma once
 #include "config.h"
+#include "POGLDeferredCommands.h"
 #include <mutex>
 #include <condition_variable>
-
-typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
-
-struct POGLDeferredCommand
-{
-	POGLCommandFuncPtr function;
-	IPOGLResource* resource;
-
-	// Extra
-	POGL_HANDLE extra[6];
-};
-
-struct POGLDeferredCreateVertexBufferCommand
-{
-	union {
-		POGLDeferredCommand command;
-		struct {
-			POGLCommandFuncPtr function;
-			class POGLVertexBuffer* vertexBuffer;
-
-			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE size;
-		};
-	};
-};
-
-struct POGLDeferredMapVertexBufferCommand
-{
-	union {
-		POGLDeferredCommand command;
-		struct {
-			POGLCommandFuncPtr function;
-			class POGLVertexBuffer* vertexBuffer;
-
-			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE size;
-		};
-	};
-};
-
-struct POGLDeferredMapRangeVertexBufferCommand
-{
-	union {
-		POGLDeferredCommand command;
-		struct {
-			POGLCommandFuncPtr function;
-			class POGLVertexBuffer* vertexBuffer;
-
-			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE offset;
-			POGL_SIZE length;
-		};
-	};
-};
 
 class POGLDeferredDeviceContext : public IPOGLDeferredDeviceContext
 {
