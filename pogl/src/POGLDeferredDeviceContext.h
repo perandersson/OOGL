@@ -94,9 +94,10 @@ public:
 
 // IPOGLDeferredDeviceContext
 public:
-	virtual void FlushAndWait(std::condition_variable& condition);
 	virtual void ExecuteCommands(IPOGLDeviceContext* context);
 	virtual void ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands);
+	virtual void Flush();
+	virtual void FlushAndWait(std::condition_variable& condition);
 
 private:
 	/*!

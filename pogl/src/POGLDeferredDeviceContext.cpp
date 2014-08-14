@@ -303,6 +303,16 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	}
 }
 
+void POGLDeferredDeviceContext::Flush()
+{
+	mFlushedCommandsMutex.lock();
+	mFlushedCommands = mCommands;
+	mFlushedCommandsSize = mCommandsOffset;
+	mFlushedCommandsMutex.unlock();
+
+	mMapMemoryPoolOffset = 0;
+}
+
 void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
 {
 	mFlushedCommandsMutex.lock();
