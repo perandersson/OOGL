@@ -22,6 +22,13 @@ public:
 		return mFramebufferID;
 	}
 
+	/*!
+		\brief Retrieves the number of draw buffers 
+	*/
+	inline POGL_UINT32 GetNumDrawBuffers() {
+		return mTextures.size();
+	}
+
 // IPOGLInterface
 public:
 	virtual void AddRef();

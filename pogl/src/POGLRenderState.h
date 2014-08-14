@@ -40,6 +40,7 @@ public:
 	void SetStencilTest(bool b);
 	void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
 	void SetBlend(bool b);
+	virtual void SetViewport(const POGL_RECTI& viewport);
 
 	/*!
 		\brief Applies the supplied effect to this render state
@@ -135,7 +136,7 @@ private:
 	void BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer);
 	
 private:
-	POGL_UINT32 mRefCount;
+	std::atomic<POGL_UINT32> mRefCount;
 	POGLDeviceContext* mDeviceContext;
 
 	IPOGLEffect* mEffect;
@@ -161,6 +162,7 @@ private:
 	POGLSrcFactor::Enum mSrcFactor;
 	POGLDstFactor::Enum mDstFactor;
 	bool mBlending;
+	POGL_RECTI mViewport;
 
 	//
 	// Textures
@@ -176,6 +178,7 @@ private:
 	//
 	// Framebuffer
 	//
+
 	POGLFramebuffer* mFramebuffer;
 	POGL_UINT32 mFramebufferUID;
 };

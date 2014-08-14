@@ -87,6 +87,7 @@ extern PFNGLDELETERENDERBUFFERSPROC _poglDeleteRenderbuffers;
 extern PFNGLDELETEFRAMEBUFFERSPROC _poglDeleteFramebuffers;
 extern PFNGLFRAMEBUFFERTEXTUREPROC _poglFramebufferTexture;
 extern PFNGLCHECKFRAMEBUFFERSTATUSPROC _poglCheckFramebufferStatus;
+extern PFNGLDRAWBUFFERSPROC _poglDrawBuffers;
 
 #define glGenBuffers _poglGenBuffers
 #define glDeleteBuffers _poglDeleteBuffers
@@ -154,6 +155,7 @@ extern PFNGLCHECKFRAMEBUFFERSTATUSPROC _poglCheckFramebufferStatus;
 #define glDeleteFramebuffers _poglDeleteFramebuffers
 #define glFramebufferTexture _poglFramebufferTexture
 #define glCheckFramebufferStatus _poglCheckFramebufferStatus
+#define glDrawBuffers _poglDrawBuffers
 
 #ifdef WIN32
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC _powglCreateContextAttribsARB;

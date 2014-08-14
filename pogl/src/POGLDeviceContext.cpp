@@ -158,9 +158,11 @@ IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
 
 IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
 {
-	assert_not_null(bytes);
-	assert_with_message(size.x > 0.0f, "You cannot create a texture with 0 width");
-	assert_with_message(size.y > 0.0f, "You cannot create a texture with 0 height");
+	if (size.width <= 0)
+		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with width: %d", size.width);
+
+	if (size.height <= 0)
+		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with height: %d", size.height);
 
 	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
 	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
@@ -207,6 +209,8 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 	//
 
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+	CHECK_GL("Could not bind framebuffer");
+
 	if (textures != nullptr && numTextures > 0) {
 		for (POGL_UINT32 i = 0; i < numTextures; ++i) {
 			IPOGLTexture* texture = textures[i];
@@ -216,6 +220,7 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 				POGLTexture2D* t2d = static_cast<POGLTexture2D*>(texture);
 				POGLTextureResource* resource = t2d->GetResourcePtr();
 				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, resource->GetTextureID(), 0);
+				CHECK_GL("Could not attach framebuffer texture to frame buffer");
 			}
 			else {
 				THROW_EXCEPTION(POGLInitializationException, "Not implemented");

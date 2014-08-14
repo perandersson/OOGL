@@ -59,4 +59,10 @@ We create one circle vertex buffer, update the same vertex buffer in two threads
 
 An example on how we can create custom vertex types instead of using any of the build-in ones.
 
-![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example6_customvertextype/screenshot.png "Example 5")
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example6_customvertextype/screenshot.png "Example 6")
+
+### Example 7: Framebuffers ###
+
+An example that shows how we can create a framebuffer with two attached render targets and one depth render target
+
+![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example7_framebuffers/screenshot.png "Example 6")

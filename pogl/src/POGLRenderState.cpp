@@ -13,7 +13,7 @@ POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
-mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false),
+mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), mViewport(0, 0, 0, 0),
 mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0),
 mFramebuffer(nullptr), mFramebufferUID(0)
 {
@@ -45,11 +45,19 @@ void POGLRenderState::Release()
 		if (mVertexBuffer != nullptr) {
 			mVertexBuffer->Release();
 			mVertexBuffer = nullptr;
+			mVertexBufferUID = 0;
 		}
 
 		if (mIndexBuffer != nullptr) {
 			mIndexBuffer->Release();
 			mIndexBuffer = nullptr;
+			mIndexBufferUID = 0;
+		}
+
+		if (mFramebuffer != nullptr) {
+			mFramebuffer->Release();
+			mFramebufferUID = 0;
+			mFramebuffer = nullptr;
 		}
 
 		auto size = mTextures.size();
@@ -57,6 +65,7 @@ void POGLRenderState::Release()
 			if (mTextures[i] != nullptr) {
 				mTextures[i]->Release();
 				mTextures[i] = nullptr;
+				mTextureUID[i] = 0;
 			}
 		}
 
@@ -115,13 +124,26 @@ void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 
 	const GLuint framebufferID = framebuffer != nullptr ? fb->GetFramebufferID() : 0;
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
+	CHECK_GL("Could not bind framebuffer");
 	if (mFramebuffer != nullptr) {
 		mFramebuffer->Release();
 	}
 	mFramebuffer = fb;
 	if (mFramebuffer != nullptr) {
 		mFramebuffer->AddRef();
+		POGL_UINT32 numDrawBuffers = mFramebuffer->GetNumDrawBuffers();
+		if (numDrawBuffers > 0) {
+			static const GLenum drawBuffers[8] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
+				GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
+			glDrawBuffers(numDrawBuffers, drawBuffers);
+			CHECK_GL("Could not set draw buffers");
+		}
+		else {
+			glDrawBuffer(GL_NONE);
+			glReadBuffer(GL_NONE);
+		}
 	}
+	mFramebufferUID = uid;
 }
 
 void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer)
@@ -265,6 +287,16 @@ void POGLRenderState::SetBlend(bool b)
 	mBlending = b;
 
 	CHECK_GL("Cannot enable/disable blendng");
+}
+
+void POGLRenderState::SetViewport(const POGL_RECTI& viewport)
+{
+	if (mViewport.x == viewport.x && mViewport.y == viewport.y && mViewport.width == viewport.width && mViewport.height == viewport.height)
+		return;
+
+	glViewport(viewport.x, viewport.y, viewport.width, viewport.height);
+	mViewport = viewport;
+	CHECK_GL("Could not set viewport");
 }
 
 IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
@@ -422,22 +454,17 @@ void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UI
 			"This computer does not support %d consecutive textures. The maximum amount of texture bindable at the same time is %d", idx, mMaxActiveTextures);
 	}
 
+	// Check if the supplied texture is already bound to this context
+	const POGL_UINT32 uid = resource != nullptr ? resource->GetUID() : 0;
+	if (mTextureUID[idx] == uid)
+		return;
+
 	if (mActiveTextureIndex != idx) {
 		glActiveTexture(GL_TEXTURE0 + idx);
 		mActiveTextureIndex = idx;
 		CHECK_GL("Could not set active texture index");
 	}
 
-	//// Make sure to wait for this resource before continuing to use
-	//if (resource != nullptr)
-	//	resource->WaitSyncDriver(mDeviceContext);
-
-	const POGL_UINT32 uid = resource != nullptr ? resource->GetUID() : 0;
-
-	// Check if the supplied texture is already bound to this context
-	if (mTextureUID[idx] == uid)
-		return;
-	
 	// Bind supplied texture
 	const GLuint textureID = resource != nullptr ? resource->GetTextureID() : 0;
 	const GLenum textureTarget = resource != nullptr ? resource->GetTextureTarget() : mTextures[idx]->GetTextureTarget();
@@ -496,6 +523,14 @@ void POGLRenderState::SetFramebuffer(POGLFramebuffer* framebuffer)
 	mFramebuffer = framebuffer;
 	mFramebuffer->AddRef();
 	mFramebufferUID = framebuffer->GetUID();
+
+	POGL_UINT32 numDrawBuffers = mFramebuffer->GetNumDrawBuffers();
+	if (numDrawBuffers > 0) {
+		static const GLenum drawBuffers[8] = { GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2, GL_COLOR_ATTACHMENT3,
+			GL_COLOR_ATTACHMENT4, GL_COLOR_ATTACHMENT5, GL_COLOR_ATTACHMENT6, GL_COLOR_ATTACHMENT7 };
+		glDrawBuffers(numDrawBuffers, drawBuffers);
+		CHECK_GL("Could not set draw buffers");
+	}
 }
 
 POGL_UINT32 POGLRenderState::NextActiveTexture()

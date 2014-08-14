@@ -97,7 +97,10 @@ typedef std::string POGL_STRING;
 struct POGLDeviceInfoFlags
 {
 	enum Enum {
-		/* Enable/Disable debug mode */
+		//
+		// Enable debug mode if this flag is set. Debug mode is different depending on which graphics card you have. 
+		// AMD, for example, enables us to attach CodeXL (a remote debugger) and change stuff in runtime
+		//
 		DEBUG_MODE = BIT(0)
 	};
 };
@@ -616,6 +619,25 @@ typedef struct POGL_VECTOR4D
 	POGL_VECTOR4D(const POGL_VECTOR4D& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
 	inline POGL_VECTOR4D& operator=(const POGL_VECTOR4D& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; return *this; }
 } POGL_COLOR4D;
+
+struct POGL_RECTI
+{
+	union {
+		struct {
+			POGL_INT32 x;
+			POGL_INT32 y;
+			POGL_INT32 width;
+			POGL_INT32 height;
+		};
+		POGL_INT32 size[4];
+	};
+
+	POGL_RECTI() {}
+	POGL_RECTI(const POGL_INT32 _x, const POGL_INT32 _y, const POGL_INT32 _width, const POGL_INT32 _height) { x = _x; y = _y; width = _width; height = _height; }
+	POGL_RECTI(const POGL_RECTI& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; }
+	~POGL_RECTI() {}
+	inline POGL_RECTI& operator=(const POGL_RECTI& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; return *this; }
+};
 
 struct POGL_MAT4D
 {
@@ -1270,7 +1292,7 @@ public:
 	virtual void Clear(POGL_UINT32 clearBits) = 0;
 
 	/*!
-		\brief 
+		\brief Locate the uniform with the given name
 	*/
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name) = 0;
 
@@ -1355,6 +1377,11 @@ public:
 		\brief
 	*/
 	virtual void SetBlend(bool b) = 0;
+
+	/*!
+		\brief
+	*/
+	virtual void SetViewport(const POGL_RECTI& viewport) = 0;
 };
 
 /*!
