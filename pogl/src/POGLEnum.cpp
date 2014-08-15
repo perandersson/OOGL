@@ -423,6 +423,5 @@ POGL_UINT32 POGLEnum::TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_
 	}
 
 	const POGL_UINT32 numComponents = bitsPerPixel / 8;
-	const POGL_UINT32 memorySize = ((size.width * bitsPerPixel + 31) / 32) * numComponents * size.height;
-	return memorySize;
+	return size.width * size.height * numComponents;
 }
