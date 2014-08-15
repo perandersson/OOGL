@@ -1,9 +1,9 @@
 #pragma once
-#include "config.h"
 #include "POGLDeferredCommands.h"
 #include <mutex>
 #include <condition_variable>
 
+class POGLDeferredRenderState;
 class POGLDeferredDeviceContext : public IPOGLDeferredDeviceContext
 {
 public:
@@ -11,9 +11,30 @@ public:
 	~POGLDeferredDeviceContext();
 	
 	/*!
-	
+		\brief Retrieves the memory location based on the supplied offset
+
+		\param offset
+		\return
 	*/
 	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
+	
+	/*!
+		\brief Add a new command to be executed and put it onto the queue
+
+		If no commands are available on the memory pool then create a new one
+
+		\param function
+		\param releaseFunction
+	*/
+	POGLDeferredCommand* AddCommand(POGLCommandFuncPtr function);
+	
+	/*!
+		\brief Retrieves the next offset position for the supplied vertex buffer size
+
+		\param size
+		\return
+	*/
+	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
 
 // IPOGLInterface
 public:
@@ -48,25 +69,10 @@ public:
 	virtual void Flush();
 	virtual void FlushAndWait(std::condition_variable& condition);
 
-private:
-	/*!
-		\brief Add a new command to be executed and put it onto the queue
-
-		If no commands are available on the memory pool then create a new one
-
-		\param function
-		\param releaseFunction
-	*/
-	POGLDeferredCommand* AddCommand(POGLCommandFuncPtr function);
-
-	/*!
-		\brief Retrieves the next offset position for the supplied vertex buffer size
-	*/
-	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
-
 protected:
 	std::atomic<POGL_UINT32> mRefCount;
 	IPOGLDevice* mDevice;
+	POGLDeferredRenderState* mRenderState;
 
 	/* Mutex used to prevent this device context from being executed during the Wait phase */
 	std::mutex mFlushAndWaitMutex;

@@ -37,6 +37,13 @@ public:
 	}
 
 	/*!
+		\brief Retrieves the primitive type 
+	*/
+	inline GLenum GetPrimitiveType() const {
+		return mPrimitiveType;
+	}
+
+	/*!
 		\brief Draw this vertex buffer
 	*/
 	void Draw(POGL_UINT32 startIndex);

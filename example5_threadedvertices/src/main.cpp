@@ -41,7 +41,7 @@ int main()
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #else
-	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
+	deviceInfo.flags = 0;
 #endif
 	deviceInfo.windowHandle = windowHandle;
 	deviceInfo.colorBits = 32;
@@ -184,6 +184,41 @@ int main()
 			}
 		});
 
+		//
+		// A third thread. The purpos for this thread is to "render" the vertex buffer onto the screen.
+		// Since we are using a deferred device context, then all the commands are pushed to an internal
+		// "to be executed" queue. This queue will be processed when the IPOGLDeferredDeviceContext::ExecuteCommands is called.
+		//
+
+		IPOGLDeferredDeviceContext* renderContext = device->CreateDeferredDeviceContext();
+		std::condition_variable renderContextCondition;
+		std::thread renderingThread([&renderContext, &vertexBuffer, &running, &simpleEffect, &renderContextCondition] {
+			try {
+				while (running.load()) {
+
+					//
+					// Draw the vertex buffer using the "simple effect"
+					//
+
+					IPOGLRenderState* state = renderContext->Apply(simpleEffect);
+					state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
+					state->Draw(vertexBuffer);
+					state->Release();
+
+					//
+					// Wait until the commands have been executed. Otherwise the deferred context will start allocating memory faster then it will be released.
+					// The reason for this happening is because this thread will be executed much much faster than the main thread because of all
+					// OpenGL commands. We allocate variables faster than we can release them.
+					//
+
+					renderContext->FlushAndWait(renderContextCondition);
+				}
+			}
+			catch (POGLException e) {
+				POGLAlert(e);
+			}
+		});
+
 		POGL_FLOAT totalTimeFlt = 0.0f;
 		while (POGLProcessEvents()) {
 			totalTimeFlt += POGLGetTimeSinceLastTick();
@@ -199,13 +234,12 @@ int main()
 			t2cond.notify_one();
 
 			//
-			// Draw the vertex buffer using the "simple effect"
+			// Execute the commands generated in the renderThread thread and then
+			// let it know that it can continue the rendering process.
 			//
 
-			IPOGLRenderState* state = context->Apply(simpleEffect);
-			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-			state->Draw(vertexBuffer);
-			state->Release();
+			renderContext->ExecuteCommands(context);
+			renderContextCondition.notify_one();
 
 			//
 			// End the current frame
@@ -216,15 +250,18 @@ int main()
 
 		running = false;
 		t1cond.notify_one();
-		t2cond.notify_one();
 		t1.join();
+		t2cond.notify_one();
 		t2.join();
+		renderContextCondition.notify_one();
+		renderingThread.join();
 
 		// Release resources
 		vertexBuffer->Release();
 		simpleEffect->Release();
 		t1context->Release();
 		t2context->Release();
+		renderContext->Release();
 		context->Release();
 	}
 	catch (POGLException e) {

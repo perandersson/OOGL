@@ -73,7 +73,6 @@ public:
 private:
 	std::atomic<POGL_UINT32> mRefCount;
 	GLuint mProgramID;
-	IPOGLDevice* mDevice;
 	POGL_UINT32 mUID;
 	std::recursive_mutex mMutex;
 	POGLEffectData* mData;

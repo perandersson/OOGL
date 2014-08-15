@@ -5,9 +5,10 @@
 #include "POGLFactory.h"
 #include "POGLRenderState.h"
 #include "POGLDeviceContext.h"
+#include "POGLDeferredRenderState.h"
 
 POGLDeferredDeviceContext::POGLDeferredDeviceContext(IPOGLDevice* device)
-: mRefCount(1), mDevice(device), 
+: mRefCount(1), mDevice(device), mRenderState(nullptr),
 mCommands(nullptr), mCommandsSize(0), mCommandsOffset(0),
 mFlushedCommands(nullptr), mFlushedCommandsSize(0), 
 mMap(nullptr),
@@ -27,14 +28,8 @@ void POGLDeferredDeviceContext::AddRef()
 void POGLDeferredDeviceContext::Release()
 {
 	if (--mRefCount == 0) {
-		if (mFlushedCommands != nullptr) {
-			for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
-				mFlushedCommands[i].resource->Release();
-			}
-			mFlushedCommands = nullptr;
-			mFlushedCommandsSize = 0;
-		}
-
+		mFlushedCommands = nullptr;
+		mFlushedCommandsSize = 0;
 		if (mCommands != nullptr) {
 			free(mCommands);
 			mCommands = nullptr;
@@ -46,6 +41,11 @@ void POGLDeferredDeviceContext::Release()
 			mMapMemoryPool = nullptr;
 			mMapMemoryPoolOffset = 0;
 			mMapMemoryPoolSize = 0;
+		}
+
+		if (mRenderState != nullptr) {
+			mRenderState->Release();
+			mRenderState = nullptr;
 		}
 
 		delete this;
@@ -113,7 +113,7 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* mem
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
 	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage);
-	POGLDeferredCreateVertexBufferCommand* command = (POGLDeferredCreateVertexBufferCommand*)AddCommand(&POGLCreateVertexBuffer_Command);
+	POGLCreateVertexBufferCommand* command = (POGLCreateVertexBufferCommand*)AddCommand(&POGLCreateVertexBuffer_Command);
 	command->vertexBuffer = vb;
 	command->vertexBuffer->AddRef();
 	command->memoryPoolOffset = GetMapOffset(memorySize);
@@ -145,8 +145,18 @@ IPOGLIndexBuffer* POGLDeferredDeviceContext::CreateIndexBuffer(const void* memor
 
 IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	if (effect == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing effect");
+
+	if (mRenderState == nullptr) {
+		mRenderState = new POGLDeferredRenderState(this);
+	}
+
+	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)AddCommand(&POGLApplyEffect_Command);
+	cmd->effect = effect;
+	cmd->effect->AddRef();
+	mRenderState->AddRef();
+	return mRenderState;
 }
 
 void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::Enum e)
@@ -157,7 +167,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStream
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
-		POGLDeferredMapVertexBufferCommand* map = (POGLDeferredMapVertexBufferCommand*)AddCommand(&POGLMapVertexBuffer_Command);
+		POGLMapVertexBufferCommand* map = (POGLMapVertexBufferCommand*)AddCommand(&POGLMapVertexBuffer_Command);
 		map->size = vb->GetCount() * vb->GetLayout()->vertexSize;
 		map->memoryPoolOffset = GetMapOffset(map->size);
 		map->vertexBuffer = vb;
@@ -182,7 +192,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		if (offset + length > memorySize)
 			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 		
-		POGLDeferredMapRangeVertexBufferCommand* map = (POGLDeferredMapRangeVertexBufferCommand*)AddCommand(&POGLMapRangeVertexBuffer_Command);
+		POGLMapRangeVertexBufferCommand* map = (POGLMapRangeVertexBufferCommand*)AddCommand(&POGLMapRangeVertexBuffer_Command);
 		map->offset = offset;
 		map->length = length;
 		map->memoryPoolOffset = GetMapOffset(memorySize);

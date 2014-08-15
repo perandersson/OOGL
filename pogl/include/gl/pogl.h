@@ -1356,11 +1356,6 @@ public:
 	virtual void SetColorMask(POGL_UINT8 colorMask) = 0;
 	
 	/*!
-		\brief
-	*/
-	virtual bool GetStencilTest() = 0;
-
-	/*!
 		\brief 
 
 		\param b

@@ -14,34 +14,8 @@ class POGLRenderState : public IPOGLRenderState
 
 public:
 	POGLRenderState(POGLDeviceContext* context);
-	~POGLRenderState();
-
-// IPOGLInterface
-public:
-	virtual void AddRef();
-	virtual void Release();
-
-// IPOGLRenderState
-public:
-	virtual IPOGLDevice* GetDevice();
-	virtual IPOGLDeviceContext* GetDeviceContext();
-	void Clear(POGL_UINT32 clearBits);
-	IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
-	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);
-	void Draw(IPOGLVertexBuffer* vertexBuffer);
-	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
-	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
-	void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
-	void SetDepthTest(bool b);
-	void SetDepthFunc(POGLDepthFunc::Enum depthFunc);
-	void SetDepthMask(bool b);
-	void SetColorMask(POGL_UINT8 mask);
-	bool GetStencilTest();
-	void SetStencilTest(bool b);
-	void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
-	void SetBlend(bool b);
-	virtual void SetViewport(const POGL_RECTI& viewport);
-
+	virtual ~POGLRenderState();
+	
 	/*!
 		\brief Applies the supplied effect to this render state
 	*/
@@ -121,6 +95,31 @@ public:
 		\param buffer
 	*/
 	void BindIndexBuffer(POGLIndexBuffer* buffer);
+
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
+
+// IPOGLRenderState
+public:
+	virtual IPOGLDevice* GetDevice();
+	virtual IPOGLDeviceContext* GetDeviceContext();
+	virtual void Clear(POGL_UINT32 clearBits);
+	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
+	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);
+	virtual void Draw(IPOGLVertexBuffer* vertexBuffer);
+	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
+	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
+	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
+	virtual void SetDepthTest(bool b);
+	virtual void SetDepthFunc(POGLDepthFunc::Enum depthFunc);
+	virtual void SetDepthMask(bool b);
+	virtual void SetColorMask(POGL_UINT8 mask);
+	virtual void SetStencilTest(bool b);
+	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
+	virtual void SetBlend(bool b);
+	virtual void SetViewport(const POGL_RECTI& viewport);
 
 private:
 	/*!

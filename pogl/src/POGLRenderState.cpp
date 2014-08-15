@@ -243,11 +243,6 @@ void POGLRenderState::SetColorMask(POGL_UINT8 mask)
 	CHECK_GL("Could not set the color mask used when render faces on the screen");
 }
 
-bool POGLRenderState::GetStencilTest()
-{
-	return mStencilTest;
-}
-
 void POGLRenderState::SetStencilTest(bool b)
 {
 	if (mStencilTest == b)
