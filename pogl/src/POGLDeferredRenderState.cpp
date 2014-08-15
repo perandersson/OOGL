@@ -45,8 +45,7 @@ void POGLDeferredRenderState::Clear(POGL_UINT32 clearBits)
 
 IPOGLUniform* POGLDeferredRenderState::FindUniformByName(const POGL_CHAR* name)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void POGLDeferredRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)

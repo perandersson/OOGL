@@ -1,4 +1,4 @@
-#include "MemCheck.h"
+﻿#include "MemCheck.h"
 #include "POGLDevice.h"
 
 // 
@@ -122,7 +122,31 @@ POGLDevice::~POGLDevice()
 {
 }
 
-const POGL_DEVICE_INFO* POGLDevice::GetDeviceInfo()
+const POGL_DEVICE_INFO* POGLDevice::GetDeviceInfo() const
 {
 	return &mDeviceInfo;
+}
+
+POGLVendor::Enum POGLDevice::GetVendor() const
+{
+	auto vendor = (char*)glGetString(GL_VENDOR);
+	static const char* VENDOR_STRINGS[] = {
+		"Microsoft",
+		"ATI",
+		"NVIDIA",
+		"INTEL"
+	};
+	static const POGLVendor::Enum VENDORS[] = {
+		POGLVendor::SOFTWARE,
+		POGLVendor::AMD,
+		POGLVendor::NVIDIA,
+		POGLVendor::INTEL
+	};
+	const POGL_UINT32 count = sizeof(VENDORS) / sizeof(POGLVendor::Enum);
+	for (POGL_UINT32 i = 0; i < count; ++i) {
+		if (strncmp(vendor, VENDOR_STRINGS[i], strlen(VENDOR_STRINGS[i])) == 0) {
+			return VENDORS[i];
+		}
+	}
+	return POGLVendor::UNKNOWN;
 }

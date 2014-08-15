@@ -5,12 +5,12 @@ class POGLDevice : public IPOGLDevice
 {
 public:
 	POGLDevice(const POGL_DEVICE_INFO* info);
-	~POGLDevice();
+	virtual ~POGLDevice();
 
-	/*!
-		\brief Retrieves the device information
-	*/
-	const POGL_DEVICE_INFO* GetDeviceInfo();
+// IPOGLDevice
+public:
+	virtual const POGL_DEVICE_INFO* GetDeviceInfo() const;
+	virtual POGLVendor::Enum GetVendor() const;
 
 protected:
 	POGL_DEVICE_INFO mDeviceInfo;

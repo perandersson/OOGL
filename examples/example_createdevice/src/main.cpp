@@ -1,4 +1,5 @@
 #include <gl/pogl.h>
+#include <iostream>
 
 int main()
 {
@@ -22,6 +23,29 @@ int main()
 	//
 
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
+	
+	//
+	// Query vendor
+	//
+
+	auto vendor = device->GetVendor();
+	switch (vendor) {
+	case POGLVendor::AMD:
+		std::cout << "Vendor: AMD" << std::endl;
+		break;
+	case POGLVendor::INTEL:
+		std::cout << "Vendor: INTEL" << std::endl;
+		break;
+	case POGLVendor::NVIDIA:
+		std::cout << "Vendor: NVIDIA" << std::endl;
+		break;
+	case POGLVendor::SOFTWARE:
+		std::cout << "Vendor: SOFTWARE" << std::endl;
+		break;
+	case POGLVendor::UNKNOWN:
+		std::cout << "Vendor: UNKNOWN" << std::endl;
+		break;
+	}
 
 	//
 	// Release the device when you are done with it

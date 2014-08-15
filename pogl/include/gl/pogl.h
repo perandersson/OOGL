@@ -105,6 +105,17 @@ struct POGLDeviceInfoFlags
 	};
 };
 
+struct POGLVendor
+{
+	enum Enum {
+		AMD = 0,
+		NVIDIA,
+		INTEL,
+		SOFTWARE,
+		UNKNOWN
+	};
+};
+
 struct POGLTextureFormat
 {
 	enum Enum {
@@ -865,7 +876,12 @@ public:
 	/*!
 		\brief Retrieves the device info
 	*/
-	virtual const POGL_DEVICE_INFO* GetDeviceInfo() = 0;
+	virtual const POGL_DEVICE_INFO* GetDeviceInfo() const = 0;
+
+	/*!
+		\brief Retrieves the vendor for the current computer
+	*/
+	virtual POGLVendor::Enum GetVendor() const = 0;
 };
 
 /*!
