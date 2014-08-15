@@ -28,10 +28,6 @@ POGLUniformSampler2D::~POGLUniformSampler2D()
 
 void POGLUniformSampler2D::Apply()
 {
-	if (mTextureResource == nullptr) {
-		return;
-	}
-
 	mRenderState->BindTextureResource(mTextureResource, mActiveTexture);
 	mRenderState->BindSamplerObject(mSamplerObject, mActiveTexture);
 	glUniform1i(mComponentID, mActiveTexture);
@@ -84,9 +80,6 @@ void POGLUniformSampler2D::SetCompareMode(POGLCompareMode::Enum compareMode)
 void POGLUniformSampler2D::SetTextureResource(POGLTextureResource* texture)
 {
 	const POGL_UINT32 uid = texture != nullptr ? texture->GetUID() : 0;
-	if (mTextureUID == uid)
-		return;
-
 	mTextureUID = uid;
 	if (mTextureResource != nullptr)
 		mTextureResource->Release();

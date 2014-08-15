@@ -499,10 +499,6 @@ IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const P
 	// Read image size from header
 	const POGL_SIZEI imageSize(*(POGL_INT32*)&(bytes[0x12]), *(POGL_INT32*)&(bytes[0x16]));
 
-	// Calculate pixel memory size
-	const POGL_UINT32 numComponents = bitsPerPixel / 8;
-	const POGL_UINT32 memorySize = ((imageSize.width * bitsPerPixel + 31) / 32) * numComponents * imageSize.height;
-
 	// Create a texture2D resource
 	return context->CreateTexture2D(imageSize, POGLTextureFormat::BGR, &bytes[offset]);
 }

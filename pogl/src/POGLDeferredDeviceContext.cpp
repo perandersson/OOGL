@@ -119,7 +119,7 @@ IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZEI& siz
 	else {
 		const POGL_UINT32 memorySize = POGLEnum::TextureFormatToSize(format, size);
 		cmd->memoryPoolOffset = GetMapOffset(memorySize);
-		memcpy(GetMapPointer(cmd->memoryPoolOffset), cmd, memorySize);
+		memcpy(GetMapPointer(cmd->memoryPoolOffset), bytes, memorySize);
 		cmd->size = memorySize;
 	}
 
