@@ -32,7 +32,7 @@ void POGLDeferredDeviceContext::Release()
 		
 		//
 		// Release the flushed commands. This is needed because some resources
-		// might be in the flushed command queue but not rendered
+		// might be in the flushed command queue but not executed
 		//
 
 		for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
@@ -76,26 +76,22 @@ IPOGLDevice* POGLDeferredDeviceContext::GetDevice()
 
 IPOGLShaderProgram* POGLDeferredDeviceContext::CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLShaderProgram* POGLDeferredDeviceContext::CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLEffect* POGLDeferredDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLTexture1D* POGLDeferredDeviceContext::CreateTexture1D()
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
@@ -132,20 +128,17 @@ IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZEI& siz
 
 IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -181,8 +174,7 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const POGL_POSI
 
 IPOGLIndexBuffer* POGLDeferredDeviceContext::CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
@@ -218,8 +210,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStream
 		return ((char*)mMapMemoryPool + map->memoryPoolOffset);
 	}
 
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e)
@@ -244,9 +235,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		return ((char*)mMapMemoryPool + map->memoryPoolOffset);
 	}
 
-
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
@@ -260,7 +249,7 @@ void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 		return;
 	}
 
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context)

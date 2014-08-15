@@ -78,6 +78,6 @@ void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex
 void POGLVertexBuffer::PostConstruct(GLuint bufferID, GLuint vaoID)
 {
 	mBufferID = bufferID;
-	mUID = GenVertexBufferUID();
 	mVAOID = vaoID;
+	mUID = GenVertexBufferUID();
 }

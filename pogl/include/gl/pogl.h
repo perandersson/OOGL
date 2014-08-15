@@ -1503,6 +1503,15 @@ protected:
 };
 
 /*!
+	\brief Exception thrown if you are trying to use a feature that's not implemented yet
+*/
+class POGLNotImplementedException : public POGLException {
+public:
+	POGLNotImplementedException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLNotImplementedException();
+};
+
+/*!
 	\brief Exception thrown if a resource generation has failed
 */
 class POGLInitializationException : public POGLException {
@@ -1550,7 +1559,11 @@ public:
 #include <cstdarg>
 
 #ifndef THROW_EXCEPTION
-#define THROW_EXCEPTION(E, Message, ...) throw E(__FUNCTION__, __LINE__, __FILE__, Message, __VA_ARGS__)
+#define THROW_EXCEPTION(E, Message, ...) throw E(__FUNCTION__, __LINE__, __FILE__, POGL_TOCHAR(Message), __VA_ARGS__)
+#endif
+
+#ifndef THROW_NOT_IMPLEMENTED_EXCEPTION
+#define THROW_NOT_IMPLEMENTED_EXCEPTION() throw POGLNotImplementedException(__FUNCTION__, __LINE__, __FILE__, POGL_TOCHAR("Feature not implemented yet!"))
 #endif
 
 #ifndef assert_with_message

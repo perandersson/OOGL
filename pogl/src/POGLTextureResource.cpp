@@ -20,8 +20,8 @@ POGLTextureResource::~POGLTextureResource()
 
 void POGLTextureResource::PostConstruct(GLuint textureID)
 {
-	mUID = GenTextureUID();
 	mTextureID = textureID;
+	mUID = GenTextureUID();
 }
 
 void POGLTextureResource::AddRef()
@@ -38,24 +38,4 @@ void POGLTextureResource::Release()
 		}
 		delete this;
 	}
-}
-
-POGL_UINT32 POGLTextureResource::GetUID() const
-{
-	return mUID;
-}
-
-GLuint POGLTextureResource::GetTextureID() const
-{
-	return mTextureID;
-}
-
-GLenum POGLTextureResource::GetTextureTarget() const
-{
-	return mTextureTarget;
-}
-
-POGLTextureFormat::Enum POGLTextureResource::GetTextureFormat() const
-{
-	return mTextureFormat;
 }

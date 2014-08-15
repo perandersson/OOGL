@@ -224,7 +224,7 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 				CHECK_GL("Could not attach framebuffer texture to frame buffer");
 			}
 			else {
-				THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+				THROW_NOT_IMPLEMENTED_EXCEPTION();
 			}
 		}
 	}
@@ -255,7 +255,7 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 
 		}
 		else {
-			THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+			THROW_NOT_IMPLEMENTED_EXCEPTION();
 		}
 	}
 
@@ -397,8 +397,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::En
 		return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
 	}
 
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e)
@@ -415,8 +414,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 		return map;
 	}
 
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void POGLDeviceContext::Unmap(IPOGLResource* resource)
@@ -426,7 +424,8 @@ void POGLDeviceContext::Unmap(IPOGLResource* resource)
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		return;
 	}
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
+
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
 void POGLDeviceContext::InitializeRenderState()
