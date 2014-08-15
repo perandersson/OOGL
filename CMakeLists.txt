@@ -1,26 +1,20 @@
-# http://brunoabinader.com/?p=29
-# Thank you for this! :-)
-
-project (PlayOpenGL)
+project (POGL)
 cmake_minimum_required (VERSION 2.6) 
 
-# Appends the cmake/modules path inside the MAKE_MODULE_PATH variable which stores the
-# directories of additional CMake modules (ie. MacroOutOfSourceBuild.cmake):
-set(CMAKE_MODULE_PATH ${PlayOpenGL_SOURCE_DIR}/cmake/modules/ ${CMAKE_MODULE_PATH})
+# Root directory for the project
+set(ROOT_DIR ${POGL_SOURCE_DIR})
 
 # Default configuration types
-set(CMAKE_CONFIGURATION_TYPES Debug;Release)
+set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
-#
+# Add GUI option
+OPTION(POGL_BUILD_EXAMPLES "Build examples" ON)
+
 # Directories
-#
-
 add_subdirectory (pogl)
-add_subdirectory (examples_window)
-add_subdirectory (example1_createdevice)
-add_subdirectory (example2_drawtriangle)
-add_subdirectory (example3_blending)
-add_subdirectory (example4_texturing)
-add_subdirectory (example5_threadedvertices)
-add_subdirectory (example6_customvertextype)
-add_subdirectory (example7_framebuffers)
+
+# If GUI option is set then build examples projects
+IF(POGL_BUILD_EXAMPLES)
+	set(EXAMPLES_DIR ${ROOT_DIR}/examples)
+	add_subdirectory (examples)
+ENDIF()

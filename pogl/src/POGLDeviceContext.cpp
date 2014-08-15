@@ -390,6 +390,13 @@ IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 
 void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::Enum e)
 {
+	auto type = resource->GetResourceType();
+	if (type == POGLResourceType::VERTEXBUFFER) {
+		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
+		mRenderState->BindVertexBuffer(vb);
+		return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+	}
+
 	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
 	return nullptr;
 }
