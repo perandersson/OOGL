@@ -1074,7 +1074,7 @@ public:
 	/*!
 		\brief Flush this command queue 
 
-		Use this method when all the calls are complete to this context. This method should only be called if you are rendering to this context inside the
+		Use this method when all the calls are complete to this context. This method should only be called if you are rendering only once or if you are inside the
 		main thread. Use IPOGLDeferredDeviceContext::FlushAndWait otherwise
 	*/
 	virtual void Flush() = 0;
