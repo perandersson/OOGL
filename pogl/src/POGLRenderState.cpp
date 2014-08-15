@@ -294,14 +294,16 @@ void POGLRenderState::SetViewport(const POGL_RECTI& viewport)
 	CHECK_GL("Could not set viewport");
 }
 
-IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
+void POGLRenderState::Apply(IPOGLEffect* effect)
 {
 	if (effect == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing effect");
 
 	// If an effect is bound then release this render state 
 	if (mEffect != nullptr) {
-		Release();
+		mApplyCurrentEffectState = true;
+		mEffect->Release();
+		mEffect = nullptr;
 	}
 
 	// Bind the effect if neccessary
@@ -323,9 +325,6 @@ IPOGLRenderState* POGLRenderState::Apply(IPOGLEffect* effect)
 	SetStencilTest(data.stencilTest);
 	SetBlend(data.blending);
 	SetBlendFunc(data.srcFactor, data.dstFactor);
-
-	AddRef();
-	return this;
 }
 
 POGLEffectState* POGLRenderState::GetEffectState(POGLEffect* effect)

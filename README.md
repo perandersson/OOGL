@@ -54,6 +54,8 @@ This example shows us how to use the POGL library in multiple threads at the sam
 We create one circle vertex buffer, update the same vertex buffer in two threads then render that vertex buffer onto the screen in a third thread.
 This example is not a the most optimal way to use the POGL library but it shows how multithreading works.
 
+Read the wiki for more information about when to use multithreading and what to think of when you do.
+
 ![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example5_threadedvertices/screenshot.png "Example 5")
 
 ### Example 6: Custom Vertex Type ###

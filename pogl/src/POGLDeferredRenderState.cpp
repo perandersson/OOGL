@@ -23,7 +23,6 @@ void POGLDeferredRenderState::Release()
 	if (--mRefCount == 0) {
 		mDeviceContext = nullptr;
 		delete this;
-		return;
 	}
 }
 

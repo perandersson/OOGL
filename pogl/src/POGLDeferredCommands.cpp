@@ -169,7 +169,6 @@ void POGLApplyEffect_Command(class POGLDeferredDeviceContext* context, POGLRende
 {
 	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)command;
 	state->Apply(cmd->effect);
-	state->Release();
 }
 
 void POGLApplyEffect_Release(POGLDeferredCommand* command)

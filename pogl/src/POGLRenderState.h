@@ -18,8 +18,10 @@ public:
 	
 	/*!
 		\brief Applies the supplied effect to this render state
+
+		\param effect
 	*/
-	IPOGLRenderState* Apply(IPOGLEffect* effect);
+	void Apply(IPOGLEffect* effect);
 
 	/*!
 		\brief Retrieves the effect state for the supplied effect

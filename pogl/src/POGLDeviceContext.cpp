@@ -382,7 +382,9 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 
 IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 {
-	return mRenderState->Apply(effect);
+	mRenderState->Apply(effect);
+	mRenderState->AddRef();
+	return mRenderState;
 }
 
 void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::Enum e)
