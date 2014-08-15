@@ -51,7 +51,8 @@ This examples shows you how to use texture mapping to display a texture onto the
 
 This example shows us how to use the POGL library in multiple threads at the same time.
 
-We create one circle vertex buffer, update the same vertex buffer in two threads and render said vertex buffer onto the screen  at the same time.
+We create one circle vertex buffer, update the same vertex buffer in two threads then render that vertex buffer onto the screen in a third thread.
+This example is not a the most optimal way to use the POGL library but it shows how multithreading works.
 
 ![alt text](https://raw.githubusercontent.com/perandersson/POGL/master/example5_threadedvertices/screenshot.png "Example 5")
 

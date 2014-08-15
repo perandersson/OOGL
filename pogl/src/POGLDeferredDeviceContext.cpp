@@ -28,8 +28,23 @@ void POGLDeferredDeviceContext::AddRef()
 void POGLDeferredDeviceContext::Release()
 {
 	if (--mRefCount == 0) {
+		
+		//
+		// Release the flushed commands. This is needed because some resources
+		// might be in the flushed command queue but not rendered
+		//
+
+		for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
+			POGLDeferredCommand* command = &mFlushedCommands[i];
+			(*command->releaseFunction)(command);
+		}
 		mFlushedCommands = nullptr;
 		mFlushedCommandsSize = 0;
+		
+		//
+		// Free the memory pools memory
+		//
+
 		if (mCommands != nullptr) {
 			free(mCommands);
 			mCommands = nullptr;
@@ -113,7 +128,7 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* mem
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
 	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage);
-	POGLCreateVertexBufferCommand* command = (POGLCreateVertexBufferCommand*)AddCommand(&POGLCreateVertexBuffer_Command);
+	POGLCreateVertexBufferCommand* command = (POGLCreateVertexBufferCommand*)AddCommand(&POGLCreateVertexBuffer_Command, &POGLCreateVertexBuffer_Release);
 	command->vertexBuffer = vb;
 	command->vertexBuffer->AddRef();
 	command->memoryPoolOffset = GetMapOffset(memorySize);
@@ -152,7 +167,7 @@ IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
 		mRenderState = new POGLDeferredRenderState(this);
 	}
 
-	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)AddCommand(&POGLApplyEffect_Command);
+	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)AddCommand(&POGLApplyEffect_Command, &POGLApplyEffect_Release);
 	cmd->effect = effect;
 	cmd->effect->AddRef();
 	mRenderState->AddRef();
@@ -167,7 +182,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStream
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
-		POGLMapVertexBufferCommand* map = (POGLMapVertexBufferCommand*)AddCommand(&POGLMapVertexBuffer_Command);
+		POGLMapVertexBufferCommand* map = (POGLMapVertexBufferCommand*)AddCommand(&POGLMapVertexBuffer_Command, &POGLMapVertexBuffer_Release);
 		map->size = vb->GetCount() * vb->GetLayout()->vertexSize;
 		map->memoryPoolOffset = GetMapOffset(map->size);
 		map->vertexBuffer = vb;
@@ -192,7 +207,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		if (offset + length > memorySize)
 			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 		
-		POGLMapRangeVertexBufferCommand* map = (POGLMapRangeVertexBufferCommand*)AddCommand(&POGLMapRangeVertexBuffer_Command);
+		POGLMapRangeVertexBufferCommand* map = (POGLMapRangeVertexBufferCommand*)AddCommand(&POGLMapRangeVertexBuffer_Command, &POGLMapRangeVertexBuffer_Release);
 		map->offset = offset;
 		map->length = length;
 		map->memoryPoolOffset = GetMapOffset(memorySize);
@@ -259,6 +274,7 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	for (POGL_UINT32 i = 0; i < size; ++i) {
 		POGLDeferredCommand* command = &mFlushedCommands[i];
 		(*command->function)(this, renderState, command);
+		(*command->releaseFunction)(command);
 	}
 	
 	//
@@ -303,15 +319,17 @@ void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
 	mMapMemoryPoolOffset = 0;
 }
 
-POGLDeferredCommand* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function)
+POGLDeferredCommand* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
 {
 	if (mCommandsOffset >= mCommandsSize) {
-		mCommandsSize += 100;
+		static const POGL_UINT32 INCREASE_SIZE = 100;
+		mCommandsSize += INCREASE_SIZE;
 		mCommands = (POGLDeferredCommand*)realloc(mCommands, mCommandsSize * sizeof(POGLDeferredCommand));
 	}
 
 	POGLDeferredCommand* command = mCommands + mCommandsOffset;
 	mCommandsOffset++;
 	command->function = function;
+	command->releaseFunction = releaseFunction;
 	return command;
 }

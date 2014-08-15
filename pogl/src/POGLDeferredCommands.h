@@ -2,16 +2,17 @@
 #include "config.h"
 
 typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
-typedef void(*POGLCommandReleaseFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
+typedef void(*POGLCommandReleaseFuncPtr)(struct POGLDeferredCommand*);
 
 struct POGLDeferredCommand
 {
 	POGLCommandFuncPtr function;
+	POGLCommandReleaseFuncPtr releaseFunction;
 
 	// Extra memory
 	POGL_HANDLE extra[4];
 };
-extern void POGLDefaultRelease_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLNothing_Release(POGLDeferredCommand* command);
 
 struct POGLCreateVertexBufferCommand
 {
@@ -19,6 +20,7 @@ struct POGLCreateVertexBufferCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			class POGLVertexBuffer* vertexBuffer;
 			POGL_UINT32 memoryPoolOffset;
@@ -27,6 +29,7 @@ struct POGLCreateVertexBufferCommand
 	};
 };
 extern void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateVertexBufferCommand));
 
 struct POGLMapVertexBufferCommand
@@ -35,6 +38,7 @@ struct POGLMapVertexBufferCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			class POGLVertexBuffer* vertexBuffer;
 			POGL_UINT32 memoryPoolOffset;
@@ -43,6 +47,7 @@ struct POGLMapVertexBufferCommand
 	};
 };
 extern void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLMapVertexBuffer_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLMapVertexBufferCommand));
 
 struct POGLMapRangeVertexBufferCommand
@@ -51,6 +56,7 @@ struct POGLMapRangeVertexBufferCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			class POGLVertexBuffer* vertexBuffer;
 			POGL_UINT32 memoryPoolOffset;
@@ -60,6 +66,7 @@ struct POGLMapRangeVertexBufferCommand
 	};
 };
 extern void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLMapRangeVertexBuffer_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLMapRangeVertexBufferCommand));
 
 struct POGLClearCommand
@@ -68,6 +75,7 @@ struct POGLClearCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			POGL_UINT32 clearBits;
 		};
@@ -82,11 +90,14 @@ struct POGLSetFramebufferCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
 			class POGLFramebuffer* framebuffer;
 		};
 	};
 };
 extern void POGLSetFramebuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLSetFramebuffer_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetFramebufferCommand));
 
 struct POGLDeferredDrawCommand
@@ -95,6 +106,7 @@ struct POGLDeferredDrawCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			IPOGLVertexBuffer* vertexBuffer;
 			IPOGLIndexBuffer* indexBuffer;
@@ -105,6 +117,7 @@ struct POGLDeferredDrawCommand
 };
 extern void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 extern void POGLDrawCount_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLDraw_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLDeferredDrawCommand));
 
 struct POGLBooleanCommand
@@ -113,6 +126,7 @@ struct POGLBooleanCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			bool value;
 		};
@@ -131,6 +145,7 @@ struct POGLColorMaskCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			POGL_UINT8 mask;
 		};
@@ -146,6 +161,7 @@ struct POGLSetDepthFuncCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			POGLDepthFunc::Enum depthFunc;
 		};
@@ -160,6 +176,7 @@ struct POGLSetBlendFuncCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			POGLSrcFactor::Enum sfactor;
 			POGLDstFactor::Enum dfactor;
@@ -175,6 +192,7 @@ struct POGLSetViewportCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			POGL_RECTI viewport;
 		};
@@ -189,10 +207,12 @@ struct POGLApplyEffectCommand
 		POGLDeferredCommand _memory;
 		struct {
 			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
 
 			class IPOGLEffect* effect;
 		};
 	};
 };
 extern void POGLApplyEffect_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLApplyEffect_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLApplyEffectCommand));

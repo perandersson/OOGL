@@ -263,13 +263,13 @@ int main()
 		t2context->Release();
 		renderContext->Release();
 		context->Release();
+
+		// Release the device
+		device->Release();
 	}
 	catch (POGLException e) {
 		POGLAlert(e);
 	}
-
-	// Release the device
-	device->Release();
 
 	// Destroy the example window
 	POGLDestroyExampleWindow(windowHandle);

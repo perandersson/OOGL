@@ -6,6 +6,10 @@
 #include "POGLDeferredDeviceContext.h"
 #include "POGLFramebuffer.h"
 
+void POGLNothing_Release(POGLDeferredCommand* command)
+{
+}
+
 void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
@@ -31,12 +35,13 @@ void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, PO
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
 
-	//
-	// Release the vertex buffer
-	//
-
+void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command)
+{
+	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -46,7 +51,13 @@ void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLR
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->size, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->size);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+void POGLMapVertexBuffer_Release(POGLDeferredCommand* command)
+{
+	POGLMapVertexBufferCommand* cmd = (POGLMapVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -56,7 +67,13 @@ void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, 
 	void* map = glMapBufferRange(GL_ARRAY_BUFFER, cmd->offset, cmd->length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	memcpy(map, context->GetMapPointer(cmd->memoryPoolOffset), cmd->length);
 	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
+void POGLMapRangeVertexBuffer_Release(POGLDeferredCommand* command)
+{
+	POGLMapRangeVertexBufferCommand* cmd = (POGLMapRangeVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLClear_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -69,26 +86,35 @@ void POGLSetFramebuffer_Command(class POGLDeferredDeviceContext* context, POGLRe
 {
 	POGLSetFramebufferCommand* cmd = (POGLSetFramebufferCommand*)command;
 	state->SetFramebuffer(cmd->framebuffer);
+}
+
+void POGLSetFramebuffer_Release(POGLDeferredCommand* command)
+{
+	POGLSetFramebufferCommand* cmd = (POGLSetFramebufferCommand*)command;
 	if (cmd->framebuffer != nullptr)
 		cmd->framebuffer->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredDrawCommand* cmd = (POGLDeferredDrawCommand*)command;
 	state->Draw(cmd->vertexBuffer, cmd->indexBuffer, cmd->startIndex);
-	cmd->vertexBuffer->Release();
-	if (cmd->indexBuffer != nullptr)
-		cmd->indexBuffer->Release();
 }
 
 void POGLDrawCount_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLDeferredDrawCommand* cmd = (POGLDeferredDrawCommand*)command;
 	state->Draw(cmd->vertexBuffer, cmd->indexBuffer, cmd->startIndex, cmd->count);
+}
+
+void POGLDraw_Release(POGLDeferredCommand* command)
+{
+	POGLDeferredDrawCommand* cmd = (POGLDeferredDrawCommand*)command;
 	cmd->vertexBuffer->Release();
 	if (cmd->indexBuffer != nullptr)
 		cmd->indexBuffer->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLSetDepthTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -143,6 +169,12 @@ void POGLApplyEffect_Command(class POGLDeferredDeviceContext* context, POGLRende
 {
 	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)command;
 	state->Apply(cmd->effect);
-	cmd->effect->Release();
 	state->Release();
+}
+
+void POGLApplyEffect_Release(POGLDeferredCommand* command)
+{
+	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)command;
+	cmd->effect->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
 }

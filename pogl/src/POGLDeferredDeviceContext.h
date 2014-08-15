@@ -26,7 +26,7 @@ public:
 		\param function
 		\param releaseFunction
 	*/
-	POGLDeferredCommand* AddCommand(POGLCommandFuncPtr function);
+	POGLDeferredCommand* AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction);
 	
 	/*!
 		\brief Retrieves the next offset position for the supplied vertex buffer size
