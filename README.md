@@ -1,6 +1,8 @@
 # POGL (Play OpenGL) #
 
-POGL is an Object-Oriented Multithread friendly framework for OpenGL 3.3.
+POGL is an Object-Oriented Multithread friendly framework for OpenGL 3.3. 
+
+Read the [wiki](https://github.com/perandersson/POGL/wiki) for more information
 
 ## What is it? ##
 
