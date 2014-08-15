@@ -2,9 +2,11 @@
 #include "POGLDeferredCommands.h"
 #include "POGLFactory.h"
 #include "POGLVertexBuffer.h"
+#include "POGLTexture2D.h"
 #include "POGLRenderState.h"
 #include "POGLDeferredDeviceContext.h"
 #include "POGLFramebuffer.h"
+#include "POGLEnum.h"
 
 void POGLNothing_Release(POGLDeferredCommand* command)
 {
@@ -41,6 +43,48 @@ void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command)
 {
 	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
+	cmd->releaseFunction = &POGLNothing_Release;
+}
+
+void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+{
+	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)command;
+
+	const POGLTextureFormat::Enum format = cmd->texture->GetTextureFormat();
+	const POGL_SIZEI& size = cmd->texture->GetSize();
+	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
+	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
+	const GLenum minFilter = POGLEnum::Convert(POGLMinFilter::DEFAULT);
+	const GLenum magFilter = POGLEnum::Convert(POGLMagFilter::DEFAULT);
+	const GLenum textureWrap = POGLEnum::Convert(POGLTextureWrap::DEFAULT);
+
+	const GLuint textureID = POGLFactory::GenTextureID();
+	cmd->texture->PostConstruct(textureID);
+	glBindTexture(GL_TEXTURE_2D, textureID);
+
+	POGL_HANDLE pointer = nullptr;
+	if (cmd->size > 0) {
+		pointer = context->GetMapPointer(cmd->memoryPoolOffset);
+	}
+
+	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, size.width, size.height, 0, _format, GL_UNSIGNED_BYTE, pointer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, minFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, magFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, textureWrap);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, textureWrap);
+
+	const GLenum status = glGetError();
+	if (status != GL_NO_ERROR) {
+		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: 0x%x", status);
+	}
+
+	state->SetTextureResource((POGLTextureResource*)cmd->texture->GetResourcePtr());
+}
+
+void POGLCreateTexture2D_Release(POGLDeferredCommand* command)
+{
+	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)command;
+	cmd->texture->Release();
 	cmd->releaseFunction = &POGLNothing_Release;
 }
 

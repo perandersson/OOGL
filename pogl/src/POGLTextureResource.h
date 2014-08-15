@@ -5,11 +5,18 @@
 class POGLTextureResource : public IPOGLInterface
 {
 public:
-	POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format);
+	POGLTextureResource(GLenum textureTarget, POGLTextureFormat::Enum format);
 	virtual ~POGLTextureResource();
 
 	void AddRef();
 	void Release();
+	
+	/*!
+		\brief Method called when the texture is completed in it's construction
+
+		\param textureID
+	*/
+	void PostConstruct(GLuint textureID);
 
 	POGL_UINT32 GetUID() const;
 	GLuint GetTextureID() const;

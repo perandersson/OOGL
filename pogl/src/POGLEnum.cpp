@@ -401,3 +401,28 @@ POGL_UINT32 POGLEnum::VertexTypeSize(POGLVertexType::Enum e)
 
 	return sizes[(POGL_UINT32)e];
 }
+
+POGL_UINT32 POGLEnum::TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_SIZEI& size)
+{
+	POGL_UINT32 bitsPerPixel = 0;
+	switch (e)
+	{
+	case POGLTextureFormat::RGB:
+	case POGLTextureFormat::BGR:
+		bitsPerPixel = 24;
+		break;
+	case POGLTextureFormat::RGBA:
+	case POGLTextureFormat::BGRA:
+		bitsPerPixel = 32;
+		break;
+	case POGLTextureFormat::R:
+		bitsPerPixel = 8;
+		break;
+	default:
+		THROW_EXCEPTION(POGLException, "Cannot calculate texture format size for: %d", e);
+	}
+
+	const POGL_UINT32 numComponents = bitsPerPixel / 8;
+	const POGL_UINT32 memorySize = ((size.width * bitsPerPixel + 31) / 32) * numComponents * size.height;
+	return memorySize;
+}

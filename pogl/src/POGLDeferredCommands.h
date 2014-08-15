@@ -32,6 +32,24 @@ extern void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* cont
 extern void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateVertexBufferCommand));
 
+struct POGLCreateTexture2DCommand
+{
+	union {
+		POGLDeferredCommand _memory;
+		struct {
+			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
+			class POGLTexture2D* texture;
+			POGL_UINT32 memoryPoolOffset;
+			POGL_SIZE size;
+		};
+	};
+};
+extern void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLCreateTexture2D_Release(POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateVertexBufferCommand));
+
 struct POGLMapVertexBufferCommand
 {
 	union {

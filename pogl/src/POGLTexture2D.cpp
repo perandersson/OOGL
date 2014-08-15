@@ -7,14 +7,19 @@ namespace {
 	}
 }
 
-POGLTexture2D::POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format)
+POGLTexture2D::POGLTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format)
 : mRefCount(1), mResourcePtr(nullptr), mSize(size)
 {
-	mResourcePtr = new POGLTextureResource(textureID, GL_TEXTURE_2D, format);
+	mResourcePtr = new POGLTextureResource(GL_TEXTURE_2D, format);
 }
 
 POGLTexture2D::~POGLTexture2D()
 {
+}
+
+void POGLTexture2D::PostConstruct(GLuint textureID)
+{
+	mResourcePtr->PostConstruct(textureID);
 }
 
 void POGLTexture2D::AddRef()

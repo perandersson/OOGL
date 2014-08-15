@@ -5,6 +5,7 @@
 #include "POGLFactory.h"
 #include "POGLRenderState.h"
 #include "POGLDeviceContext.h"
+#include "POGLTexture2D.h"
 #include "POGLDeferredRenderState.h"
 
 POGLDeferredDeviceContext::POGLDeferredDeviceContext(IPOGLDevice* device)
@@ -99,8 +100,34 @@ IPOGLTexture1D* POGLDeferredDeviceContext::CreateTexture1D()
 
 IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
 {
-	THROW_EXCEPTION(POGLInitializationException, "Not implemented");
-	return nullptr;
+	if (size.width <= 0)
+		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with width: %d", size.width);
+
+	if (size.height <= 0)
+		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with height: %d", size.height);
+
+	//
+	// When the bytes container is null then it usually means that we want to create a texture used togehter
+	// with a framebuffer
+	//
+
+	POGLTexture2D* texture = new POGLTexture2D(size, format);
+	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)AddCommand(&POGLCreateTexture2D_Command, &POGLCreateTexture2D_Release);
+	cmd->texture = texture;
+	cmd->texture->AddRef();
+
+	if (bytes == nullptr) {
+		cmd->memoryPoolOffset = 0;
+		cmd->size = 0;
+	}
+	else {
+		const POGL_UINT32 memorySize = POGLEnum::TextureFormatToSize(format, size);
+		cmd->memoryPoolOffset = GetMapOffset(memorySize);
+		memcpy(GetMapPointer(cmd->memoryPoolOffset), cmd, memorySize);
+		cmd->size = memorySize;
+	}
+
+	return texture;
 }
 
 IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()

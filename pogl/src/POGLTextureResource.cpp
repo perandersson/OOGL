@@ -8,14 +8,20 @@ namespace {
 	}
 }
 
-POGLTextureResource::POGLTextureResource(GLuint textureID, GLenum textureTarget, POGLTextureFormat::Enum format)
-: mRefCount(1), mUID(GenTextureUID()), mTextureID(textureID), mTextureTarget(textureTarget), mTextureFormat(format)
+POGLTextureResource::POGLTextureResource(GLenum textureTarget, POGLTextureFormat::Enum format)
+: mRefCount(1), mUID(0), mTextureID(0), mTextureTarget(textureTarget), mTextureFormat(format)
 {
 
 }
 
 POGLTextureResource::~POGLTextureResource()
 {
+}
+
+void POGLTextureResource::PostConstruct(GLuint textureID)
+{
+	mUID = GenTextureUID();
+	mTextureID = textureID;
 }
 
 void POGLTextureResource::AddRef()

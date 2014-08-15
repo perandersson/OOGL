@@ -30,4 +30,6 @@ public:
 	static GLenum ConvertToInternalTextureFormatEnum(POGLTextureFormat::Enum format);
 
 	static POGL_UINT32 VertexTypeSize(POGLVertexType::Enum e);
+
+	static POGL_UINT32 TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_SIZEI& size);
 };

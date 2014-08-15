@@ -6,7 +6,7 @@
 class POGLTexture2D : public IPOGLTexture2D
 {
 public:
-	POGLTexture2D(GLuint textureID, const POGL_SIZEI& size, POGLTextureFormat::Enum format);
+	POGLTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format);
 	~POGLTexture2D();
 
 	/*!
@@ -15,6 +15,13 @@ public:
 	inline POGLTextureResource* GetResourcePtr() const {
 		return mResourcePtr;
 	}
+
+	/*!
+		\brief Method called when the texture is completed in it's construction
+
+		\param textureID
+	*/
+	void PostConstruct(GLuint textureID);
 
 // IPOGLInterface
 public:
