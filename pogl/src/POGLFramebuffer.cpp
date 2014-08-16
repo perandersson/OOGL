@@ -34,17 +34,11 @@ void POGLFramebuffer::Release()
 			mFramebufferID = 0;
 		}
 
-		if (mDepthStencilTexture != nullptr) {
-			mDepthStencilTexture->Release();
-			mDepthStencilTexture = nullptr;
-		}
-
+		POGL_SAFE_RELEASE(mDepthStencilTexture);
 		POGL_UINT32 size = mTextures.size();
 		for (POGL_UINT32 i = 0; i < size; ++i) {
-			mTextures[i]->Release();
+			POGL_SAFE_RELEASE(mTextures[i]);
 		}
-		mTextures.clear();
-
 		delete this;
 	}
 }

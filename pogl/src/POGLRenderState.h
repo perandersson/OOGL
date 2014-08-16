@@ -144,9 +144,9 @@ private:
 	EffectStates mEffectStates;
 	bool mApplyCurrentEffectState;
 
-	IPOGLVertexBuffer *mVertexBuffer;
+	POGLVertexBuffer *mVertexBuffer;
 	POGL_UINT32 mVertexBufferUID;
-	IPOGLIndexBuffer* mIndexBuffer;
+	POGLIndexBuffer* mIndexBuffer;
 	POGL_UINT32 mIndexBufferUID;
 
 	//

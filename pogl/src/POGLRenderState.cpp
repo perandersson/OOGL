@@ -125,7 +125,8 @@ void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* in
 
 void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
 {
-	assert_not_null(vertexBuffer);
+	if (vertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw a non-existing vertex buffer");
 
 	POGLVertexBuffer* vbo = static_cast<POGLVertexBuffer*>(vertexBuffer);
 	POGLIndexBuffer* ibo = static_cast<POGLIndexBuffer*>(indexBuffer);
@@ -141,7 +142,8 @@ void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* in
 
 void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
 {
-	assert_not_null(vertexBuffer);
+	if (vertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw a non-existing vertex buffer");
 
 	POGLVertexBuffer* vbo = static_cast<POGLVertexBuffer*>(vertexBuffer);
 	POGLIndexBuffer* ibo = static_cast<POGLIndexBuffer*>(indexBuffer);
@@ -264,11 +266,6 @@ void POGLRenderState::Apply(IPOGLEffect* effect)
 	if (effect == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing effect");
 
-	// If an effect is bound then release this render state 
-	if (mEffect != nullptr) {
-		mApplyCurrentEffectState = true;
-	}
-
 	// Bind the effect if neccessary
 	POGLEffect* effectImpl = static_cast<POGLEffect*>(effect);
 	BindEffect(effectImpl);
@@ -344,30 +341,28 @@ void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffe
 		mApplyCurrentEffectState = false;
 	}
 
-	// TODO: Add Framebuffer
-
 	BindVertexBuffer(vertexBuffer);
 	BindIndexBuffer(indexBuffer);
 }
 
 void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 {
-	assert_not_null(buffer);
-	const POGL_UINT32 uid = buffer->GetUID();
+	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
 	if (mVertexBufferUID == uid) {
 		return;
 	}
 
-	if (mVertexBuffer != nullptr) {
+	if (mVertexBuffer != nullptr)
 		mVertexBuffer->Release();
-	}
 	mVertexBuffer = buffer;
-	mVertexBuffer->AddRef();
+	if (mVertexBuffer != nullptr)
+		mVertexBuffer->AddRef();
 
-	glBindVertexArray(buffer->GetVAOID());
-	CHECK_GL("Could not bind the supplied vertex array object");
-
+	const GLuint vaoID = mVertexBuffer != nullptr ? mVertexBuffer->GetVAOID() : 0;
+	glBindVertexArray(vaoID);
 	mVertexBufferUID = uid;
+
+	CHECK_GL("Could not bind the supplied vertex array object");
 }
 
 void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
@@ -377,19 +372,17 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 		return;
 	}
 
-	if (mIndexBuffer != nullptr) {
+	if (mIndexBuffer != nullptr)
 		mIndexBuffer->Release();
-	}
 	mIndexBuffer = buffer;
-	if (mIndexBuffer != nullptr) {
+	if (mIndexBuffer != nullptr)
 		mIndexBuffer->AddRef();
-	}
 
 	const GLuint bufferID = buffer != nullptr ? buffer->GetBufferID() : 0;
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	mIndexBufferUID = uid;
 
 	CHECK_GL("Could not bind the supplied index buffer");
-	mIndexBufferUID = uid;
 }
 
 void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UINT32 idx)

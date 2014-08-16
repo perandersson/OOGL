@@ -37,13 +37,7 @@ void Win32POGLDevice::Release()
 {
 	if (--mRefCount == 0 && !mReleasing) {
 		mReleasing = true;
-
-		POGL_UINT32 size = mDeferredDeviceContexts.size();
-		for (POGL_UINT32 i = 0; i < size; ++i) {
-			mDeferredDeviceContexts[i]->Release();
-		}
-		mDeferredDeviceContexts.clear();
-		
+				
 		if (mDeviceContext != nullptr) {
 			mDeviceContext->Destroy();
 			mDeviceContext->Release();
@@ -69,8 +63,6 @@ IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
 IPOGLDeferredDeviceContext* Win32POGLDevice::CreateDeferredDeviceContext()
 {
 	POGLDeferredDeviceContext* context = new POGLDeferredDeviceContext(this);
-	context->AddRef();
-	mDeferredDeviceContexts.push_back(context);
 	return context;
 }
 

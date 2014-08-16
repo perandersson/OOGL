@@ -40,5 +40,4 @@ private:
 	HDC mDC;
 	
 	Win32POGLDeviceContext* mDeviceContext;
-	std::vector<IPOGLDeferredDeviceContext*> mDeferredDeviceContexts;
 };

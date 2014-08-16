@@ -410,8 +410,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 
 		mRenderState->BindVertexBuffer(vb);
-		void* map = glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-		return map;
+		return glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();

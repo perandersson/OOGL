@@ -114,7 +114,7 @@ int main()
 					}
 
 					//
-					// Close the stream and synchronize between contexts
+					// Unmap the vertex buffer
 					//
 
 					t1context->Unmap(vertexBuffer);
@@ -174,7 +174,7 @@ int main()
 					}
 
 					//
-					// Close the stream and synchronize between contexts
+					// Unmap the vertex buffer
 					//
 
 					t2context->Unmap(vertexBuffer);

@@ -34,8 +34,8 @@ void POGLDeferredDeviceContext::Release()
 		// Release the flushed commands. This is needed because some resources
 		// might be in the flushed command queue but not executed
 		//
-		{
-			std::lock_guard<std::mutex> lock(mFlushedCommandsMutex);
+
+		if (mFlushedCommands != nullptr) {
 			for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
 				POGLDeferredCommand* command = &mFlushedCommands[i];
 				(*command->releaseFunction)(command);
@@ -49,6 +49,10 @@ void POGLDeferredDeviceContext::Release()
 		//
 
 		if (mCommands != nullptr) {
+			for (POGL_UINT32 i = 0; i < mCommandsOffset; ++i) {
+				POGLDeferredCommand* command = &mCommands[i];
+				(*command->releaseFunction)(command);
+			}
 			free(mCommands);
 			mCommands = nullptr;
 			mCommandsSize = mCommandsOffset = 0;
@@ -209,7 +213,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 		map->vertexBuffer = vb;
 		map->vertexBuffer->AddRef();
 		mMap = (POGLDeferredCommand*)map;
-		return ((char*)mMapMemoryPool + map->memoryPoolOffset);
+		return GetMapPointer(map->memoryPoolOffset);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
@@ -234,7 +238,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		map->vertexBuffer = vb;
 		map->vertexBuffer->AddRef();
 		mMap = (POGLDeferredCommand*)map;
-		return ((char*)mMapMemoryPool + map->memoryPoolOffset);
+		return GetMapPointer(map->memoryPoolOffset);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
@@ -307,7 +311,6 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	if (clearCommands) {
 		mFlushedCommandsSize = 0;
 		mFlushedCommands = nullptr;
-		mCommandsOffset = 0;
 	}
 }
 
@@ -316,9 +319,9 @@ void POGLDeferredDeviceContext::Flush()
 	mFlushedCommandsMutex.lock();
 	mFlushedCommands = mCommands;
 	mFlushedCommandsSize = mCommandsOffset;
-	mFlushedCommandsMutex.unlock();
-
+	mCommandsOffset = 0;
 	mMapMemoryPoolOffset = 0;
+	mFlushedCommandsMutex.unlock();
 }
 
 POGLDeferredCommand* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
