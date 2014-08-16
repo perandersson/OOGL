@@ -196,12 +196,12 @@ IPOGLTexture3D* POGLDeviceContext::CreateTexture3D()
 	return nullptr;
 }
 
-IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures)
+IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures)
 {
-	return CreateFramebuffer(textures, numTextures, nullptr);
+	return CreateFramebuffer(textures, nullptr);
 }
 
-IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthStencilTexture)
+IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture)
 {
 	const GLuint framebufferID = POGLFactory::GenFramebufferID();
 	std::vector<IPOGLTexture*> texturesVector;
@@ -213,20 +213,19 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 	glBindFramebuffer(GL_FRAMEBUFFER, framebufferID);
 	CHECK_GL("Could not bind framebuffer");
 
-	if (textures != nullptr && numTextures > 0) {
-		for (POGL_UINT32 i = 0; i < numTextures; ++i) {
-			IPOGLTexture* texture = textures[i];
-			texturesVector.push_back(texture);
-			const POGLResourceType::Enum type = texture->GetResourceType();
-			if (type == POGLResourceType::TEXTURE2D) {
-				POGLTexture2D* t2d = static_cast<POGLTexture2D*>(texture);
-				POGLTextureResource* resource = t2d->GetResourcePtr();
-				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, resource->GetTextureID(), 0);
-				CHECK_GL("Could not attach framebuffer texture to frame buffer");
-			}
-			else {
-				THROW_NOT_IMPLEMENTED_EXCEPTION();
-			}
+	POGL_UINT32 idx = 0;
+	for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
+		IPOGLTexture* texture = *ptr;
+		texturesVector.push_back(texture);
+		const POGLResourceType::Enum type = texture->GetResourceType();
+		if (type == POGLResourceType::TEXTURE2D) {
+			POGLTexture2D* t2d = static_cast<POGLTexture2D*>(texture);
+			POGLTextureResource* resource = t2d->GetResourcePtr();
+			glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx++, resource->GetTextureID(), 0);
+			CHECK_GL("Could not attach framebuffer texture to frame buffer");
+		}
+		else {
+			THROW_NOT_IMPLEMENTED_EXCEPTION();
 		}
 	}
 
@@ -427,6 +426,11 @@ void POGLDeviceContext::Unmap(IPOGLResource* resource)
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLDeviceContext::SetViewport(const POGL_RECTI& viewport)
+{
+	mRenderState->SetViewport(viewport);
 }
 
 void POGLDeviceContext::InitializeRenderState()

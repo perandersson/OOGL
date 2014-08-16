@@ -133,12 +133,12 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures)
+IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return CreateFramebuffer(textures, nullptr);
 }
 
-IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthTexture)
+IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
@@ -252,6 +252,11 @@ void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLDeferredDeviceContext::SetViewport(const POGL_RECTI& viewport)
+{
+	mRenderState->SetViewport(viewport);
 }
 
 void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context)

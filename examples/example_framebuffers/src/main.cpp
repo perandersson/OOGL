@@ -156,8 +156,8 @@ int main()
 		// textures array defines the color location used in the fragment shader
 		//
 
-		IPOGLTexture* textures[] = { texture0, texture1 };
-		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, 2, depthTexture);
+		IPOGLTexture* textures[] = { texture0, texture1, nullptr };
+		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, depthTexture);
 
 		//
 		// Release the textures. We don't really need them at this point anymore

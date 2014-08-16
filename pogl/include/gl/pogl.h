@@ -975,18 +975,29 @@ public:
 		\brief Creates a framebuffer that renders to the supplied textures
 
 		\param textures
-		\param numTextures
+				The textures we want to use for the framebuffer. The array must end with a nullptr or 0. 
+				{@code
+					IPOGLTexture** textures = {texture1, texture2, nullptr};
+					context->CreateFramebuffer(textures);
+				}
+		\return A framebuffer instance. You can use the framebuffer instance with the IPOGLRenderState to render to a texture
 	*/
-	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures) = 0;
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures) = 0;
 	
 	/*!
 		\brief Creates a framebuffer that renders to the supplied textures
-
+		
 		\param textures
-		\param numTextures
+				The textures we want to use for the framebuffer. The array must end with a nullptr or 0. 
+				{@code
+					IPOGLTexture** textures = {texture1, texture2, nullptr};
+					context->CreateFramebuffer(textures);
+				}
 		\param depthStencilTexture
+				A depth- and/or stencil texture
+		\return A framebuffer instance. You can use the framebuffer instance with the IPOGLRenderState to render to a texture
 	*/
-	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 numTextures, IPOGLTexture* depthStencilTexture) = 0;
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture) = 0;
 
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
@@ -1073,6 +1084,13 @@ public:
 		update your objects synchronization status so that any future rending operations will get the correct buffer data.
 	*/
 	virtual void Unmap(IPOGLResource* resource) = 0;
+
+	/*!
+		\brief A rectangle specifying the viewport area
+
+		\param viewport
+	*/
+	virtual void SetViewport(const POGL_RECTI& viewport) = 0;
 };
 
 /*!
@@ -1403,9 +1421,11 @@ public:
 		\brief
 	*/
 	virtual void SetBlend(bool b) = 0;
-
+	
 	/*!
-		\brief
+		\brief A rectangle specifying the viewport area
+
+		\param viewport
 	*/
 	virtual void SetViewport(const POGL_RECTI& viewport) = 0;
 };

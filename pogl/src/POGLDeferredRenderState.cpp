@@ -10,7 +10,6 @@ POGLDeferredRenderState::POGLDeferredRenderState(POGLDeferredDeviceContext* cont
 
 POGLDeferredRenderState::~POGLDeferredRenderState()
 {
-	mDeviceContext = nullptr;
 }
 
 void POGLDeferredRenderState::AddRef()
@@ -20,10 +19,8 @@ void POGLDeferredRenderState::AddRef()
 
 void POGLDeferredRenderState::Release()
 {
-	if (--mRefCount == 0) {
-		mDeviceContext = nullptr;
+	if (--mRefCount == 0)
 		delete this;
-	}
 }
 
 void POGLDeferredRenderState::Clear(POGL_UINT32 clearBits)
