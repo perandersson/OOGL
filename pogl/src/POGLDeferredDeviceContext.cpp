@@ -7,6 +7,7 @@
 #include "POGLDeviceContext.h"
 #include "POGLTexture2D.h"
 #include "POGLDeferredRenderState.h"
+#include "POGLFramebuffer.h"
 
 POGLDeferredDeviceContext::POGLDeferredDeviceContext(IPOGLDevice* device)
 : mRefCount(1), mDevice(device), mRenderState(nullptr),
@@ -39,6 +40,7 @@ void POGLDeferredDeviceContext::Release()
 			for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
 				POGLDeferredCommand* command = &mFlushedCommands[i];
 				(*command->releaseFunction)(command);
+				command->releaseFunction = &POGLNothing_Release;
 			}
 			mFlushedCommands = nullptr;
 			mFlushedCommandsSize = 0;
@@ -52,6 +54,7 @@ void POGLDeferredDeviceContext::Release()
 			for (POGL_UINT32 i = 0; i < mCommandsOffset; ++i) {
 				POGLDeferredCommand* command = &mCommands[i];
 				(*command->releaseFunction)(command);
+				command->releaseFunction = &POGLNothing_Release;
 			}
 			free(mCommands);
 			mCommands = nullptr;
@@ -144,7 +147,20 @@ IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** te
 
 IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+
+	std::vector<IPOGLTexture*> texturesVector;
+	if (textures != nullptr) {
+		for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
+			IPOGLTexture* texture = *ptr;
+			texturesVector.push_back(texture);
+		}
+	}
+
+	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)AddCommand(&POGLCreateFrameBuffer_Command, &POGLCreateFrameBuffer_Release);
+	POGLFramebuffer* framebuffer = new POGLFramebuffer(texturesVector, depthTexture);
+	cmd->framebuffer = framebuffer;
+	cmd->framebuffer->AddRef();
+	return framebuffer;
 }
 
 IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
@@ -302,6 +318,8 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 		POGLDeferredCommand* command = &mFlushedCommands[i];
 		(*command->function)(this, renderState, command);
 		(*command->releaseFunction)(command);
+		command->function = &POGLNothing_Command;
+		command->releaseFunction = &POGLNothing_Release;
 	}
 	
 	//

@@ -5,7 +5,7 @@
 class POGLFramebuffer : public IPOGLFramebuffer
 {
 public:
-	POGLFramebuffer(GLuint framebufferID, std::vector<IPOGLTexture*>& textures, IPOGLTexture* depthStencilTexture);
+	POGLFramebuffer(std::vector<IPOGLTexture*>& textures, IPOGLTexture* depthStencilTexture);
 	virtual ~POGLFramebuffer();
 
 	/*!
@@ -28,6 +28,11 @@ public:
 	inline POGL_UINT32 GetNumDrawBuffers() {
 		return mTextures.size();
 	}
+
+	/*!
+		\brief Post-construct this framebuffer
+	*/
+	void PostConstruct(GLuint framebufferID);
 
 // IPOGLInterface
 public:

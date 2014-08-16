@@ -12,6 +12,10 @@ void POGLNothing_Release(POGLDeferredCommand* command)
 {
 }
 
+void POGLNothing_Command(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*)
+{
+}
+
 void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
@@ -43,7 +47,6 @@ void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command)
 {
 	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -85,7 +88,6 @@ void POGLCreateTexture2D_Release(POGLDeferredCommand* command)
 {
 	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)command;
 	cmd->texture->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -101,7 +103,6 @@ void POGLMapVertexBuffer_Release(POGLDeferredCommand* command)
 {
 	POGLMapVertexBufferCommand* cmd = (POGLMapVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -117,7 +118,6 @@ void POGLMapRangeVertexBuffer_Release(POGLDeferredCommand* command)
 {
 	POGLMapRangeVertexBufferCommand* cmd = (POGLMapRangeVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLClear_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -137,7 +137,6 @@ void POGLSetFramebuffer_Release(POGLDeferredCommand* command)
 	POGLSetFramebufferCommand* cmd = (POGLSetFramebufferCommand*)command;
 	if (cmd->framebuffer != nullptr)
 		cmd->framebuffer->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -158,7 +157,6 @@ void POGLDraw_Release(POGLDeferredCommand* command)
 	cmd->vertexBuffer->Release();
 	if (cmd->indexBuffer != nullptr)
 		cmd->indexBuffer->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
 }
 
 void POGLSetDepthTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
@@ -219,5 +217,29 @@ void POGLApplyEffect_Release(POGLDeferredCommand* command)
 {
 	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)command;
 	cmd->effect->Release();
-	cmd->releaseFunction = &POGLNothing_Release;
+}
+
+void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+{
+	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)command;
+
+	IPOGLTexture* textures[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
+	const POGL_UINT32 size = cmd->framebuffer->GetNumDrawBuffers();
+	for (POGL_UINT32 i = 0; i < size; ++i) {
+		IPOGLTexture* texture = cmd->framebuffer->GetTexture(i);
+		textures[i] = texture;
+		texture->Release();
+	}
+
+	IPOGLTexture* depthStencilTexture = cmd->framebuffer->GetDepthStencilTexture();
+	POGLFactory::GenFramebufferObjectID(textures, depthStencilTexture);
+	depthStencilTexture->Release();
+
+	state->SetFramebuffer(cmd->framebuffer);
+}
+
+void POGLCreateFrameBuffer_Release(POGLDeferredCommand* command)
+{
+	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)command;
+	cmd->framebuffer->Release();
 }

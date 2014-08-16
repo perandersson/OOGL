@@ -13,6 +13,7 @@ struct POGLDeferredCommand
 	POGL_HANDLE extra[4];
 };
 extern void POGLNothing_Release(POGLDeferredCommand* command);
+extern void POGLNothing_Command(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
 
 struct POGLCreateVertexBufferCommand
 {
@@ -234,3 +235,19 @@ struct POGLApplyEffectCommand
 extern void POGLApplyEffect_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 extern void POGLApplyEffect_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLApplyEffectCommand));
+
+struct POGLCreateFrameBufferCommand
+{
+	union {
+		POGLDeferredCommand _memory;
+		struct {
+			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
+			class POGLFramebuffer* framebuffer;
+		};
+	};
+};
+extern void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLCreateFrameBuffer_Release(POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateFrameBufferCommand));

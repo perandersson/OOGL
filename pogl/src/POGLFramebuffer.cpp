@@ -7,8 +7,8 @@ namespace {
 	}
 }
 
-POGLFramebuffer::POGLFramebuffer(GLuint framebufferID, std::vector<IPOGLTexture*>& textures, IPOGLTexture* depthStencilTexture)
-: mRefCount(1), mUID(GenFramebufferID()), mFramebufferID(framebufferID), mTextures(textures), mDepthStencilTexture(depthStencilTexture)
+POGLFramebuffer::POGLFramebuffer(std::vector<IPOGLTexture*>& textures, IPOGLTexture* depthStencilTexture)
+: mRefCount(1), mUID(0), mFramebufferID(0), mTextures(textures), mDepthStencilTexture(depthStencilTexture)
 {
 	for (POGL_UINT32 i = 0; i < mTextures.size(); ++i) {
 		mTextures[i]->AddRef();
@@ -66,3 +66,10 @@ IPOGLTexture* POGLFramebuffer::GetDepthStencilTexture()
 	}
 	return nullptr;
 }
+
+void POGLFramebuffer::PostConstruct(GLuint framebufferID)
+{
+	mFramebufferID = framebufferID;
+	mUID = GenFramebufferID();
+}
+

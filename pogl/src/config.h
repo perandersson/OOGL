@@ -40,7 +40,7 @@ typedef std::stringstream POGL_STRINGSTREAM;
 #define open_file fopen
 #endif
 
-/* Reference counter */
+/* Atomic types */
 typedef std::atomic<POGL_UINT32> REF_COUNTER;
 
 #ifndef POGL_SAFE_RELEASE

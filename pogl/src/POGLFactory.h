@@ -32,4 +32,9 @@ public:
 		\return
 	*/
 	static GLuint GenVertexArrayObjectID(GLuint bufferID, const POGL_VERTEX_LAYOUT* layout);
+
+	/*!
+		\brief Generates a framebuffer ID based on the supplied parameters
+	*/
+	static GLuint GenFramebufferObjectID(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture);
 };
