@@ -86,7 +86,7 @@ IPOGLShaderProgram* POGLDeferredDeviceContext::CreateShaderProgramFromMemory(con
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLEffect* POGLDeferredDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
+IPOGLEffect* POGLDeferredDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }

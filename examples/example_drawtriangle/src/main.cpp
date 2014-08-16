@@ -60,13 +60,13 @@ int main()
 
 		//
 		// Load a very simple vertex- and fragment shader and link them into an effect resource 
-		// usable when drawing the geometry onto the screen.
+		// usable when drawing the geometry onto the screen. The array of IPOGLShaderProgram's must end with a nullptr (or 0).
 		//
 
 		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
 		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs, 2);
+		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
 
 		//
 		// The vertex- and fragment shaders are no longer needed. You can reuse the vertex- and fragment shader resources 

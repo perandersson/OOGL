@@ -75,24 +75,25 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 	return new POGLShaderProgram(shaderID, type);
 }
 
-IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms)
+IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs)
 {
 	assert_not_null(programs);
-	assert_with_message(numPrograms > 0, "You cannot create an effect with no programs");
 
 	// Attach all the shaders to the program
 	const GLuint programID = glCreateProgram();
-	for (POGL_UINT32 i = 0; i < numPrograms; ++i) {
-		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(programs[i]);
+	IPOGLShaderProgram** ptr = programs;
+	for (IPOGLShaderProgram** ptr = programs; *ptr != nullptr; ++ptr) {
+		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(*ptr);
 		glAttachShader(programID, program->GetShaderID());
+
 	}
 
 	// Link program
 	glLinkProgram(programID);
 
 	// Detach the shaders when linking is complete: http://www.opengl.org/wiki/GLSL_Object
-	for (POGL_UINT32 i = 0; i < numPrograms; ++i) {
-		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(programs[i]);
+	for (IPOGLShaderProgram** ptr = programs; *ptr != nullptr; ++ptr) {
+		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(*ptr);
 		glDetachShader(programID, program->GetShaderID());
 	}
 

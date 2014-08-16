@@ -928,13 +928,11 @@ public:
 
 		\param programs
 				The programs to be bound to the effect
-		\param numPrograms
-				The number of programs to be bound to the effect
 		\throwd POGLResourceException 
 				Exception is thrown if the exception failed to be loaded by some reason.
 		\return An effect instance
 	*/
-	virtual IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs, POGL_UINT32 numPrograms) = 0;
+	virtual IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs) = 0;
 
 	/*!
 		\brief Creates a 3D texture

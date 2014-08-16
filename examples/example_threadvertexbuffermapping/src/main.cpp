@@ -52,8 +52,8 @@ int main()
 		// Create an effect based on the supplied vertex- and fragment shader
 		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
 		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs, 2);
+		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
 		vertexShader->Release();
 		fragmentShader->Release();
 

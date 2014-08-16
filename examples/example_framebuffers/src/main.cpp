@@ -98,8 +98,8 @@ int main()
 			sizeof(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
 		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_FS, 
 			sizeof(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader };
-		IPOGLEffect* framebufferEffect = context->CreateEffectFromPrograms(programs, 2);
+		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLEffect* framebufferEffect = context->CreateEffectFromPrograms(programs);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -109,8 +109,8 @@ int main()
 
 		vertexShader = context->CreateShaderProgramFromMemory(TEXTURING_VS, sizeof(TEXTURING_VS), POGLShaderProgramType::VERTEX_SHADER);
 		fragmentShader = context->CreateShaderProgramFromMemory(TEXTURING_FS, sizeof(TEXTURING_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs2[] = { vertexShader, fragmentShader };
-		IPOGLEffect* resultEffect = context->CreateEffectFromPrograms(programs2, 2);
+		IPOGLShaderProgram* programs2[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLEffect* resultEffect = context->CreateEffectFromPrograms(programs2);
 		vertexShader->Release();
 		fragmentShader->Release();
 
