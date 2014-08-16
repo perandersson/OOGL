@@ -899,8 +899,12 @@ public:
 		\brief Creates a shader program based on the supplied file
 
 		\param path
+				The path to the file where the shader source code is located
 		\param type
-		\return
+				The shader type
+		\throws POGLResourceException
+				Exception thrown if the shader source code is not found or is invalid
+		\return A shader program
 	*/
 	virtual IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type) = 0;
 
@@ -908,9 +912,14 @@ public:
 		\brief Creates a shader program based on the memory buffer
 
 		\param memory
+				String containing the shader source code
 		\param size
+				The size of the memory
 		\param type
-		\return
+				The shader type
+		\throws POGLResourceException
+				Exception thrown if the shader source code is invalid
+		\return A shader program
 	*/
 	virtual IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type) = 0;
 
@@ -936,8 +945,12 @@ public:
 		\brief Creates a 2D texture
 
 		\param size
+				Texture geometry size (width and height)
 		\param format
+				Texture format
 		\param bytes
+				Bytes containing the texture data.
+		\return
 	*/
 	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes) = 0;
 

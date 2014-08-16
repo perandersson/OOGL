@@ -41,7 +41,7 @@ int main()
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #else
-	deviceInfo.flags = 0;
+	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
 #endif
 	deviceInfo.windowHandle = windowHandle;
 	deviceInfo.colorBits = 32;

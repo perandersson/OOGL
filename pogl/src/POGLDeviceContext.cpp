@@ -50,6 +50,9 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromFile(const POGL_CH
 
 IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type)
 {
+	if (size == 0 || memory == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You cannot generate a non-existing shader");
+
 	const GLuint shaderID = glCreateShader(POGLEnum::Convert(type));
 	glShaderSource(shaderID, 1, (const GLchar**)&memory, (const GLint*)&size);
 	glCompileShader(shaderID);

@@ -34,14 +34,16 @@ void POGLDeferredDeviceContext::Release()
 		// Release the flushed commands. This is needed because some resources
 		// might be in the flushed command queue but not executed
 		//
-
-		for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
-			POGLDeferredCommand* command = &mFlushedCommands[i];
-			(*command->releaseFunction)(command);
+		{
+			std::lock_guard<std::mutex> lock(mFlushedCommandsMutex);
+			for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
+				POGLDeferredCommand* command = &mFlushedCommands[i];
+				(*command->releaseFunction)(command);
+			}
+			mFlushedCommands = nullptr;
+			mFlushedCommandsSize = 0;
 		}
-		mFlushedCommands = nullptr;
-		mFlushedCommandsSize = 0;
-		
+
 		//
 		// Free the memory pools memory
 		//

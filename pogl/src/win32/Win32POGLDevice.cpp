@@ -135,15 +135,12 @@ void Win32POGLDevice::Initialize()
 		THROW_EXCEPTION(POGLInitializationException, "Could not bind the legacy render context. Reason: 0x%x", error);
 	}
 
-	// Load extensions
+	// Load extensions for the Legacy OpenGL RenderContext
 	if (!POGLLoadExtensions()) {
 		wglDeleteContext(legacyRenderContext);
 		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
 		THROW_EXCEPTION(POGLInitializationException, "Could not load OpenGL extensions");
 	}
-
-	// Legacy Render context is no longer needed
-	wglDeleteContext(legacyRenderContext);
 
 	// Verify OpenGL 3.3
 	if (wglCreateContextAttribsARB == nullptr) {
@@ -151,8 +148,22 @@ void Win32POGLDevice::Initialize()
 		THROW_EXCEPTION(POGLException, "Your computer does not support OpenGL 3.3. Make sure that you have the latest graphics-card drivers installed");
 	}
 
+	// Create the OpenGL 3.3 render context
 	mDeviceContext = CreateRenderContext();
+
+	// Legacy Render context is no longer needed
+	wglDeleteContext(legacyRenderContext);
+
+	// Ensure that we have the reference for it
 	mDeviceContext->AddRef();
+
+	// Load extensions for the OpenGL 3.3 RenderContext
+	if (!POGLLoadExtensions()) {
+		mDeviceContext->Release();
+		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
+		THROW_EXCEPTION(POGLInitializationException, "Could not load OpenGL extensions");
+	}
+
 	mDeviceContext->InitializeRenderState();
 }
 
