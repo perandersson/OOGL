@@ -154,7 +154,7 @@ void POGLDeferredDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const P
 	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)AddCommand(&POGLResizeTexture2D_Command, &POGLResizeTexture2D_Release);
 	cmd->texture = static_cast<POGLTexture2D*>(texture);
 	cmd->texture->AddRef();
-	cmd->texture->SetSize(size);
+	cmd->newSize = size;
 }
 
 IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures)

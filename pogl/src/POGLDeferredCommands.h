@@ -261,6 +261,7 @@ struct POGLResizeTexture2DCommand
 			POGLCommandReleaseFuncPtr releaseFunction;
 
 			class POGLTexture2D* texture;
+			POGL_SIZE newSize;
 		};
 	};
 };

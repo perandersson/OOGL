@@ -256,10 +256,12 @@ void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLR
 	const POGLTextureFormat::Enum format = resource->GetTextureFormat();
 	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
 	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
-	const POGL_SIZE& size = cmd->texture->GetSize();
+	const POGL_SIZE& size = cmd->newSize;
 
 	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, size.width, size.height, 0, _format, GL_UNSIGNED_BYTE, NULL);
 	CHECK_GL("Could not set new texture size");
+
+	cmd->texture->SetSize(cmd->newSize);
 }
 
 void POGLResizeTexture2D_Release(POGLDeferredCommand* command)
