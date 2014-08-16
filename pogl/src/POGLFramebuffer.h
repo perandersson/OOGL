@@ -44,7 +44,7 @@ public:
 	virtual IPOGLTexture* GetDepthStencilTexture();
 
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mFramebufferID;
 	std::vector<IPOGLTexture*> mTextures;

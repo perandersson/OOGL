@@ -89,7 +89,7 @@ int main()
 				//
 
 				POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, offset * sizeof(POGL_POSITION_VERTEX), 
-					length * sizeof(POGL_POSITION_VERTEX), POGLResourceStreamType::WRITE);
+					length * sizeof(POGL_POSITION_VERTEX), POGLResourceMapType::WRITE);
 
 				//
 				// Make sure to not update the midpoint
@@ -129,7 +129,7 @@ int main()
 				//
 
 				POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, offset * sizeof(POGL_POSITION_VERTEX),
-					length * sizeof(POGL_POSITION_VERTEX), POGLResourceStreamType::WRITE);
+					length * sizeof(POGL_POSITION_VERTEX), POGLResourceMapType::WRITE);
 				POGL_POSITION_VERTEX* ptr = vertices;
 
 				//

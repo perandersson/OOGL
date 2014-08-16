@@ -58,8 +58,8 @@ public:
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	virtual IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage);
 	virtual IPOGLRenderState* Apply(IPOGLEffect* effect);
-	virtual void* Map(IPOGLResource* resource, POGLResourceStreamType::Enum e);
-	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e);
+	virtual void* Map(IPOGLResource* resource, POGLResourceMapType::Enum e);
+	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	virtual void Unmap(IPOGLResource* resource);
 
 // IPOGLDeferredDeviceContext
@@ -70,7 +70,7 @@ public:
 	virtual void FlushAndWait(std::condition_variable& condition);
 
 protected:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	IPOGLDevice* mDevice;
 	POGLDeferredRenderState* mRenderState;
 

@@ -39,3 +39,14 @@ typedef std::ifstream POGL_ISTREAM;
 typedef std::stringstream POGL_STRINGSTREAM;
 #define open_file fopen
 #endif
+
+/* Reference counter */
+typedef std::atomic<POGL_UINT32> REF_COUNTER;
+
+#ifndef POGL_SAFE_RELEASE
+#define POGL_SAFE_RELEASE(x) if(x != nullptr) { x->Release(); x = nullptr; }
+#endif
+
+#ifndef POGL_SAFE_RELEASE_UID
+#define POGL_SAFE_RELEASE_UID(x) if(x != nullptr) { x->Release(); x = nullptr; x##UID = 0; }
+#endif

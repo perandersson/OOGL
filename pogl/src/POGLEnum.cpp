@@ -172,18 +172,18 @@ GLenum POGLEnum::Convert(POGLDstFactor::Enum dfactor)
 	return enums[(POGL_UINT32)dfactor];
 }
 
-GLenum POGLEnum::ConvertForMapBuffer(POGLResourceStreamType::Enum e)
+GLenum POGLEnum::ConvertForMapBuffer(POGLResourceMapType::Enum e)
 {
-	static GLenum access[POGLResourceStreamType::COUNT] = {
+	static GLenum access[POGLResourceMapType::COUNT] = {
 		GL_WRITE_ONLY
 	};
 
 	return access[(POGL_UINT32)e];
 }
 
-GLbitfield POGLEnum::ConvertForMapBufferRange(POGLResourceStreamType::Enum e)
+GLbitfield POGLEnum::ConvertForMapBufferRange(POGLResourceMapType::Enum e)
 {
-	static GLenum access[POGLResourceStreamType::COUNT] = {
+	static GLenum access[POGLResourceMapType::COUNT] = {
 		GL_MAP_WRITE_BIT
 	};
 

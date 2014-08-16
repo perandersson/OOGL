@@ -38,7 +38,7 @@ public:
 	virtual POGLResourceType::Enum GetResourceType() const;
 
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mShaderID;
 	POGLShaderProgramType::Enum mType;

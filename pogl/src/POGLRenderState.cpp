@@ -25,7 +25,6 @@ mFramebuffer(nullptr), mFramebufferUID(0)
 
 POGLRenderState::~POGLRenderState()
 {
-	mDeviceContext = nullptr;
 }
 
 void POGLRenderState::AddRef()
@@ -36,45 +35,21 @@ void POGLRenderState::AddRef()
 void POGLRenderState::Release()
 {
 	mApplyCurrentEffectState = true;
-	if (mEffect != nullptr) {
-		mEffect->Release();
-		mEffect = nullptr;
-	}
-
 	if (--mRefCount == 0) {
-		if (mVertexBuffer != nullptr) {
-			mVertexBuffer->Release();
-			mVertexBuffer = nullptr;
-			mVertexBufferUID = 0;
-		}
-
-		if (mIndexBuffer != nullptr) {
-			mIndexBuffer->Release();
-			mIndexBuffer = nullptr;
-			mIndexBufferUID = 0;
-		}
-
-		if (mFramebuffer != nullptr) {
-			mFramebuffer->Release();
-			mFramebufferUID = 0;
-			mFramebuffer = nullptr;
-		}
+		POGL_SAFE_RELEASE_UID(mEffect);
+		POGL_SAFE_RELEASE_UID(mVertexBuffer);
+		POGL_SAFE_RELEASE_UID(mIndexBuffer);
+		POGL_SAFE_RELEASE_UID(mFramebuffer);
 
 		auto size = mTextures.size();
 		for (size_t i = 0; i < size; ++i) {
-			if (mTextures[i] != nullptr) {
-				mTextures[i]->Release();
-				mTextures[i] = nullptr;
-				mTextureUID[i] = 0;
-			}
+			POGL_SAFE_RELEASE(mTextures[i]);
+			mTextureUID[i] = 0;
 		}
 
 		// Clear all effect states
 		mEffectStates.clear();
-
-		mDeviceContext = nullptr;
 		delete this;
-		return;
 	}
 }
 
@@ -302,8 +277,6 @@ void POGLRenderState::Apply(IPOGLEffect* effect)
 	// If an effect is bound then release this render state 
 	if (mEffect != nullptr) {
 		mApplyCurrentEffectState = true;
-		mEffect->Release();
-		mEffect = nullptr;
 	}
 
 	// Bind the effect if neccessary
@@ -358,10 +331,6 @@ void POGLRenderState::BindEffect(POGLEffect* effect)
 {
 	const POGL_UINT32 uid = effect->GetUID();
 	if (uid == mEffectUID) {
-		if (mEffect == nullptr && effect != nullptr) {
-			mEffect = effect;
-			mEffect->AddRef();
-		}
 		return;
 	}
 
@@ -396,10 +365,6 @@ void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 	assert_not_null(buffer);
 	const POGL_UINT32 uid = buffer->GetUID();
 	if (mVertexBufferUID == uid) {
-		if (mVertexBuffer == nullptr && buffer != nullptr) {
-			mVertexBuffer = buffer;
-			mVertexBuffer->AddRef();
-		}
 		return;
 	}
 
@@ -419,10 +384,6 @@ void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
 {
 	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
 	if (mIndexBufferUID == uid) {
-		if (mIndexBuffer == nullptr && buffer != nullptr) {
-			mIndexBuffer = buffer;
-			mIndexBuffer->AddRef();
-		}
 		return;
 	}
 

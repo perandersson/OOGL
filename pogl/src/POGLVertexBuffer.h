@@ -86,7 +86,7 @@ public:
 	virtual POGL_UINT32 GetCount() const;
 
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mBufferID;
 	POGL_UINT32 mCount;

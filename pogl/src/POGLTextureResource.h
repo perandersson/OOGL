@@ -49,7 +49,7 @@ public:
 	virtual void Release();
 	
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mTextureID;
 	GLenum mTextureTarget;

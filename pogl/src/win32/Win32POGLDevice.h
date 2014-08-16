@@ -34,7 +34,7 @@ private:
 	Win32POGLDeviceContext* CreateRenderContext();
 
 private:
-	POGL_UINT32 mRefCount;
+	REF_COUNTER mRefCount;
 	bool mReleasing;
 	HWND mHWND;
 	HDC mDC;

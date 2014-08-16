@@ -195,7 +195,7 @@ IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
 	return mRenderState;
 }
 
-void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::Enum e)
+void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
 	if (mMap != nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You are not allowed to map more than one resource at the same time");
@@ -215,7 +215,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceStream
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e)
+void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
 	if (mMap != nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You are not allowed to map more than one resource at the same time");

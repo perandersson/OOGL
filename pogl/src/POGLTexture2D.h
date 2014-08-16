@@ -41,7 +41,7 @@ public:
 	const POGL_SIZEI& GetSize() const;
 
 private:
-	POGL_UINT32 mRefCount;
+	REF_COUNTER mRefCount;
 	POGLTextureResource* mResourcePtr;
 	POGL_SIZEI mSize;
 };

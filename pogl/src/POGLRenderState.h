@@ -137,7 +137,7 @@ private:
 	void BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer);
 	
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	POGLDeviceContext* mDeviceContext;
 
 	IPOGLEffect* mEffect;

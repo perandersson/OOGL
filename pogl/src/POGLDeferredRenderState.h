@@ -35,6 +35,6 @@ public:
 	virtual void SetViewport(const POGL_RECTI& viewport);
 
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	POGLDeferredDeviceContext* mDeviceContext;
 };

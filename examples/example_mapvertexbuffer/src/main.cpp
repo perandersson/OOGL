@@ -80,7 +80,7 @@ int main()
 			// Map a memory location where the new vertex buffer data can be put into
 			//
 
-			POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, POGLResourceStreamType::WRITE);
+			POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)context->Map(vertexBuffer, POGLResourceMapType::WRITE);
 
 			//
 			// Make sure to not update the midpoint

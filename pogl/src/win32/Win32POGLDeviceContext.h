@@ -20,7 +20,7 @@ public:
 	virtual void Release();
 
 private:
-	POGL_UINT32 mRefCount;
+	REF_COUNTER mRefCount;
 	HDC mDeviceContext;
 	HGLRC mRenderContext;
 };

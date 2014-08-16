@@ -98,7 +98,7 @@ struct POGLDeviceInfoFlags
 {
 	enum Enum {
 		//
-		// Enable debug mode if this flag is set. Debug mode is different depending on which graphics card you have. 
+		// This flag enables debug mode. Debug mode is differs depending on the graphics card you have. 
 		// AMD, for example, enables us to attach CodeXL (a remote debugger) and change stuff in runtime
 		//
 		DEBUG_MODE = BIT(0)
@@ -421,7 +421,7 @@ struct POGLDstFactor
 
 };
 
-struct POGLResourceStreamType
+struct POGLResourceMapType
 {
 	enum Enum {
 		/* Open a reading stream */
@@ -1042,7 +1042,7 @@ public:
 	/*!
 		\brief Map the data to a memory location and return a pointer to it
 	*/
-	virtual void* Map(IPOGLResource* resource, POGLResourceStreamType::Enum e) = 0;
+	virtual void* Map(IPOGLResource* resource, POGLResourceMapType::Enum e) = 0;
 	
 	/*!
 		\brief Map parts of the data to a memory location and return a pointer to it
@@ -1052,7 +1052,7 @@ public:
 		\param length
 				The length of the data buffer we want to map
 	*/
-	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e) = 0;
+	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e) = 0;
 
 	/*!
 		\brief Close the stream

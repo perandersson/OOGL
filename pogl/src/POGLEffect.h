@@ -71,7 +71,7 @@ public:
 	virtual POGLResourceType::Enum GetResourceType() const;
 
 private:
-	std::atomic<POGL_UINT32> mRefCount;
+	REF_COUNTER mRefCount;
 	GLuint mProgramID;
 	POGL_UINT32 mUID;
 	std::recursive_mutex mMutex;

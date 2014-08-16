@@ -25,10 +25,7 @@ POGLDeviceContext::~POGLDeviceContext()
 
 void POGLDeviceContext::Destroy()
 {
-	if (mRenderState != nullptr) {
-		mRenderState->Release();
-		mRenderState = nullptr;
-	}
+	POGL_SAFE_RELEASE(mRenderState);
 }
 
 IPOGLDevice* POGLDeviceContext::GetDevice()
@@ -391,7 +388,7 @@ IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 	return mRenderState;
 }
 
-void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::Enum e)
+void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
@@ -403,7 +400,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceStreamType::En
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceStreamType::Enum e)
+void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {

@@ -38,11 +38,7 @@ int main()
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo = { 0 };
-#ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
-#else
-	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;
-#endif
 	deviceInfo.windowHandle = windowHandle;
 	deviceInfo.colorBits = 32;
 	deviceInfo.depthBits = 16;
@@ -99,7 +95,7 @@ int main()
 					//
 
 					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)t1context->Map(vertexBuffer, offset * sizeof(POGL_POSITION_VERTEX),
-						length * sizeof(POGL_POSITION_VERTEX), POGLResourceStreamType::WRITE);
+						length * sizeof(POGL_POSITION_VERTEX), POGLResourceMapType::WRITE);
 					POGL_POSITION_VERTEX* ptr = vertices;
 
 					//
@@ -149,7 +145,7 @@ int main()
 					//
 
 					POGL_POSITION_VERTEX* vertices = (POGL_POSITION_VERTEX*)t2context->Map(vertexBuffer, offset * sizeof(POGL_POSITION_VERTEX),
-						length * sizeof(POGL_POSITION_VERTEX), POGLResourceStreamType::WRITE);
+						length * sizeof(POGL_POSITION_VERTEX), POGLResourceMapType::WRITE);
 					POGL_POSITION_VERTEX* ptr = vertices;
 
 					//
