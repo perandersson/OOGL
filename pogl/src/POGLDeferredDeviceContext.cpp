@@ -321,27 +321,6 @@ void POGLDeferredDeviceContext::Flush()
 	mMapMemoryPoolOffset = 0;
 }
 
-void POGLDeferredDeviceContext::FlushAndWait(std::condition_variable& condition)
-{
-	mFlushedCommandsMutex.lock();
-	mFlushedCommands = mCommands;
-	mFlushedCommandsSize = mCommandsOffset;
-	mFlushedCommandsMutex.unlock();
-
-	//
-	// Wait for the next frame
-	//
-
-	std::unique_lock<std::mutex> lock(mFlushAndWaitMutex);
-	condition.wait(lock);
-
-	//
-	// Reset any used buffers
-	//
-
-	mMapMemoryPoolOffset = 0;
-}
-
 POGLDeferredCommand* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
 {
 	if (mCommandsOffset >= mCommandsSize) {

@@ -1117,20 +1117,9 @@ public:
 	/*!
 		\brief Flush this command queue 
 
-		Use this method when all the calls are complete to this context. This method should only be called if you are rendering only once or if you are inside the
-		main thread. Use IPOGLDeferredDeviceContext::FlushAndWait otherwise
+		Use this method when all the calls are complete to this context. 
 	*/
 	virtual void Flush() = 0;
-
-	/*!
-		\brief Flush the commands queue and put the current thread to sleep and wait until the supplied condition have been met
-
-		This method will flush the commands from the internal buffer so that they can be executed by IPOGLDeferredDeviceContext::ExecuteCommands method.
-
-		\param condition
-				Condition used by the flushing mechanism to know when we can start render again
-	*/
-	virtual void FlushAndWait(std::condition_variable& condition) = 0;
 };
 
 /*!

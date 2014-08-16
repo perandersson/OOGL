@@ -68,15 +68,11 @@ public:
 	virtual void ExecuteCommands(IPOGLDeviceContext* context);
 	virtual void ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands);
 	virtual void Flush();
-	virtual void FlushAndWait(std::condition_variable& condition);
 
 protected:
 	REF_COUNTER mRefCount;
 	IPOGLDevice* mDevice;
 	POGLDeferredRenderState* mRenderState;
-
-	/* Mutex used to prevent this device context from being executed during the Wait phase */
-	std::mutex mFlushAndWaitMutex;
 
 	//
 	// Commands to be flushed
@@ -89,6 +85,7 @@ protected:
 	//
 	// Flushed commands
 	//
+
 	std::mutex mFlushedCommandsMutex;
 	POGLDeferredCommand* mFlushedCommands;
 	POGL_UINT32 mFlushedCommandsSize;
