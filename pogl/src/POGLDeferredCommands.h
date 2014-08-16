@@ -24,7 +24,7 @@ struct POGLCreateVertexBufferCommand
 
 			class POGLVertexBuffer* vertexBuffer;
 			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE size;
+			POGL_UINT32 size;
 		};
 	};
 };
@@ -42,7 +42,7 @@ struct POGLCreateTexture2DCommand
 
 			class POGLTexture2D* texture;
 			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE size;
+			POGL_UINT32 size;
 		};
 	};
 };
@@ -60,7 +60,7 @@ struct POGLMapVertexBufferCommand
 
 			class POGLVertexBuffer* vertexBuffer;
 			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE size;
+			POGL_UINT32 size;
 		};
 	};
 };
@@ -78,8 +78,8 @@ struct POGLMapRangeVertexBufferCommand
 
 			class POGLVertexBuffer* vertexBuffer;
 			POGL_UINT32 memoryPoolOffset;
-			POGL_SIZE offset;
-			POGL_SIZE length;
+			POGL_UINT32 offset;
+			POGL_UINT32 length;
 		};
 	};
 };

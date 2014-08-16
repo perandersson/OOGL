@@ -9,6 +9,16 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release")
 
 # Add GUI option
 OPTION(POGL_BUILD_EXAMPLES "Build examples" ON)
+OPTION(POGL_ENABLE_SSE2 "Enable Enhanced Instruction Set" ON)
+
+# Add definitions
+IF(POGL_ENABLE_SSE2)
+	IF(MSVC)
+		ADD_DEFINITIONS(/arch:SSE2)
+		ADD_DEFINITIONS(/fp:fast)
+		ADD_DEFINITIONS(-DPOGL_ENHANCED_INSTRUCTION_SET=1)
+	ENDIF()
+ENDIF()
 
 # Directories
 add_subdirectory (pogl)

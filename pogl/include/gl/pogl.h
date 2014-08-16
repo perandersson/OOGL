@@ -76,18 +76,17 @@ class IPOGLUniform;
 // typedefs
 //
 
-typedef char POGL_INT8;
-typedef unsigned char POGL_UINT8;
-typedef short POGL_INT16;
-typedef unsigned short POGL_UINT16;
-typedef int POGL_INT32;
-typedef unsigned int POGL_UINT32;
+typedef int8_t POGL_INT8;
+typedef uint8_t POGL_UINT8;
+typedef int16_t POGL_INT16;
+typedef uint16_t POGL_UINT16;
+typedef int32_t POGL_INT32;
+typedef uint32_t POGL_UINT32;
 typedef int64_t POGL_INT64;
 typedef uint64_t POGL_UINT64;
 typedef void* POGL_HANDLE;
 typedef float POGL_FLOAT;
 typedef double POGL_DOUBLE;
-typedef size_t POGL_SIZE;
 
 #include <string>
 #ifdef UNICODE
@@ -472,6 +471,27 @@ struct POGLResourceType
 // Structs
 //
 
+#if !defined(POGL_ENHANCED_INSTRUCTION_SET)
+typedef struct __POGL_VECTOR128
+{
+	union {
+		POGL_UINT32 u[4];
+		POGL_FLOAT  f[4];
+	};
+} __POGL_VECTOR128;
+
+typedef struct __POGL_VECTOR64
+{
+	union {
+		POGL_UINT32 u[2];
+		POGL_FLOAT  f[2];
+	};
+} __POGL_VECTOR64;
+#else
+typedef __m128 __POGL_VECTOR128;
+typedef __m64 __POGL_VECTOR64;
+#endif
+
 typedef struct POGL_SIZEI
 {
 	union {
@@ -493,7 +513,7 @@ typedef struct POGL_SIZEI
 	inline POGL_SIZEI& operator=(const POGL_SIZEI& rhs) { x = rhs.x; y = rhs.y; return *this; }
 } POGL_POINTI;
 
-struct POGL_VECTOR2
+struct POGL_DECLARE_ALIGN(16) POGL_VECTOR2
 {
 	union {
 		struct {
@@ -512,7 +532,7 @@ struct POGL_VECTOR2
 	inline POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs) { x = rhs.x; y = rhs.y; return *this; }
 };
 
-typedef struct POGL_VECTOR3
+typedef struct POGL_DECLARE_ALIGN(16) POGL_VECTOR3
 {
 	union {
 		struct {
@@ -539,7 +559,7 @@ typedef struct POGL_VECTOR3
 	inline POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; return *this; }
 } POGL_COLOR3;
 
-typedef struct POGL_VECTOR4
+typedef struct POGL_DECLARE_ALIGN(16) POGL_VECTOR4
 {
 	union {
 		struct {
@@ -588,7 +608,7 @@ struct POGL_RECT
 	inline POGL_RECT& operator=(const POGL_RECT& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; return *this; }
 };
 
-struct POGL_MAT4
+struct POGL_DECLARE_ALIGN(16) POGL_MAT4
 {
 	union {
 		struct {
@@ -930,7 +950,7 @@ public:
 		\param bufferUsage
 		\return
 	*/
-	virtual IPOGLVertexBuffer* CreateVertexBuffer(const void* memory, POGL_SIZE memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
+	virtual IPOGLVertexBuffer* CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
 	
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
@@ -941,7 +961,7 @@ public:
 		\param bufferUsage
 		\return
 	*/
-	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
+	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
 	
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
@@ -952,7 +972,7 @@ public:
 		\param bufferUsage
 		\return
 	*/
-	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
+	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
 	
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
@@ -963,7 +983,7 @@ public:
 		\param bufferUsage
 		\return
 	*/
-	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_SIZE memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
+	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
 
 	/*!
 		\brief Creates an index buffer based on the supplied parameters
@@ -973,7 +993,7 @@ public:
 		\param type
 		\param bufferUsage
 	*/
-	virtual IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_SIZE memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage) = 0;
+	virtual IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage) = 0;
 
 	/*!
 		\brief Apply the supplied effect to the current context
