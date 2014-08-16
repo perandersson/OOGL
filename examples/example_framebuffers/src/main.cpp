@@ -160,20 +160,31 @@ int main()
 		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, depthTexture);
 
 		//
-		// Release the textures. We don't really need them at this point anymore
+		// Release the depth texture. We don't really need it anymore
 		//
 
-		texture0->Release(); texture1->Release(); depthTexture->Release();
+		depthTexture->Release();
 
 		while (POGLProcessEvents()) {
-			
+			IPOGLRenderState* state = context->Apply(framebufferEffect);
+
 			//
-			// Bind the effect used when drawing to the framebuffer
+			// Set the framebuffer to the render state. This enables us to render to the attached textures
+			// This also changes the viewport of the IPOGLRenderState.
 			//
 
-			IPOGLRenderState* state = context->Apply(framebufferEffect);
 			state->SetFramebuffer(framebuffer);
+
+			//
+			// Update the viewport based on the framebuffer
+			//
+
 			state->SetViewport(POGL_RECTI(0, 0, 1024, 768));
+
+			//
+			// Render as usual
+			//
+
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			state->Draw(vertexBuffer);
 			state->Release();
@@ -184,16 +195,21 @@ int main()
 			//
 
 			state = context->Apply(resultEffect);
+
+			//
+			// Detach the active framebuffer so that we render to the screen instead of to the textures
+			//
+
 			state->SetFramebuffer(nullptr);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			
-			IPOGLTexture* texture0 = framebuffer->GetTexture(0);
-			state->FindUniformByName("Texture0")->SetTexture(texture0); 
-			texture0->Release();
+			//
+			// Bind the textures to the uniforms "Texture0" and "Texture1".
+			// You can also get the textures by calling IPOGLFramebuffer::GetTexture(POGL_UINT32).
+			//
 
-			IPOGLTexture* texture1 = framebuffer->GetTexture(1);
+			state->FindUniformByName("Texture0")->SetTexture(texture0); 
 			state->FindUniformByName("Texture1")->SetTexture(texture1);
-			texture1->Release();
 
 			state->Draw(fullscreenVB, fullscreenIB);
 			state->Release();
@@ -205,6 +221,8 @@ int main()
 			device->EndFrame();
 		}
 
+		texture0->Release();
+		texture1->Release();
 		framebuffer->Release();
 		vertexBuffer->Release();
 		fullscreenVB->Release();
