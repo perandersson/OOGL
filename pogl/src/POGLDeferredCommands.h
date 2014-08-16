@@ -251,3 +251,19 @@ struct POGLCreateFrameBufferCommand
 extern void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 extern void POGLCreateFrameBuffer_Release(POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateFrameBufferCommand));
+
+struct POGLResizeTexture2DCommand
+{
+	union {
+		POGLDeferredCommand _memory;
+		struct {
+			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
+			class POGLTexture2D* texture;
+		};
+	};
+};
+extern void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLResizeTexture2D_Release(POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateFrameBufferCommand));

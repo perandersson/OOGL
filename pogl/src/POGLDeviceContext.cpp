@@ -196,6 +196,30 @@ IPOGLTexture3D* POGLDeviceContext::CreateTexture3D()
 	return nullptr;
 }
 
+void POGLDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size)
+{
+	if (texture == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You cannot resize a non-existing texture");
+
+	if (size.width <= 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot resize a texture to 0 width");
+
+	if (size.height <= 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot resize a texture to 0 height");
+
+	POGLTexture2D* impl = static_cast<POGLTexture2D*>(texture);
+	POGLTextureResource* resource = impl->GetResourcePtr();
+	mRenderState->BindTextureResource(resource, 0);
+
+	const POGLTextureFormat::Enum format = resource->GetTextureFormat();
+	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
+	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
+	
+	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, size.width, size.height, 0, _format, GL_UNSIGNED_BYTE, NULL);
+	impl->SetSize(size);
+	CHECK_GL("Could not set new texture size");
+}
+
 IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures)
 {
 	return CreateFramebuffer(textures, nullptr);

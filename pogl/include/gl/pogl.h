@@ -914,7 +914,17 @@ public:
 		\brief Creates a 3D texture
 	*/
 	virtual IPOGLTexture3D* CreateTexture3D() = 0;
+	
+	/*!
+		\brief Resize the supplied texture
 
+		\param texture
+				The texture we want to resize
+		\param size
+				The new texture size
+	*/
+	virtual void ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size) = 0;
+	
 	/*!
 		\brief Creates a framebuffer that renders to the supplied textures
 
@@ -927,7 +937,7 @@ public:
 		\return A framebuffer instance. You can use the framebuffer instance with the IPOGLRenderState to render to a texture
 	*/
 	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures) = 0;
-	
+
 	/*!
 		\brief Creates a framebuffer that renders to the supplied textures
 		

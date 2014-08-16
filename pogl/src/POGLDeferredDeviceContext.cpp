@@ -140,6 +140,23 @@ IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
+void POGLDeferredDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size)
+{
+	if (texture == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You cannot resize a non-existing texture");
+
+	if (size.width <= 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot resize a texture to 0 width");
+
+	if (size.height <= 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot resize a texture to 0 height");
+
+	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)AddCommand(&POGLResizeTexture2D_Command, &POGLResizeTexture2D_Release);
+	cmd->texture = static_cast<POGLTexture2D*>(texture);
+	cmd->texture->AddRef();
+	cmd->texture->SetSize(size);
+}
+
 IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures)
 {
 	return CreateFramebuffer(textures, nullptr);
@@ -147,7 +164,6 @@ IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** te
 
 IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture)
 {
-
 	std::vector<IPOGLTexture*> texturesVector;
 	if (textures != nullptr) {
 		for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
@@ -156,8 +172,9 @@ IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** te
 		}
 	}
 
-	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)AddCommand(&POGLCreateFrameBuffer_Command, &POGLCreateFrameBuffer_Release);
 	POGLFramebuffer* framebuffer = new POGLFramebuffer(texturesVector, depthTexture);
+
+	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)AddCommand(&POGLCreateFrameBuffer_Command, &POGLCreateFrameBuffer_Release);
 	cmd->framebuffer = framebuffer;
 	cmd->framebuffer->AddRef();
 	return framebuffer;

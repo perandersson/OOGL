@@ -22,6 +22,11 @@ void POGLTexture2D::PostConstruct(GLuint textureID)
 	mResourcePtr->PostConstruct(textureID);
 }
 
+void POGLTexture2D::SetSize(const POGL_SIZE& newSize)
+{
+	mSize = newSize;
+}
+
 void POGLTexture2D::AddRef()
 {
 	mRefCount++;

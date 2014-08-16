@@ -243,3 +243,25 @@ void POGLCreateFrameBuffer_Release(POGLDeferredCommand* command)
 	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)command;
 	cmd->framebuffer->Release();
 }
+
+void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+{
+	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)command;
+
+	POGLTextureResource* resource = cmd->texture->GetResourcePtr();
+	state->BindTextureResource(resource, 0);
+
+	const POGLTextureFormat::Enum format = resource->GetTextureFormat();
+	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
+	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
+	const POGL_SIZE& size = cmd->texture->GetSize();
+
+	glTexImage2D(GL_TEXTURE_2D, 0, _internalFormat, size.width, size.height, 0, _format, GL_UNSIGNED_BYTE, NULL);
+	CHECK_GL("Could not set new texture size");
+}
+
+void POGLResizeTexture2D_Release(POGLDeferredCommand* command)
+{
+	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)command;
+	cmd->texture->Release();
+}

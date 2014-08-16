@@ -23,6 +23,11 @@ public:
 	*/
 	void PostConstruct(GLuint textureID);
 
+	/*!
+		\brief Set a new size for this texture
+	*/
+	void SetSize(const POGL_SIZE& newSize);
+
 // IPOGLInterface
 public:
 	virtual void AddRef();

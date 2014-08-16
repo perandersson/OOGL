@@ -50,6 +50,7 @@ public:
 	virtual IPOGLTexture1D* CreateTexture1D();
 	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes);
 	virtual IPOGLTexture3D* CreateTexture3D();
+	virtual void ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size);
 	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures);
 	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture);
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
