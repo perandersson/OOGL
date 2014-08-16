@@ -34,7 +34,7 @@ static const POGL_UINT32 CIRCLE_PTS = 365;
 int main()
 {
 	// Create a window
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example: MapRange Vertex Data"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: MapRange Vertex Data"));
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo = { 0 };

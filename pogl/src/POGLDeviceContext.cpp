@@ -157,7 +157,7 @@ IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
 	return nullptr;
 }
 
-IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
+IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes)
 {
 	if (size.width <= 0)
 		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with width: %d", size.width);
@@ -501,7 +501,7 @@ IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const P
 	const POGL_UINT32 offset = bytes[10] + (bytes[11] << 8);
 
 	// Read image size from header
-	const POGL_SIZEI imageSize(*(POGL_INT32*)&(bytes[0x12]), *(POGL_INT32*)&(bytes[0x16]));
+	const POGL_SIZE imageSize(*(POGL_INT32*)&(bytes[0x12]), *(POGL_INT32*)&(bytes[0x16]));
 
 	// Create a texture2D resource
 	return context->CreateTexture2D(imageSize, POGLTextureFormat::BGR, &bytes[offset]);

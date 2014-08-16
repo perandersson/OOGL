@@ -7,7 +7,7 @@ namespace {
 	}
 }
 
-POGLTexture2D::POGLTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format)
+POGLTexture2D::POGLTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format)
 : mRefCount(1), mResourcePtr(nullptr), mSize(size)
 {
 	mResourcePtr = new POGLTextureResource(GL_TEXTURE_2D, format);
@@ -48,7 +48,7 @@ POGLTextureFormat::Enum POGLTexture2D::GetTextureFormat() const
 	return mResourcePtr->GetTextureFormat();
 }
 
-const POGL_SIZEI& POGLTexture2D::GetSize() const
+const POGL_SIZE& POGLTexture2D::GetSize() const
 {
 	return mSize;
 }

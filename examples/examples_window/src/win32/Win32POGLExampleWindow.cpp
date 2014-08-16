@@ -27,7 +27,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
 	return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
-POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZEI& size, const POGL_STRING& title)
+POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZE& size, const POGL_STRING& title)
 {
 	HINSTANCE applicationHandle = GetModuleHandle(NULL);
 

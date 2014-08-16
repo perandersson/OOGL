@@ -31,5 +31,5 @@ public:
 
 	static POGL_UINT32 VertexTypeSize(POGLVertexType::Enum e);
 
-	static POGL_UINT32 TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_SIZEI& size);
+	static POGL_UINT32 TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_SIZE& size);
 };

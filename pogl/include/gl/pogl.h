@@ -492,7 +492,7 @@ typedef __m128 __POGL_VECTOR128;
 typedef __m64 __POGL_VECTOR64;
 #endif
 
-typedef struct POGL_SIZEI
+typedef struct POGL_SIZE
 {
 	union {
 		struct {
@@ -506,14 +506,14 @@ typedef struct POGL_SIZEI
 		POGL_INT32 size[2];
 	};
 
-	POGL_SIZEI() {}
-	POGL_SIZEI(const POGL_INT32 _x, const POGL_INT32 _y) { x = _x; y = _y; }
-	POGL_SIZEI(const POGL_SIZEI& rhs) { x = rhs.x; y = rhs.y; }
-	~POGL_SIZEI() {}
-	inline POGL_SIZEI& operator=(const POGL_SIZEI& rhs) { x = rhs.x; y = rhs.y; return *this; }
+	POGL_SIZE() {}
+	POGL_SIZE(const POGL_INT32 _x, const POGL_INT32 _y) : x(_x), y(_y) {}
+	POGL_SIZE(const POGL_SIZE& rhs) : x(rhs.x), y(rhs.y) {}
+
+	POGL_SIZE& operator=(const POGL_SIZE& rhs);
 } POGL_POINTI;
 
-struct POGL_DECLARE_ALIGN(16) POGL_VECTOR2
+struct POGL_VECTOR2
 {
 	union {
 		struct {
@@ -527,12 +527,13 @@ struct POGL_DECLARE_ALIGN(16) POGL_VECTOR2
 		POGL_FLOAT vec[2];
 	};
 	POGL_VECTOR2() {}
-	POGL_VECTOR2(const POGL_FLOAT _x, const POGL_FLOAT _y) { x = _x; y = _y; }
-	POGL_VECTOR2(const POGL_VECTOR2& rhs) { x = rhs.x; y = rhs.y; }
-	inline POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs) { x = rhs.x; y = rhs.y; return *this; }
+	POGL_VECTOR2(const POGL_FLOAT _x, const POGL_FLOAT _y) : x(_x), y(_y) {}
+	POGL_VECTOR2(const POGL_VECTOR2& rhs) : x(rhs.x), y(rhs.y) {}
+
+	POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs);
 };
 
-typedef struct POGL_DECLARE_ALIGN(16) POGL_VECTOR3
+typedef struct POGL_VECTOR3
 {
 	union {
 		struct {
@@ -554,12 +555,13 @@ typedef struct POGL_DECLARE_ALIGN(16) POGL_VECTOR3
 	};
 
 	POGL_VECTOR3() {}
-	POGL_VECTOR3(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z) { x = _x; y = _y; z = _z; }
-	POGL_VECTOR3(const POGL_VECTOR3& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; }
-	inline POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; return *this; }
+	POGL_VECTOR3(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z) : x(_x), y(_y), z(_z) {}
+	POGL_VECTOR3(const POGL_VECTOR3& rhs) : x(rhs.x), y(rhs.y), z(rhs.z) {}
+
+	POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs);
 } POGL_COLOR3;
 
-typedef struct POGL_DECLARE_ALIGN(16) POGL_VECTOR4
+typedef struct POGL_VECTOR4
 {
 	union {
 		struct {
@@ -584,9 +586,10 @@ typedef struct POGL_DECLARE_ALIGN(16) POGL_VECTOR4
 	};
 
 	POGL_VECTOR4() {}
-	POGL_VECTOR4(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z, const POGL_FLOAT _w) { x = _x; y = _y; z = _z; w = _w; }
-	POGL_VECTOR4(const POGL_VECTOR4& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
-	inline POGL_VECTOR4& operator=(const POGL_VECTOR4& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; return *this; }
+	POGL_VECTOR4(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z, const POGL_FLOAT _w) : x(_x), y(_y), z(_z), w(_w) {}
+	POGL_VECTOR4(const POGL_VECTOR4& rhs) : x(rhs.x), y(rhs.y), z(rhs.z), w(rhs.w) {}
+
+	POGL_VECTOR4& operator=(const POGL_VECTOR4& rhs);
 } POGL_COLOR4;
 
 struct POGL_RECT
@@ -602,13 +605,13 @@ struct POGL_RECT
 	};
 
 	POGL_RECT() {}
-	POGL_RECT(const POGL_INT32 _x, const POGL_INT32 _y, const POGL_INT32 _width, const POGL_INT32 _height) { x = _x; y = _y; width = _width; height = _height; }
-	POGL_RECT(const POGL_RECT& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; }
-	~POGL_RECT() {}
-	inline POGL_RECT& operator=(const POGL_RECT& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; return *this; }
+	POGL_RECT(const POGL_INT32 _x, const POGL_INT32 _y, const POGL_INT32 _width, const POGL_INT32 _height) : x(_x), y(_y), width(_width), height(_height) {}
+	POGL_RECT(const POGL_RECT& rhs) : x(rhs.x), y(rhs.y), width(rhs.width), height(rhs.height) {}
+
+	POGL_RECT& operator=(const POGL_RECT& rhs);
 };
 
-struct POGL_DECLARE_ALIGN(16) POGL_MAT4
+struct POGL_MAT4
 {
 	union {
 		struct {
@@ -692,10 +695,10 @@ struct POGL_POSITION_VERTEX
 	POGL_VECTOR3 position;
 
 	POGL_POSITION_VERTEX() {}
-	POGL_POSITION_VERTEX(const POGL_VECTOR3& p) { position = p; }
-	POGL_POSITION_VERTEX(const POGL_POSITION_VERTEX& v) { position = v.position; }
-	~POGL_POSITION_VERTEX() {}
-	inline POGL_POSITION_VERTEX& operator=(const POGL_POSITION_VERTEX& rhs) { position = rhs.position; return *this; }
+	POGL_POSITION_VERTEX(const POGL_VECTOR3& p) : position(p) {}
+	POGL_POSITION_VERTEX(const POGL_POSITION_VERTEX& rhs) : position(rhs.position) {}
+
+	POGL_POSITION_VERTEX& operator=(const POGL_POSITION_VERTEX& rhs);
 };
 
 /* Vertex layout for the POGL_POSITION_VERTEX struct. */
@@ -716,10 +719,10 @@ struct POGL_POSITION_COLOR_VERTEX
 	POGL_COLOR4 color;
 
 	POGL_POSITION_COLOR_VERTEX() {}
-	POGL_POSITION_COLOR_VERTEX(const POGL_VECTOR3& p, const POGL_COLOR4& c) { position = p; color = c; }
-	POGL_POSITION_COLOR_VERTEX(const POGL_POSITION_COLOR_VERTEX& v) { position = v.position; color = v.color; }
-	~POGL_POSITION_COLOR_VERTEX() {}
-	inline POGL_POSITION_COLOR_VERTEX& operator=(const POGL_POSITION_COLOR_VERTEX& rhs) { position = rhs.position; color = rhs.color;  return *this; }
+	POGL_POSITION_COLOR_VERTEX(const POGL_VECTOR3& p, const POGL_COLOR4& c) : position(p), color(c) {}
+	POGL_POSITION_COLOR_VERTEX(const POGL_POSITION_COLOR_VERTEX& rhs) : position(rhs.position), color(rhs.color) {}
+
+	POGL_POSITION_COLOR_VERTEX& operator=(const POGL_POSITION_COLOR_VERTEX& rhs);
 };
 
 /* Vertex layout for the POGL_POSITION_COLOR_VERTEX struct. */
@@ -741,10 +744,10 @@ struct POGL_POSITION_TEXCOORD_VERTEX
 	POGL_VECTOR2 texCoord;
 
 	POGL_POSITION_TEXCOORD_VERTEX() {}
-	POGL_POSITION_TEXCOORD_VERTEX(const POGL_VECTOR3& p, const POGL_VECTOR2& t) { position = p; texCoord = t; }
-	POGL_POSITION_TEXCOORD_VERTEX(const POGL_POSITION_TEXCOORD_VERTEX& v) { position = v.position; texCoord = v.texCoord; }
-	~POGL_POSITION_TEXCOORD_VERTEX() {}
-	inline POGL_POSITION_TEXCOORD_VERTEX& operator=(const POGL_POSITION_TEXCOORD_VERTEX& rhs) { position = rhs.position; texCoord = rhs.texCoord;  return *this; }
+	POGL_POSITION_TEXCOORD_VERTEX(const POGL_VECTOR3& p, const POGL_VECTOR2& t) : position(p), texCoord(t) {}
+	POGL_POSITION_TEXCOORD_VERTEX(const POGL_POSITION_TEXCOORD_VERTEX& rhs) : position(rhs.position), texCoord(rhs.texCoord) {}
+
+	POGL_POSITION_TEXCOORD_VERTEX& operator=(const POGL_POSITION_TEXCOORD_VERTEX& rhs);
 };
 
 /* Vertex layout for the POGL_POSITION_TEXCOORD_VERTEX struct. */
@@ -905,7 +908,7 @@ public:
 				Bytes containing the texture data.
 		\return
 	*/
-	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes) = 0;
+	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes) = 0;
 
 	/*!
 		\brief Creates a 3D texture
@@ -1375,6 +1378,9 @@ public:
 class IPOGLTexture1D : public IPOGLTexture
 {
 public:
+	/*!
+		\brief Retrieves the size (width) of this texture in pixels
+	*/
 	virtual POGL_UINT32 GetSize() const = 0;
 };
 
@@ -1384,7 +1390,10 @@ public:
 class IPOGLTexture2D : public IPOGLTexture
 {
 public:
-	virtual const POGL_SIZEI& GetSize() const = 0;
+	/*!
+		\brief Retrieves the size (width and height) of this texture in pixels
+	*/
+	virtual const POGL_SIZE& GetSize() const = 0;
 };
 
 /*!
@@ -1394,7 +1403,11 @@ class IPOGLTexture3D : public IPOGLTexture
 {
 public:
 	virtual POGL_UINT32 GetDepth() const = 0;
-	virtual const POGL_SIZEI& GetSize() const = 0;
+	
+	/*!
+		\brief Retrieves the size (width and height) of this texture in pixels
+	*/
+	virtual const POGL_SIZE& GetSize() const = 0;
 };
 
 /*!
@@ -1468,10 +1481,10 @@ public:
 	POGLException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	virtual ~POGLException();
 
-	inline const POGL_CHAR* GetMessage() const { return mMessage; }
-	inline const POGL_CHAR* GetFunction() const { return mFunction; }
-	inline const POGL_CHAR* GetFile() const { return mFile; }
-	inline POGL_UINT64 GetLine() const { return mLine; }
+	const POGL_CHAR* GetMessage() const;
+	const POGL_CHAR* GetFunction() const;
+	const POGL_CHAR* GetFile() const;
+	POGL_UINT64 GetLine() const;
 
 protected:
 	POGL_CHAR mFunction[128];

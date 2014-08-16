@@ -8,7 +8,7 @@
 	\param title
 	\return
 */
-extern POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZEI& size, const POGL_STRING& title);
+extern POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZE& size, const POGL_STRING& title);
 
 /*!
 	\brief Process events raised by the example window

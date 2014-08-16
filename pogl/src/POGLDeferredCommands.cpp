@@ -51,7 +51,7 @@ void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLR
 	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)command;
 
 	const POGLTextureFormat::Enum format = cmd->texture->GetTextureFormat();
-	const POGL_SIZEI& size = cmd->texture->GetSize();
+	const POGL_SIZE& size = cmd->texture->GetSize();
 	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
 	const GLenum _internalFormat = POGLEnum::ConvertToInternalTextureFormatEnum(format);
 	const GLenum minFilter = POGLEnum::Convert(POGLMinFilter::DEFAULT);

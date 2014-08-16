@@ -100,7 +100,7 @@ IPOGLTexture1D* POGLDeferredDeviceContext::CreateTexture1D()
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes)
+IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes)
 {
 	if (size.width <= 0)
 		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with width: %d", size.width);

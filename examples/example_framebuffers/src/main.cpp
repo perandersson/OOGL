@@ -72,7 +72,7 @@ static const POGL_CHAR TEXTURING_FS[] = { R"(
 int main()
 {
 	// Create a window
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZEI(1024, 768), POGL_TOSTRING("Example: Framebuffers"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: Framebuffers"));
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo = { 0 };
@@ -147,9 +147,9 @@ int main()
 		// Prepare and create a framebuffer to render to
 		//
 
-		IPOGLTexture2D* texture0 = context->CreateTexture2D(POGL_SIZEI(1024, 768), POGLTextureFormat::RGBA32F, nullptr);
-		IPOGLTexture2D* texture1 = context->CreateTexture2D(POGL_SIZEI(1024, 768), POGLTextureFormat::RGBA32F, nullptr);
-		IPOGLTexture2D* depthTexture = context->CreateTexture2D(POGL_SIZEI(1024, 768), POGLTextureFormat::DEPTH24, nullptr);
+		IPOGLTexture2D* texture0 = context->CreateTexture2D(POGL_SIZE(1024, 768), POGLTextureFormat::RGBA32F, nullptr);
+		IPOGLTexture2D* texture1 = context->CreateTexture2D(POGL_SIZE(1024, 768), POGLTextureFormat::RGBA32F, nullptr);
+		IPOGLTexture2D* depthTexture = context->CreateTexture2D(POGL_SIZE(1024, 768), POGLTextureFormat::DEPTH24, nullptr);
 
 		//
 		// Create a framebuffer that renders to the following textures. The index in the 

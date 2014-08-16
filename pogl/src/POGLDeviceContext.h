@@ -27,7 +27,7 @@ public:
 	virtual IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);
 	virtual IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs);
 	virtual IPOGLTexture1D* CreateTexture1D();
-	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format, const void* bytes);
+	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes);
 	virtual IPOGLTexture3D* CreateTexture3D();
 	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures);
 	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture);

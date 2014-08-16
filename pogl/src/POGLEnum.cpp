@@ -402,7 +402,7 @@ POGL_UINT32 POGLEnum::VertexTypeSize(POGLVertexType::Enum e)
 	return sizes[(POGL_UINT32)e];
 }
 
-POGL_UINT32 POGLEnum::TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_SIZEI& size)
+POGL_UINT32 POGLEnum::TextureFormatToSize(POGLTextureFormat::Enum e, const POGL_SIZE& size)
 {
 	POGL_UINT32 bitsPerPixel = 0;
 	switch (e)

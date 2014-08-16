@@ -6,8 +6,8 @@
 class POGLTexture2D : public IPOGLTexture2D
 {
 public:
-	POGLTexture2D(const POGL_SIZEI& size, POGLTextureFormat::Enum format);
-	~POGLTexture2D();
+	POGLTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format);
+	virtual ~POGLTexture2D();
 
 	/*!
 		\brief 
@@ -38,10 +38,10 @@ public:
 
 // IPOGLTexture2D
 public:
-	const POGL_SIZEI& GetSize() const;
+	virtual const POGL_SIZE& GetSize() const;
 
 private:
 	REF_COUNTER mRefCount;
 	POGLTextureResource* mResourcePtr;
-	POGL_SIZEI mSize;
+	POGL_SIZE mSize;
 };
