@@ -82,7 +82,7 @@ int main()
 
 		IPOGLDeferredDeviceContext* t1context = device->CreateDeferredDeviceContext();
 		std::condition_variable t1cond;
-		std::thread t1([&t1context, &vertexBuffer, &running, &totalTime, &t1cond] {
+		std::thread t1([t1context, vertexBuffer, &running, &totalTime, &t1cond] {
 			try {
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
@@ -132,7 +132,7 @@ int main()
 
 		IPOGLDeferredDeviceContext* t2context = device->CreateDeferredDeviceContext();
 		std::condition_variable t2cond;
-		std::thread t2([&t2context, &vertexBuffer, &running, &totalTime, &t2cond] {
+		std::thread t2([t2context, vertexBuffer, &running, &totalTime, &t2cond] {
 			try {
 				while (running.load()) {
 					const POGL_FLOAT totalTimeFlt = totalTime.load();
