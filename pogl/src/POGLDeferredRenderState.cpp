@@ -26,17 +26,6 @@ void POGLDeferredRenderState::Release()
 	}
 }
 
-IPOGLDevice* POGLDeferredRenderState::GetDevice()
-{
-	return mDeviceContext->GetDevice();
-}
-
-IPOGLDeviceContext* POGLDeferredRenderState::GetDeviceContext()
-{
-	mDeviceContext->AddRef();
-	return mDeviceContext;
-}
-
 void POGLDeferredRenderState::Clear(POGL_UINT32 clearBits)
 {
 	POGLClearCommand* cmd = (POGLClearCommand*)mDeviceContext->AddCommand(&POGLClear_Command, &POGLNothing_Release);

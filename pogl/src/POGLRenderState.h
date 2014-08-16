@@ -105,8 +105,6 @@ public:
 
 // IPOGLRenderState
 public:
-	virtual IPOGLDevice* GetDevice();
-	virtual IPOGLDeviceContext* GetDeviceContext();
 	virtual void Clear(POGL_UINT32 clearBits);
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
 	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);

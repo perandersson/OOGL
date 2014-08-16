@@ -53,16 +53,6 @@ void POGLRenderState::Release()
 	}
 }
 
-IPOGLDevice* POGLRenderState::GetDevice()
-{
-	return mDeviceContext->GetDevice();
-}
-
-IPOGLDeviceContext* POGLRenderState::GetDeviceContext()
-{
-	mDeviceContext->AddRef();
-	return mDeviceContext;
-}
 
 void POGLRenderState::Clear(POGL_UINT32 clearBits)
 {

@@ -826,8 +826,18 @@ class IPOGLInterface
 public:
 	virtual ~IPOGLInterface() {}
 
+	/*!
+		\brief Increase the reference counter with 1
+		
+		Reference counters are used internally to prevent resources from being deleted when they are in use
+	*/
 	virtual void AddRef() = 0;
 
+	/*!
+		\brief Decrease the reference counter with 1
+
+		Reference counters are used internally to prevent resources from being deleted when they are in use
+	*/
 	virtual void Release() = 0;
 };
 
@@ -927,7 +937,11 @@ public:
 		\brief Creates an effect based on the supplied programs
 
 		\param programs
-				The programs to be bound to the effect
+				The programs we want to link when creating the effect. The array must end with a nullptr or 0. 
+				{@code
+					IPOGLShaderProgram** programs = {shader1, shader2, nullptr};
+					context->CreateEffectFromPrograms(programs);
+				}
 		\throwd POGLResourceException 
 				Exception is thrown if the exception failed to be loaded by some reason.
 		\return An effect instance
@@ -1301,16 +1315,6 @@ public:
 class IPOGLRenderState : public IPOGLInterface
 {
 public:
-	/*!
-		\brief Retrieves the device 
-	*/
-	virtual IPOGLDevice* GetDevice() = 0;
-	
-	/*!
-		\brief Retrieves the device context
-	*/
-	virtual IPOGLDeviceContext* GetDeviceContext() = 0;
-
 	/*!
 		\brief Clears the current render states back buffers
 
