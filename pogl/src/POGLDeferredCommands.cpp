@@ -232,9 +232,10 @@ void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POG
 	}
 
 	IPOGLTexture* depthStencilTexture = cmd->framebuffer->GetDepthStencilTexture();
-	POGLFactory::GenFramebufferObjectID(textures, depthStencilTexture);
+	GLuint frameBufferID = POGLFactory::GenFramebufferObjectID(textures, depthStencilTexture);
+	cmd->framebuffer->PostConstruct(frameBufferID);
 	depthStencilTexture->Release();
-
+	
 	state->SetFramebuffer(cmd->framebuffer);
 }
 
@@ -249,7 +250,8 @@ void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLR
 	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)command;
 
 	POGLTextureResource* resource = cmd->texture->GetResourcePtr();
-	state->BindTextureResource(resource, 0);
+	glBindTexture(GL_TEXTURE_2D, resource->GetTextureID());
+	state->SetTextureResource(resource);
 
 	const POGLTextureFormat::Enum format = resource->GetTextureFormat();
 	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
