@@ -407,7 +407,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
 		if (offset + length > memorySize)
-			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
+			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 
 		mRenderState->BindVertexBuffer(vb);
 		return glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
@@ -427,7 +427,7 @@ void POGLDeviceContext::Unmap(IPOGLResource* resource)
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeviceContext::SetViewport(const POGL_RECTI& viewport)
+void POGLDeviceContext::SetViewport(const POGL_RECT& viewport)
 {
 	mRenderState->SetViewport(viewport);
 }

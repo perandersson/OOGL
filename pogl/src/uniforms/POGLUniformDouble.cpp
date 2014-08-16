@@ -138,32 +138,17 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 		mValues[i] = ptr[i];
 }
 
-void POGLUniformDouble::SetVector2F(const POGL_VECTOR2F& vec)
+void POGLUniformDouble::SetVector2(const POGL_VECTOR2& vec)
 {
 	SetDouble((POGL_DOUBLE)vec.x, (POGL_DOUBLE)vec.y);
 }
 
-void POGLUniformDouble::SetVector2D(const POGL_VECTOR2D& vec)
-{
-	SetDouble(vec.x, vec.y);
-}
-
-void POGLUniformDouble::SetVector3F(const POGL_VECTOR3F& vec)
+void POGLUniformDouble::SetVector3(const POGL_VECTOR3& vec)
 {
 	SetDouble((POGL_DOUBLE)vec.x, (POGL_DOUBLE)vec.y, (POGL_DOUBLE)vec.z);
 }
 
-void POGLUniformDouble::SetVector3D(const POGL_VECTOR3D& vec)
-{
-	SetDouble(vec.x, vec.y, vec.z);
-}
-
-void POGLUniformDouble::SetVector4F(const POGL_VECTOR4F& vec)
+void POGLUniformDouble::SetVector4(const POGL_VECTOR4& vec)
 {
 	SetDouble((POGL_DOUBLE)vec.x, (POGL_DOUBLE)vec.y, (POGL_DOUBLE)vec.z, (POGL_DOUBLE)vec.w);
-}
-
-void POGLUniformDouble::SetVector4D(const POGL_VECTOR4D& vec)
-{
-	SetDouble(vec.x, vec.y, vec.z, vec.w);
 }

@@ -4,6 +4,11 @@
 
 #include <exception>
 #include <condition_variable>
+#if defined(POGL_ENHANCED_INSTRUCTION_SET)
+#include <xmmintrin.h>
+#include <emmintrin.h>
+#endif
+#include <cinttypes>
 
 #ifndef OFFSET
 #define OFFSET(x) ((char *)0 + x)
@@ -31,6 +36,14 @@
 
 #ifndef BIT_NONE
 #define BIT_NONE 0
+#endif
+
+#ifndef POGL_DECLARE_ALIGN
+#ifdef WIN32
+#define POGL_DECLARE_ALIGN(x) __declspec(align(x))
+#else
+#error Add align declaration here
+#endif
 #endif
 
 //
@@ -62,7 +75,6 @@ class IPOGLUniform;
 //
 // typedefs
 //
-#include <cinttypes>
 
 typedef char POGL_INT8;
 typedef unsigned char POGL_UINT8;
@@ -479,9 +491,9 @@ typedef struct POGL_SIZEI
 	POGL_SIZEI(const POGL_SIZEI& rhs) { x = rhs.x; y = rhs.y; }
 	~POGL_SIZEI() {}
 	inline POGL_SIZEI& operator=(const POGL_SIZEI& rhs) { x = rhs.x; y = rhs.y; return *this; }
-} POGL_POINTI, POGL_VECTOR2I;
+} POGL_POINTI;
 
-struct POGL_VECTOR2F
+struct POGL_VECTOR2
 {
 	union {
 		struct {
@@ -494,33 +506,13 @@ struct POGL_VECTOR2F
 		};
 		POGL_FLOAT vec[2];
 	};
-	POGL_VECTOR2F() {}
-	POGL_VECTOR2F(const POGL_FLOAT _x, const POGL_FLOAT _y) { x = _x; y = _y; }
-	POGL_VECTOR2F(const POGL_VECTOR2F& rhs) { x = rhs.x; y = rhs.y; }
-	inline POGL_VECTOR2F& operator=(const POGL_VECTOR2F& rhs) { x = rhs.x; y = rhs.y; return *this; }
+	POGL_VECTOR2() {}
+	POGL_VECTOR2(const POGL_FLOAT _x, const POGL_FLOAT _y) { x = _x; y = _y; }
+	POGL_VECTOR2(const POGL_VECTOR2& rhs) { x = rhs.x; y = rhs.y; }
+	inline POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs) { x = rhs.x; y = rhs.y; return *this; }
 };
 
-struct POGL_VECTOR2D
-{
-	union {
-		struct {
-			POGL_DOUBLE x;
-			POGL_DOUBLE y;
-		};
-		struct {
-			POGL_DOUBLE s;
-			POGL_DOUBLE t;
-		};
-		POGL_DOUBLE vec[2];
-	};
-
-	POGL_VECTOR2D() {}
-	POGL_VECTOR2D(const POGL_DOUBLE _x, const POGL_DOUBLE _y) { x = _x; y = _y; }
-	POGL_VECTOR2D(const POGL_VECTOR2D& rhs) { x = rhs.x; y = rhs.y; }
-	inline POGL_VECTOR2D& operator=(const POGL_VECTOR2D& rhs) { x = rhs.x; y = rhs.y; return *this; }
-};
-
-typedef struct POGL_VECTOR3F
+typedef struct POGL_VECTOR3
 {
 	union {
 		struct {
@@ -541,40 +533,13 @@ typedef struct POGL_VECTOR3F
 		POGL_FLOAT vec[3];
 	};
 
-	POGL_VECTOR3F() {}
-	POGL_VECTOR3F(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z) { x = _x; y = _y; z = _z; }
-	POGL_VECTOR3F(const POGL_VECTOR3F& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; }
-	inline POGL_VECTOR3F& operator=(const POGL_VECTOR3F& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; return *this; }
-} POGL_COLOR3F;
+	POGL_VECTOR3() {}
+	POGL_VECTOR3(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z) { x = _x; y = _y; z = _z; }
+	POGL_VECTOR3(const POGL_VECTOR3& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; }
+	inline POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; return *this; }
+} POGL_COLOR3;
 
-typedef struct POGL_VECTOR3D
-{
-	union {
-		struct {
-			POGL_DOUBLE x;
-			POGL_DOUBLE y;
-			POGL_DOUBLE z;
-		};
-		struct {
-			POGL_DOUBLE r;
-			POGL_DOUBLE g;
-			POGL_DOUBLE b;
-		};
-		struct {
-			POGL_DOUBLE s;
-			POGL_DOUBLE t;
-			POGL_DOUBLE r;
-		};
-		POGL_DOUBLE vec[3];
-	};
-
-	POGL_VECTOR3D() {}
-	POGL_VECTOR3D(const POGL_DOUBLE _x, const POGL_DOUBLE _y, const POGL_DOUBLE _z) { x = _x; y = _y; z = _z; }
-	POGL_VECTOR3D(const POGL_VECTOR3D& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; }
-	inline POGL_VECTOR3D& operator=(const POGL_VECTOR3D& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; return *this; }
-} POGL_COLOR3D;
-
-typedef struct POGL_VECTOR4F
+typedef struct POGL_VECTOR4
 {
 	union {
 		struct {
@@ -598,43 +563,13 @@ typedef struct POGL_VECTOR4F
 		POGL_FLOAT vec[4];
 	};
 
-	POGL_VECTOR4F() {}
-	POGL_VECTOR4F(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z, const POGL_FLOAT _w) { x = _x; y = _y; z = _z; w = _w; }
-	POGL_VECTOR4F(const POGL_VECTOR4F& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
-	inline POGL_VECTOR4F& operator=(const POGL_VECTOR4F& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; return *this; }
-} POGL_COLOR4F;
+	POGL_VECTOR4() {}
+	POGL_VECTOR4(const POGL_FLOAT _x, const POGL_FLOAT _y, const POGL_FLOAT _z, const POGL_FLOAT _w) { x = _x; y = _y; z = _z; w = _w; }
+	POGL_VECTOR4(const POGL_VECTOR4& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
+	inline POGL_VECTOR4& operator=(const POGL_VECTOR4& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; return *this; }
+} POGL_COLOR4;
 
-typedef struct POGL_VECTOR4D
-{
-	union {
-		struct {
-			POGL_DOUBLE x;
-			POGL_DOUBLE y;
-			POGL_DOUBLE z;
-			POGL_DOUBLE w;
-		};
-		struct {
-			POGL_DOUBLE r;
-			POGL_DOUBLE g;
-			POGL_DOUBLE b;
-			POGL_DOUBLE a;
-		};
-		struct {
-			POGL_DOUBLE s;
-			POGL_DOUBLE t;
-			POGL_DOUBLE r;
-			POGL_DOUBLE q;
-		};
-		POGL_DOUBLE vec[4];
-	};
-
-	POGL_VECTOR4D() {}
-	POGL_VECTOR4D(const POGL_DOUBLE _x, const POGL_DOUBLE _y, const POGL_DOUBLE _z, const POGL_DOUBLE _w) { x = _x; y = _y; z = _z; w = _w; }
-	POGL_VECTOR4D(const POGL_VECTOR4D& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; }
-	inline POGL_VECTOR4D& operator=(const POGL_VECTOR4D& rhs) { x = rhs.x; y = rhs.y; z = rhs.z; w = rhs.w; return *this; }
-} POGL_COLOR4D;
-
-struct POGL_RECTI
+struct POGL_RECT
 {
 	union {
 		struct {
@@ -646,31 +581,14 @@ struct POGL_RECTI
 		POGL_INT32 size[4];
 	};
 
-	POGL_RECTI() {}
-	POGL_RECTI(const POGL_INT32 _x, const POGL_INT32 _y, const POGL_INT32 _width, const POGL_INT32 _height) { x = _x; y = _y; width = _width; height = _height; }
-	POGL_RECTI(const POGL_RECTI& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; }
-	~POGL_RECTI() {}
-	inline POGL_RECTI& operator=(const POGL_RECTI& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; return *this; }
+	POGL_RECT() {}
+	POGL_RECT(const POGL_INT32 _x, const POGL_INT32 _y, const POGL_INT32 _width, const POGL_INT32 _height) { x = _x; y = _y; width = _width; height = _height; }
+	POGL_RECT(const POGL_RECT& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; }
+	~POGL_RECT() {}
+	inline POGL_RECT& operator=(const POGL_RECT& rhs) { x = rhs.x; y = rhs.y; width = rhs.width; height = rhs.height; return *this; }
 };
 
-struct POGL_MAT4D
-{
-	union {
-		struct {
-			POGL_DOUBLE 
-			_11, _21, _31, _41,
-			_12, _22, _32, _42,
-			_13, _23, _33, _43,
-			_14, _24, _34, _44;
-		};
-		struct {
-			POGL_DOUBLE m[4][4];
-		};
-		POGL_DOUBLE vec[16];
-	};
-};
-
-struct POGL_MAT4F
+struct POGL_MAT4
 {
 	union {
 		struct {
@@ -751,10 +669,10 @@ struct POGL_VERTEX_LAYOUT
 */
 struct POGL_POSITION_VERTEX
 {
-	POGL_VECTOR3F position;
+	POGL_VECTOR3 position;
 
 	POGL_POSITION_VERTEX() {}
-	POGL_POSITION_VERTEX(const POGL_VECTOR3F& p) { position = p; }
+	POGL_POSITION_VERTEX(const POGL_VECTOR3& p) { position = p; }
 	POGL_POSITION_VERTEX(const POGL_POSITION_VERTEX& v) { position = v.position; }
 	~POGL_POSITION_VERTEX() {}
 	inline POGL_POSITION_VERTEX& operator=(const POGL_POSITION_VERTEX& rhs) { position = rhs.position; return *this; }
@@ -763,7 +681,7 @@ struct POGL_POSITION_VERTEX
 /* Vertex layout for the POGL_POSITION_VERTEX struct. */
 static const POGL_VERTEX_LAYOUT POGL_POSITION_VERTEX_LAYOUT = {
 	{
-		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
+		{ sizeof(POGL_VECTOR3), POGLVertexType::FLOAT, false },
 		0
 	},
 	sizeof(POGL_POSITION_VERTEX)
@@ -774,11 +692,11 @@ static const POGL_VERTEX_LAYOUT POGL_POSITION_VERTEX_LAYOUT = {
 */
 struct POGL_POSITION_COLOR_VERTEX
 {
-	POGL_VECTOR3F position;
-	POGL_COLOR4F color;
+	POGL_VECTOR3 position;
+	POGL_COLOR4 color;
 
 	POGL_POSITION_COLOR_VERTEX() {}
-	POGL_POSITION_COLOR_VERTEX(const POGL_VECTOR3F& p, const POGL_COLOR4F& c) { position = p; color = c; }
+	POGL_POSITION_COLOR_VERTEX(const POGL_VECTOR3& p, const POGL_COLOR4& c) { position = p; color = c; }
 	POGL_POSITION_COLOR_VERTEX(const POGL_POSITION_COLOR_VERTEX& v) { position = v.position; color = v.color; }
 	~POGL_POSITION_COLOR_VERTEX() {}
 	inline POGL_POSITION_COLOR_VERTEX& operator=(const POGL_POSITION_COLOR_VERTEX& rhs) { position = rhs.position; color = rhs.color;  return *this; }
@@ -787,8 +705,8 @@ struct POGL_POSITION_COLOR_VERTEX
 /* Vertex layout for the POGL_POSITION_COLOR_VERTEX struct. */
 static const POGL_VERTEX_LAYOUT POGL_POSITION_COLOR_VERTEX_LAYOUT = {
 	{ 
-		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
-		{ sizeof(POGL_COLOR4F), POGLVertexType::FLOAT, false },
+		{ sizeof(POGL_VECTOR3), POGLVertexType::FLOAT, false },
+		{ sizeof(POGL_COLOR4), POGLVertexType::FLOAT, false },
 		0
 	},
 	sizeof(POGL_POSITION_COLOR_VERTEX)
@@ -799,11 +717,11 @@ static const POGL_VERTEX_LAYOUT POGL_POSITION_COLOR_VERTEX_LAYOUT = {
 */
 struct POGL_POSITION_TEXCOORD_VERTEX
 {
-	POGL_VECTOR3F position;
-	POGL_VECTOR2F texCoord;
+	POGL_VECTOR3 position;
+	POGL_VECTOR2 texCoord;
 
 	POGL_POSITION_TEXCOORD_VERTEX() {}
-	POGL_POSITION_TEXCOORD_VERTEX(const POGL_VECTOR3F& p, const POGL_VECTOR2F& t) { position = p; texCoord = t; }
+	POGL_POSITION_TEXCOORD_VERTEX(const POGL_VECTOR3& p, const POGL_VECTOR2& t) { position = p; texCoord = t; }
 	POGL_POSITION_TEXCOORD_VERTEX(const POGL_POSITION_TEXCOORD_VERTEX& v) { position = v.position; texCoord = v.texCoord; }
 	~POGL_POSITION_TEXCOORD_VERTEX() {}
 	inline POGL_POSITION_TEXCOORD_VERTEX& operator=(const POGL_POSITION_TEXCOORD_VERTEX& rhs) { position = rhs.position; texCoord = rhs.texCoord;  return *this; }
@@ -812,9 +730,9 @@ struct POGL_POSITION_TEXCOORD_VERTEX
 /* Vertex layout for the POGL_POSITION_TEXCOORD_VERTEX struct. */
 static const POGL_VERTEX_LAYOUT POGL_POSITION_TEXCOORD_VERTEX_LAYOUT = {
 	{ 
-		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
+		{ sizeof(POGL_VECTOR3), POGLVertexType::FLOAT, false },
 		{ 0 }, 
-		{ sizeof(POGL_VECTOR2F), POGLVertexType::FLOAT, false },
+		{ sizeof(POGL_VECTOR2), POGLVertexType::FLOAT, false },
 		0
 	},
 	sizeof(POGL_POSITION_TEXCOORD_VERTEX)
@@ -1093,7 +1011,7 @@ public:
 
 		\param viewport
 	*/
-	virtual void SetViewport(const POGL_RECTI& viewport) = 0;
+	virtual void SetViewport(const POGL_RECT& viewport) = 0;
 };
 
 /*!
@@ -1204,18 +1122,11 @@ public:
 	virtual void SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d) = 0;
 	virtual void SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count) = 0;
 
-	virtual void SetMatrix(const POGL_MAT4F& mat4) = 0;
-	virtual void SetMatrix(const POGL_MAT4D& mat4) = 0;
+	virtual void SetMatrix(const POGL_MAT4& mat4) = 0;
 
-	virtual void SetVector2I(const POGL_VECTOR2I& vec) = 0;
-	virtual void SetVector2F(const POGL_VECTOR2F& vec) = 0;
-	virtual void SetVector2D(const POGL_VECTOR2D& vec) = 0;
-
-	virtual void SetVector3F(const POGL_VECTOR3F& vec) = 0;
-	virtual void SetVector3D(const POGL_VECTOR3D& vec) = 0;
-
-	virtual void SetVector4F(const POGL_VECTOR4F& vec) = 0;
-	virtual void SetVector4D(const POGL_VECTOR4D& vec) = 0;
+	virtual void SetVector2(const POGL_VECTOR2& vec) = 0;
+	virtual void SetVector3(const POGL_VECTOR3& vec) = 0;
+	virtual void SetVector4(const POGL_VECTOR4& vec) = 0;
 
 	virtual IPOGLSamplerState* GetSamplerState() = 0;
 
@@ -1423,7 +1334,7 @@ public:
 
 		\param viewport
 	*/
-	virtual void SetViewport(const POGL_RECTI& viewport) = 0;
+	virtual void SetViewport(const POGL_RECT& viewport) = 0;
 };
 
 /*!
@@ -1592,15 +1503,6 @@ class POGLStateException : public POGLException {
 public:
 	POGLStateException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLStateException();
-};
-
-/*!
-	\brief Excepton thrown if synchronization between threads failed.
-*/
-class POGLSyncException : public POGLException {
-public:
-	POGLSyncException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLSyncException();
 };
 
 #include <cstdarg>

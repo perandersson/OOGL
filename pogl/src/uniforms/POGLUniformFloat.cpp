@@ -138,32 +138,17 @@ void POGLUniformFloat::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 		mValues[i] = (POGL_FLOAT)ptr[i];
 }
 
-void POGLUniformFloat::SetVector2F(const POGL_VECTOR2F& vec)
+void POGLUniformFloat::SetVector2(const POGL_VECTOR2& vec)
 {
 	SetFloat(vec.x, vec.y);
 }
 
-void POGLUniformFloat::SetVector2D(const POGL_VECTOR2D& vec)
-{
-	SetFloat((POGL_FLOAT)vec.x, (POGL_FLOAT)vec.y);
-}
-
-void POGLUniformFloat::SetVector3F(const POGL_VECTOR3F& vec)
+void POGLUniformFloat::SetVector3(const POGL_VECTOR3& vec)
 {
 	SetFloat(vec.x, vec.y, vec.z);
 }
 
-void POGLUniformFloat::SetVector3D(const POGL_VECTOR3D& vec)
-{
-	SetFloat((POGL_FLOAT)vec.x, (POGL_FLOAT)vec.y, (POGL_FLOAT)vec.z);
-}
-
-void POGLUniformFloat::SetVector4F(const POGL_VECTOR4F& vec)
+void POGLUniformFloat::SetVector4(const POGL_VECTOR4& vec)
 {
 	SetFloat(vec.x, vec.y, vec.z, vec.w);
-}
-
-void POGLUniformFloat::SetVector4D(const POGL_VECTOR4D& vec)
-{
-	SetFloat((POGL_FLOAT)vec.x, (POGL_FLOAT)vec.y, (POGL_FLOAT)vec.z, (POGL_FLOAT)vec.w);
 }

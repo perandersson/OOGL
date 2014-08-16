@@ -46,11 +46,11 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 struct CustomVertex
 {
-	POGL_VECTOR3F position;
+	POGL_VECTOR3 position;
 	POGL_FLOAT value;
 
 	CustomVertex() {}
-	CustomVertex(const POGL_VECTOR3F& p, POGL_FLOAT v) { position = p; value = v; }
+	CustomVertex(const POGL_VECTOR3& p, POGL_FLOAT v) { position = p; value = v; }
 	CustomVertex(const CustomVertex& v) { position = v.position; value = v.value; }
 	~CustomVertex() {}
 	inline CustomVertex& operator=(const CustomVertex& rhs) { position = rhs.position; value = rhs.value;  return *this; }
@@ -83,7 +83,7 @@ static const POGL_VERTEX_LAYOUT CustomVertexLayout = {
 		// The third value indicates if we want OpenGL to normalize the value on input. This is almost always "false".
 		//
 
-		{ sizeof(POGL_VECTOR3F), POGLVertexType::FLOAT, false },
+		{ sizeof(POGL_VECTOR3), POGLVertexType::FLOAT, false },
 
 		//
 		// Do not use attribute location = 1
@@ -147,9 +147,9 @@ int main()
 		//
 
 		const CustomVertex VERTICES[] = {
-			CustomVertex(POGL_VECTOR3F(-0.5f, -0.5f, 0.0f), 1.0f),
-			CustomVertex(POGL_VECTOR3F(0.0f, 0.5f, 0.0f), 0.0f),
-			CustomVertex(POGL_VECTOR3F(0.5f, -0.5f, 0.0f), 1.0f)
+			CustomVertex(POGL_VECTOR3(-0.5f, -0.5f, 0.0f), 1.0f),
+			CustomVertex(POGL_VECTOR3(0.0f, 0.5f, 0.0f), 0.0f),
+			CustomVertex(POGL_VECTOR3(0.5f, -0.5f, 0.0f), 1.0f)
 		};
 
 		//

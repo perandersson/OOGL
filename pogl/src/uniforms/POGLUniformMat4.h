@@ -9,9 +9,8 @@ public:
 
 	void Apply();
 
-	void SetMatrix(const POGL_MAT4F& mat4);
-	void SetMatrix(const POGL_MAT4D& mat4);
+	void SetMatrix(const POGL_MAT4& mat4);
 
 private:
-	POGL_MAT4D mValue;
+	POGL_MAT4 mValue;
 };

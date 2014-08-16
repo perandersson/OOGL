@@ -62,11 +62,11 @@ int main()
 		//
 
 		std::vector<POGL_POSITION_VERTEX> vertices;
-		vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3F(0, 0, 0)));
+		vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(0, 0, 0)));
 		for (POGL_UINT32 i = 0; i < CIRCLE_PTS; ++i) {
 			const POGL_FLOAT x = 0.1f * cosf(i * 0.0174532925f);
 			const POGL_FLOAT y = 0.1f * sinf(i * 0.0174532925f);
-			vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3F(x, y, 0)));
+			vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(x, y, 0)));
 		}
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::DYNAMIC);
 

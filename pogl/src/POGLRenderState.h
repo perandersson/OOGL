@@ -119,7 +119,7 @@ public:
 	virtual void SetStencilTest(bool b);
 	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
 	virtual void SetBlend(bool b);
-	virtual void SetViewport(const POGL_RECTI& viewport);
+	virtual void SetViewport(const POGL_RECT& viewport);
 
 private:
 	/*!
@@ -161,7 +161,7 @@ private:
 	POGLSrcFactor::Enum mSrcFactor;
 	POGLDstFactor::Enum mDstFactor;
 	bool mBlending;
-	POGL_RECTI mViewport;
+	POGL_RECT mViewport;
 
 	//
 	// Textures

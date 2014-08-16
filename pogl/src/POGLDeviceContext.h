@@ -40,7 +40,7 @@ public:
 	virtual void* Map(IPOGLResource* resource, POGLResourceMapType::Enum e);
 	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	virtual void Unmap(IPOGLResource* resource);
-	virtual void SetViewport(const POGL_RECTI& viewport);
+	virtual void SetViewport(const POGL_RECT& viewport);
 
 	/*!
 		\brief 

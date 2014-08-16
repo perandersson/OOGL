@@ -137,8 +137,3 @@ void POGLUniformInt32::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = (POGL_INT32)ptr[i];
 }
-
-void POGLUniformInt32::SetVector2I(const POGL_VECTOR2I& vec)
-{
-	SetUInt32((POGL_UINT32)vec.x, (POGL_UINT32)vec.y);
-}

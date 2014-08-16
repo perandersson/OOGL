@@ -21,14 +21,9 @@ public:
 	void SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d);
 	void SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count);
 
-	void SetVector2F(const POGL_VECTOR2F& vec);
-	void SetVector2D(const POGL_VECTOR2D& vec);
-
-	void SetVector3F(const POGL_VECTOR3F& vec);
-	void SetVector3D(const POGL_VECTOR3D& vec);
-
-	void SetVector4F(const POGL_VECTOR4F& vec);
-	void SetVector4D(const POGL_VECTOR4D& vec);
+	void SetVector2(const POGL_VECTOR2& vec);
+	void SetVector3(const POGL_VECTOR3& vec);
+	void SetVector4(const POGL_VECTOR4& vec);
 
 private:
 	POGL_INT32 mCount;

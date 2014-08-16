@@ -122,7 +122,7 @@ void POGLDeferredRenderState::SetBlend(bool b)
 	cmd->value = b;
 }
 
-void POGLDeferredRenderState::SetViewport(const POGL_RECTI& viewport)
+void POGLDeferredRenderState::SetViewport(const POGL_RECT& viewport)
 {
 	POGLSetViewportCommand* cmd = (POGLSetViewportCommand*)mDeviceContext->AddCommand(&POGLSetViewport_Command, &POGLNothing_Release);
 	cmd->viewport = viewport;

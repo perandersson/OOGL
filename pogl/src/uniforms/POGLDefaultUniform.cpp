@@ -117,47 +117,22 @@ void POGLDefaultUniform::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 	assert_with_message(false, "Invalid uniform type");
 }
 
-void POGLDefaultUniform::SetMatrix(const POGL_MAT4F& mat4)
+void POGLDefaultUniform::SetMatrix(const POGL_MAT4& mat4)
 {
 	assert_with_message(false, "Invalid uniform type");
 }
 
-void POGLDefaultUniform::SetMatrix(const POGL_MAT4D& mat4)
+void POGLDefaultUniform::SetVector2(const POGL_VECTOR2& vec)
 {
 	assert_with_message(false, "Invalid uniform type");
 }
 
-void POGLDefaultUniform::SetVector2I(const POGL_VECTOR2I& vec)
+void POGLDefaultUniform::SetVector3(const POGL_VECTOR3& vec)
 {
 	assert_with_message(false, "Invalid uniform type");
 }
 
-void POGLDefaultUniform::SetVector2F(const POGL_VECTOR2F& vec)
-{
-	assert_with_message(false, "Invalid uniform type");
-}
-
-void POGLDefaultUniform::SetVector2D(const POGL_VECTOR2D& vec)
-{
-	assert_with_message(false, "Invalid uniform type");
-}
-
-void POGLDefaultUniform::SetVector3F(const POGL_VECTOR3F& vec)
-{
-	assert_with_message(false, "Invalid uniform type");
-}
-
-void POGLDefaultUniform::SetVector3D(const POGL_VECTOR3D& vec)
-{
-	assert_with_message(false, "Invalid uniform type");
-}
-
-void POGLDefaultUniform::SetVector4F(const POGL_VECTOR4F& vec)
-{
-	assert_with_message(false, "Invalid uniform type");
-}
-
-void POGLDefaultUniform::SetVector4D(const POGL_VECTOR4D& vec)
+void POGLDefaultUniform::SetVector4(const POGL_VECTOR4& vec)
 {
 	assert_with_message(false, "Invalid uniform type");
 }

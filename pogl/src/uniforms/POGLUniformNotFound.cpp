@@ -89,39 +89,19 @@ void POGLUniformNotFound::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 {
 }
 
-void POGLUniformNotFound::SetMatrix(const POGL_MAT4F& mat4)
+void POGLUniformNotFound::SetMatrix(const POGL_MAT4& mat4)
 {
 }
 
-void POGLUniformNotFound::SetMatrix(const POGL_MAT4D& mat4)
+void POGLUniformNotFound::SetVector2(const POGL_VECTOR2& vec)
 {
 }
 
-void POGLUniformNotFound::SetVector2I(const POGL_VECTOR2I& vec)
+void POGLUniformNotFound::SetVector3(const POGL_VECTOR3& vec)
 {
 }
 
-void POGLUniformNotFound::SetVector2F(const POGL_VECTOR2F& vec)
-{
-}
-
-void POGLUniformNotFound::SetVector2D(const POGL_VECTOR2D& vec)
-{
-}
-
-void POGLUniformNotFound::SetVector3F(const POGL_VECTOR3F& vec)
-{
-}
-
-void POGLUniformNotFound::SetVector3D(const POGL_VECTOR3D& vec)
-{
-}
-
-void POGLUniformNotFound::SetVector4F(const POGL_VECTOR4F& vec)
-{
-}
-
-void POGLUniformNotFound::SetVector4D(const POGL_VECTOR4D& vec)
+void POGLUniformNotFound::SetVector4(const POGL_VECTOR4& vec)
 {
 }
 

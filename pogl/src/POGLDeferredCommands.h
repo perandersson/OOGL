@@ -212,7 +212,7 @@ struct POGLSetViewportCommand
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
 
-			POGL_RECTI viewport;
+			POGL_RECT viewport;
 		};
 	};
 };

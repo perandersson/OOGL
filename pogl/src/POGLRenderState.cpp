@@ -251,7 +251,7 @@ void POGLRenderState::SetBlend(bool b)
 	CHECK_GL("Cannot enable/disable blendng");
 }
 
-void POGLRenderState::SetViewport(const POGL_RECTI& viewport)
+void POGLRenderState::SetViewport(const POGL_RECT& viewport)
 {
 	if (mViewport.x == viewport.x && mViewport.y == viewport.y && mViewport.width == viewport.width && mViewport.height == viewport.height)
 		return;

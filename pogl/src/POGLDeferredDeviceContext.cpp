@@ -186,7 +186,7 @@ IPOGLIndexBuffer* POGLDeferredDeviceContext::CreateIndexBuffer(const void* memor
 IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
 {
 	if (effect == nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing effect");
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to apply a non-existing effect");
 
 	if (mRenderState == nullptr) {
 		mRenderState = new POGLDeferredRenderState(this);
@@ -202,7 +202,7 @@ IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
 void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
 	if (mMap != nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You are not allowed to map more than one resource at the same time");
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
 
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
@@ -222,14 +222,14 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
 	if (mMap != nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You are not allowed to map more than one resource at the same time");
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
 
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
 		if (offset + length > memorySize)
-			THROW_EXCEPTION(POGLResourceException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
+			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 		
 		POGLMapRangeVertexBufferCommand* map = (POGLMapRangeVertexBufferCommand*)AddCommand(&POGLMapRangeVertexBuffer_Command, &POGLMapRangeVertexBuffer_Release);
 		map->offset = offset;
@@ -247,7 +247,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 {
 	if (mMap == nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You are not allowed to unmap a non-mapped resource");
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to unmap a non-mapped resource");
 
 	auto type = resource->GetResourceType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
@@ -258,7 +258,7 @@ void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeferredDeviceContext::SetViewport(const POGL_RECTI& viewport)
+void POGLDeferredDeviceContext::SetViewport(const POGL_RECT& viewport)
 {
 	mRenderState->SetViewport(viewport);
 }
