@@ -220,7 +220,7 @@ struct POGLSetViewportCommand
 extern void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetViewportCommand));
 
-struct POGLApplyEffectCommand
+struct POGLApplyProgramCommand
 {
 	union {
 		POGLDeferredCommand _memory;
@@ -228,13 +228,13 @@ struct POGLApplyEffectCommand
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
 
-			class IPOGLEffect* effect;
+			IPOGLProgram* program;
 		};
 	};
 };
-extern void POGLApplyEffect_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLApplyEffect_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLApplyEffectCommand));
+extern void POGLApplyProgram_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+extern void POGLApplyProgram_Release(POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLApplyProgramCommand));
 
 struct POGLCreateFrameBufferCommand
 {

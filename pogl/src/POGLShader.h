@@ -1,11 +1,11 @@
 #pragma once
 #include "config.h"
 
-class POGLShaderProgram : public IPOGLShaderProgram
+class POGLShader : public IPOGLShader
 {
 public:
-	POGLShaderProgram(GLuint shaderID, POGLShaderProgramType::Enum type);
-	~POGLShaderProgram();
+	POGLShader(GLuint shaderID, POGLShaderType::Enum shaderType);
+	virtual ~POGLShader();
 	
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer
@@ -24,8 +24,8 @@ public:
 	/*!
 		\brief Retrieves this programs type
 	*/
-	inline POGLShaderProgramType::Enum GetType() const {
-		return mType;
+	inline POGLShaderType::Enum GetShaderType() const {
+		return mShaderType;
 	}
 	
 // IPOGLInterface
@@ -35,11 +35,11 @@ public:
 
 // IPOGLResource
 public:
-	virtual POGLResourceType::Enum GetResourceType() const;
+	virtual POGLResourceType::Enum GetType() const;
 
 private:
 	REF_COUNTER mRefCount;
 	POGL_UINT32 mUID;
 	GLuint mShaderID;
-	POGLShaderProgramType::Enum mType;
+	POGLShaderType::Enum mShaderType;
 };

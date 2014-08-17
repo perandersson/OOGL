@@ -23,9 +23,9 @@ public:
 	}
 
 	virtual IPOGLDevice* GetDevice();
-	virtual IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type);
-	virtual IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type);
-	virtual IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs);
+	virtual IPOGLShader* CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type);
+	virtual IPOGLShader* CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type);
+	virtual IPOGLProgram* CreateProgramFromShaders(IPOGLShader** shaders);
 	virtual IPOGLTexture1D* CreateTexture1D();
 	virtual IPOGLTexture2D* CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes);
 	virtual IPOGLTexture3D* CreateTexture3D();
@@ -40,7 +40,7 @@ public:
 	virtual IPOGLResource* CloneResource(IPOGLResource* resource);
 	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination);
 	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size);
-	virtual IPOGLRenderState* Apply(IPOGLEffect* effect);
+	virtual IPOGLRenderState* Apply(IPOGLProgram* program);
 	virtual void* Map(IPOGLResource* resource, POGLResourceMapType::Enum e);
 	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	virtual void Unmap(IPOGLResource* resource);

@@ -1,5 +1,5 @@
 #pragma once
-#include "POGLEffectState.h"
+#include "POGLProgramState.h"
 #include <memory>
 
 class POGLDeviceContext;
@@ -10,32 +10,32 @@ class POGLSamplerObject;
 class POGLFramebuffer;
 class POGLRenderState : public IPOGLRenderState
 {
-	typedef std::hash_map<POGL_UINT32, std::shared_ptr<POGLEffectState>> EffectStates;
+	typedef std::hash_map<POGL_UINT32, std::shared_ptr<POGLProgramState>> EffectStates;
 
 public:
 	POGLRenderState(POGLDeviceContext* context);
 	virtual ~POGLRenderState();
 	
 	/*!
-		\brief Applies the supplied effect to this render state
+		\brief Applies the supplied program to this render state
 
-		\param effect
+		\param program
 	*/
-	void Apply(IPOGLEffect* effect);
+	void Apply(IPOGLProgram* program);
 
 	/*!
-		\brief Retrieves the effect state for the supplied effect
+		\brief Retrieves the state for the supplied program
 
-		\return effect
+		\return program
 	*/
-	POGLEffectState* GetEffectState(POGLEffect* effect);
+	POGLProgramState* GetProgramState(POGLProgram* program);
 
 
 	/*!
-		\brief Check to see if the current effect is of the supplied type
+		\brief Check to see if the current program is of the supplied type
 	*/
-	inline bool IsEffectActive(POGL_UINT32 effectUID) const {
-		return mEffectUID == effectUID;
+	inline bool IsProgramActive(POGL_UINT32 effectUID) const {
+		return mProgramUID == effectUID;
 	}
 
 	/*!
@@ -107,6 +107,7 @@ public:
 public:
 	virtual void Clear(POGL_UINT32 clearBits);
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
+	virtual IPOGLUniform* FindUniformByName(const POGL_STRING& name);
 	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer);
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
@@ -123,11 +124,11 @@ public:
 
 private:
 	/*!
-		\brief Binds the supplied effect to this state
+		\brief Binds the supplied program to this state
 
 		\param effect
 	*/
-	void BindEffect(POGLEffect* effect);
+	void BindProgram(POGLProgram* program);
 
 	/*!
 		\brief Binds the supplied buffers
@@ -138,9 +139,9 @@ private:
 	REF_COUNTER mRefCount;
 	POGLDeviceContext* mDeviceContext;
 
-	IPOGLEffect* mEffect;
-	POGL_UINT32 mEffectUID;
-	POGLEffectState* mCurrentEffectState;
+	POGLProgram* mProgram;
+	POGL_UINT32 mProgramUID;
+	POGLProgramState* mCurrentProgramState;
 	EffectStates mEffectStates;
 	bool mApplyCurrentEffectState;
 

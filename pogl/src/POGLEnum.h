@@ -13,13 +13,11 @@ public:
 	static GLenum Convert(POGLTextureWrap::Enum e);
 	static GLenum Convert(POGLBufferUsage::Enum e);
 	static GLenum Convert(POGLVertexType::Enum e);
-	static GLenum Convert(POGLShaderProgramType::Enum e);
+	static GLenum Convert(POGLShaderType::Enum e);
 
 	static GLenum Convert(POGLDepthFunc::Enum e);
 	static GLenum Convert(POGLSrcFactor::Enum e);
 	static GLenum Convert(POGLDstFactor::Enum e);
-	static GLenum ConvertForMapBuffer(POGLResourceMapType::Enum e);
-	static GLbitfield ConvertForMapBufferRange(POGLResourceMapType::Enum e);
 	//static GLenum Convert(FrontFace::Enum e);
 	//static GLenum Convert(CullFace::Enum e);
 	//static GLenum Convert(PolygonMode::Enum e);

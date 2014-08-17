@@ -207,16 +207,16 @@ void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRende
 	state->SetViewport(cmd->viewport);
 }
 
-void POGLApplyEffect_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLApplyProgram_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
-	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)command;
-	state->Apply(cmd->effect);
+	POGLApplyProgramCommand* cmd = (POGLApplyProgramCommand*)command;
+	state->Apply(cmd->program);
 }
 
-void POGLApplyEffect_Release(POGLDeferredCommand* command)
+void POGLApplyProgram_Release(POGLDeferredCommand* command)
 {
-	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)command;
-	cmd->effect->Release();
+	POGLApplyProgramCommand* cmd = (POGLApplyProgramCommand*)command;
+	cmd->program->Release();
 }
 
 void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)

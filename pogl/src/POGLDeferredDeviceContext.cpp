@@ -83,17 +83,17 @@ IPOGLDevice* POGLDeferredDeviceContext::GetDevice()
 	return mDevice;
 }
 
-IPOGLShaderProgram* POGLDeferredDeviceContext::CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type)
+IPOGLShader* POGLDeferredDeviceContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLShaderProgram* POGLDeferredDeviceContext::CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type)
+IPOGLShader* POGLDeferredDeviceContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLEffect* POGLDeferredDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs)
+IPOGLProgram* POGLDeferredDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
@@ -231,18 +231,18 @@ void POGLDeferredDeviceContext::CopyResource(IPOGLResource* source, IPOGLResourc
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
+IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLProgram* program)
 {
-	if (effect == nullptr)
-		THROW_EXCEPTION(POGLStateException, "You are not allowed to apply a non-existing effect");
+	if (program == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to apply a non-existing program");
 
 	if (mRenderState == nullptr) {
 		mRenderState = new POGLDeferredRenderState(this);
 	}
 
-	POGLApplyEffectCommand* cmd = (POGLApplyEffectCommand*)AddCommand(&POGLApplyEffect_Command, &POGLApplyEffect_Release);
-	cmd->effect = effect;
-	cmd->effect->AddRef();
+	POGLApplyProgramCommand* cmd = (POGLApplyProgramCommand*)AddCommand(&POGLApplyProgram_Command, &POGLApplyProgram_Release);
+	cmd->program = program;
+	cmd->program->AddRef();
 	mRenderState->AddRef();
 	return mRenderState;
 }
@@ -252,7 +252,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 	if (mMap != nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
 
-	auto type = resource->GetResourceType();
+	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 		POGLMapVertexBufferCommand* map = (POGLMapVertexBufferCommand*)AddCommand(&POGLMapVertexBuffer_Command, &POGLMapVertexBuffer_Release);
@@ -272,7 +272,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 	if (mMap != nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
 
-	auto type = resource->GetResourceType();
+	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
@@ -297,7 +297,7 @@ void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 	if (mMap == nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to unmap a non-mapped resource");
 
-	auto type = resource->GetResourceType();
+	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		mMap = nullptr;
 		return;

@@ -4,7 +4,7 @@
 class POGLUniformInt32 : public POGLDefaultUniform
 {
 public:
-	POGLUniformInt32(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLUniformInt32(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
 	~POGLUniformInt32();
 
 	void Apply();

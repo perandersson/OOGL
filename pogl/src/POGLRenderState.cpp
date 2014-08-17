@@ -1,7 +1,7 @@
 #include "MemCheck.h"
 #include "POGLRenderState.h"
 #include "POGLDeviceContext.h"
-#include "POGLEffectData.h"
+#include "POGLProgramData.h"
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
 #include "POGLEnum.h"
@@ -10,7 +10,7 @@
 #include "POGLFramebuffer.h"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
-: mRefCount(1), mDeviceContext(context), mEffect(nullptr), mEffectUID(0), mCurrentEffectState(nullptr), mApplyCurrentEffectState(false),
+: mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mCurrentProgramState(nullptr), mApplyCurrentEffectState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), mViewport(0, 0, 0, 0),
@@ -36,7 +36,7 @@ void POGLRenderState::Release()
 {
 	mApplyCurrentEffectState = true;
 	if (--mRefCount == 0) {
-		POGL_SAFE_RELEASE_UID(mEffect);
+		POGL_SAFE_RELEASE_UID(mProgram);
 		POGL_SAFE_RELEASE_UID(mVertexBuffer);
 		POGL_SAFE_RELEASE_UID(mIndexBuffer);
 		POGL_SAFE_RELEASE_UID(mFramebuffer);
@@ -72,7 +72,12 @@ void POGLRenderState::Clear(POGL_UINT32 clearBits)
 
 IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_CHAR* name)
 {
-	return mCurrentEffectState->FindUniformByName(POGL_STRING(name));
+	return mCurrentProgramState->FindUniformByName(POGL_STRING(name));
+}
+
+IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_STRING& name)
+{
+	return mCurrentProgramState->FindUniformByName(name);
 }
 
 void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
@@ -261,18 +266,18 @@ void POGLRenderState::SetViewport(const POGL_RECT& viewport)
 	CHECK_GL("Could not set viewport");
 }
 
-void POGLRenderState::Apply(IPOGLEffect* effect)
+void POGLRenderState::Apply(IPOGLProgram* program)
 {
-	if (effect == nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing effect");
+	if (program == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing program");
 
 	// Bind the effect if neccessary
-	POGLEffect* effectImpl = static_cast<POGLEffect*>(effect);
-	BindEffect(effectImpl);
+	POGLProgram* programImpl = static_cast<POGLProgram*>(program);
+	BindProgram(programImpl);
 
 	// Retrieve the effect data
-	POGLEffectData data;
-	effectImpl->CopyEffectData(&data);
+	POGLProgramData data;
+	programImpl->CopyProgramData(&data);
 
 	//
 	// Update the render state with the (potentially) new properties
@@ -287,14 +292,13 @@ void POGLRenderState::Apply(IPOGLEffect* effect)
 	SetBlendFunc(data.srcFactor, data.dstFactor);
 }
 
-POGLEffectState* POGLRenderState::GetEffectState(POGLEffect* effect)
+POGLProgramState* POGLRenderState::GetProgramState(POGLProgram* program)
 {
-	assert_not_null(effect);
-	const POGL_UINT32 uid = effect->GetUID();
+	const POGL_UINT32 uid = program->GetUID();
 	auto it = mEffectStates.find(uid);
 	if (it == mEffectStates.end()) {
-		POGLEffectState* state = new POGLEffectState(effect, this, mDeviceContext);
-		mEffectStates.insert(std::make_pair(uid, std::shared_ptr<POGLEffectState>(state)));
+		POGLProgramState* state = new POGLProgramState(program, this, mDeviceContext);
+		mEffectStates.insert(std::make_pair(uid, std::shared_ptr<POGLProgramState>(state)));
 		return state;
 	}
 
@@ -314,21 +318,21 @@ void POGLRenderState::BindSamplerObject(POGLSamplerObject* samplerObject, POGL_U
 	CHECK_GL("Cannot bind sampler ID");
 }
 
-void POGLRenderState::BindEffect(POGLEffect* effect)
+void POGLRenderState::BindProgram(POGLProgram* program)
 {
-	const POGL_UINT32 uid = effect->GetUID();
-	if (uid == mEffectUID) {
+	const POGL_UINT32 uid = program->GetUID();
+	if (uid == mProgramUID) {
 		return;
 	}
 
-	if (mEffect != nullptr)
-		mEffect->Release();
+	if (mProgram != nullptr)
+		mProgram->Release();
 
-	mEffect = effect;
-	mEffect->AddRef();
-	mEffectUID = effect->GetUID();
-	glUseProgram(effect->GetProgramID());
-	mCurrentEffectState = GetEffectState(effect);
+	mProgram = program;
+	mProgram->AddRef();
+	mProgramUID = uid;
+	glUseProgram(mProgram->GetProgramID());
+	mCurrentProgramState = GetProgramState(program);
 	mApplyCurrentEffectState = true;
 
 	CHECK_GL("Could not bind the supplied effect");
@@ -337,7 +341,7 @@ void POGLRenderState::BindEffect(POGLEffect* effect)
 void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer)
 {
 	if (mApplyCurrentEffectState) {
-		mCurrentEffectState->ApplyUniforms();
+		mCurrentProgramState->ApplyUniforms();
 		mApplyCurrentEffectState = false;
 	}
 

@@ -135,10 +135,10 @@ int main()
 	try {
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
-		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
+		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -159,7 +159,7 @@ int main()
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), &CustomVertexLayout, POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
 
 		while (POGLProcessEvents()) {
-			IPOGLRenderState* state = context->Apply(simpleEffect);
+			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
@@ -177,7 +177,7 @@ int main()
 		//
 
 		vertexBuffer->Release();
-		simpleEffect->Release();
+		program->Release();
 		context->Release();
 	}
 	catch (POGLException e) {

@@ -89,17 +89,17 @@ int main()
 
 	try {
 		IPOGLDeviceContext* context = device->GetDeviceContext();
-		
+
 		//
 		// Load the vertex- and fragment shader used to render to the framebuffer render targets
 		//
 
-		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_VS, 
-			sizeof(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
-		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_FS, 
-			sizeof(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* framebufferEffect = context->CreateEffectFromPrograms(programs);
+		IPOGLShader* vertexShader = context->CreateShaderFromMemory(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_VS,
+			sizeof(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_FS,
+			sizeof(DRAW_VERTICES_TO_FRAMEBUFFER_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* framebufferProgram = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -107,10 +107,10 @@ int main()
 		// Load the vertex- and fragment shader used to render the resulted framebuffer to the screen
 		//
 
-		vertexShader = context->CreateShaderProgramFromMemory(TEXTURING_VS, sizeof(TEXTURING_VS), POGLShaderProgramType::VERTEX_SHADER);
-		fragmentShader = context->CreateShaderProgramFromMemory(TEXTURING_FS, sizeof(TEXTURING_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs2[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* resultEffect = context->CreateEffectFromPrograms(programs2);
+		vertexShader = context->CreateShaderFromMemory(TEXTURING_VS, sizeof(TEXTURING_VS), POGLShaderType::VERTEX_SHADER);
+		fragmentShader = context->CreateShaderFromMemory(TEXTURING_FS, sizeof(TEXTURING_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders2[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* resultProgram = context->CreateProgramFromShaders(shaders2);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -166,7 +166,7 @@ int main()
 		depthTexture->Release();
 
 		while (POGLProcessEvents()) {
-			IPOGLRenderState* state = context->Apply(framebufferEffect);
+			IPOGLRenderState* state = context->Apply(framebufferProgram);
 
 			//
 			// Set the framebuffer to the render state. This enables us to render to the attached textures
@@ -194,7 +194,7 @@ int main()
 			// and draw them on a fullscreen quad
 			//
 
-			state = context->Apply(resultEffect);
+			state = context->Apply(resultProgram);
 
 			//
 			// Detach the active framebuffer so that we render to the screen instead of to the textures
@@ -227,8 +227,8 @@ int main()
 		vertexBuffer->Release();
 		fullscreenVB->Release();
 		fullscreenIB->Release();
-		resultEffect->Release();
-		framebufferEffect->Release();
+		resultProgram->Release();
+		framebufferProgram->Release();
 		context->Release();
 	}
 	catch (POGLException e) {

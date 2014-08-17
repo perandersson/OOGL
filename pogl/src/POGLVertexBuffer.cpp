@@ -38,7 +38,7 @@ void POGLVertexBuffer::Release()
 	}
 }
 
-POGLResourceType::Enum POGLVertexBuffer::GetResourceType() const
+POGLResourceType::Enum POGLVertexBuffer::GetType() const
 {
 	return POGLResourceType::VERTEXBUFFER;
 }

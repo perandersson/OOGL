@@ -6,8 +6,8 @@
 #include "POGLTexture2D.h"
 #include "POGLEnum.h"
 
-POGLUniformSampler2D::POGLUniformSampler2D(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
-: POGLDefaultUniform(effect, state, context, componentID),
+POGLUniformSampler2D::POGLUniformSampler2D(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
+: POGLDefaultUniform(program, state, context, componentID),
 mTextureResource(nullptr), mTextureUID(0), mActiveTexture(activeTexture), mSamplerObject(samplerObject)
 {
 	assert_not_null(mSamplerObject);
@@ -40,7 +40,7 @@ void POGLUniformSampler2D::SetTexture(IPOGLTexture* texture)
 	if (texture == nullptr)
 		SetTextureResource(nullptr);
 	else {
-		auto type = texture->GetResourceType();
+		auto type = texture->GetType();
 		if (type == POGLResourceType::TEXTURE2D)
 			SetTextureResource(reinterpret_cast<POGLTexture2D*>(texture)->GetResourcePtr());
 	}

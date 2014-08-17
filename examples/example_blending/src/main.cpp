@@ -48,10 +48,10 @@ int main()
 	try {
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
-		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
+		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -77,14 +77,14 @@ int main()
 		// Setup effect properties. This can be done on the associated RenderState as well, but since we want this to be applied for all
 		// contexts when this applied we do it on the effect instead. 
 		//
-		// Changes made on the effect will NOT be applied until we call IPOGLDeviceContext::Apply(IPOGLEffect*)
+		// Changes made on the program will NOT be applied until the next time we call IPOGLDeviceContext::Apply(IPOGLProgram*)
 		//
 
-		simpleEffect->SetBlend(true);
-		simpleEffect->SetBlendFunc(POGLSrcFactor::SRC_COLOR, POGLDstFactor::ONE_MINUS_SRC_COLOR);
+		program->SetBlend(true);
+		program->SetBlendFunc(POGLSrcFactor::SRC_COLOR, POGLDstFactor::ONE_MINUS_SRC_COLOR);
 
 		while (POGLProcessEvents()) {
-			IPOGLRenderState* state = context->Apply(simpleEffect);
+			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
@@ -104,7 +104,7 @@ int main()
 
 		vertexBuffer->Release();
 		vertexBufferInv->Release();
-		simpleEffect->Release();
+		program->Release();
 		context->Release();
 	}
 	catch (POGLException e) {

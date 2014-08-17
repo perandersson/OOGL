@@ -39,10 +39,6 @@ public:
 	virtual void AddRef();
 	virtual void Release();
 	
-// IPOGLResource
-public:
-	virtual POGLResourceType::Enum GetResourceType() const;
-
 // IPOGLFramebuffer
 public:
 	virtual IPOGLTexture* GetTexture(POGL_UINT32 idx);

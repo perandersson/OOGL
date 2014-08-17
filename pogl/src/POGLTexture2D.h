@@ -35,7 +35,7 @@ public:
 	
 // IPOGLResource
 public:
-	virtual POGLResourceType::Enum GetResourceType() const;
+	virtual POGLResourceType::Enum GetType() const;
 
 // IPOGLTexture
 public:

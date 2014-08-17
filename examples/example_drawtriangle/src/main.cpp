@@ -63,10 +63,10 @@ int main()
 		// usable when drawing the geometry onto the screen. The array of IPOGLShaderProgram's must end with a nullptr (or 0).
 		//
 
-		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
-		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
+		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 
 		//
 		// The vertex- and fragment shaders are no longer needed. You can reuse the vertex- and fragment shader resources 
@@ -114,7 +114,7 @@ int main()
 			// preventing unneccessary OpenGL state changes. It is also used to help you synchronize resources between concurrent contexts.
 			//
 
-			IPOGLRenderState* state = context->Apply(simpleEffect);
+			IPOGLRenderState* state = context->Apply(program);
 
 			//
 			// Clear the color and depth buffer on the screen
@@ -147,7 +147,7 @@ int main()
 		//
 
 		vertexBuffer->Release();
-		simpleEffect->Release();
+		program->Release();
 		context->Release();
 	}
 	catch (POGLException e) {

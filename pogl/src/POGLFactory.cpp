@@ -125,7 +125,7 @@ GLuint POGLFactory::GenFramebufferObjectID(IPOGLTexture** textures, IPOGLTexture
 		POGL_UINT32 idx = 0;
 		for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
 			IPOGLTexture* texture = *ptr;
-			const POGLResourceType::Enum type = texture->GetResourceType();
+			const POGLResourceType::Enum type = texture->GetType();
 			if (type == POGLResourceType::TEXTURE2D) {
 				POGLTexture2D* t2d = static_cast<POGLTexture2D*>(texture);
 				POGLTextureResource* resource = t2d->GetResourcePtr();
@@ -139,7 +139,7 @@ GLuint POGLFactory::GenFramebufferObjectID(IPOGLTexture** textures, IPOGLTexture
 		}
 	}
 	if (depthStencilTexture != nullptr) {
-		const POGLResourceType::Enum type = depthStencilTexture->GetResourceType();
+		const POGLResourceType::Enum type = depthStencilTexture->GetType();
 		if (type == POGLResourceType::TEXTURE2D) {
 			POGLTexture2D* t2d = static_cast<POGLTexture2D*>(depthStencilTexture);
 			POGLTextureResource* resource = t2d->GetResourcePtr();

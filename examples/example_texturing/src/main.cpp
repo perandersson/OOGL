@@ -51,10 +51,10 @@ int main()
 	try {
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
-		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
+		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -87,7 +87,7 @@ int main()
 		IPOGLTexture2D* texture = POGLXLoadBMPImageFromFile(context, POGL_TOCHAR("texture.bmp"));
 
 		while (POGLProcessEvents()) {
-			IPOGLRenderState* state = context->Apply(simpleEffect);
+			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
@@ -97,7 +97,7 @@ int main()
 			//
 			// If the texture is already bound then the only thing the "SetTexture" method does is a couple of simple integer
 			// comparisons. The IPOGLUniform instance returned by the render state is RenderState specific, which means that you
-			// are not allowed to use it on anything other than when rendering on the state returned by the IPOGLDeviceContext::Apply(IPOGLEffect*)
+			// are not allowed to use it on anything other than when rendering on the state returned by the IPOGLDeviceContext::Apply(IPOGLProgram*)
 			// method above. 
 
 			state->FindUniformByName("Texture")->SetTexture(texture);
@@ -114,7 +114,7 @@ int main()
 		texture->Release();
 		indexBuffers->Release();
 		vertexBuffer->Release();
-		simpleEffect->Release();
+		program->Release();
 		context->Release();
 	}
 	catch (POGLException e) {

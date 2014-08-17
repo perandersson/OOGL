@@ -6,7 +6,7 @@ class POGLTextureResource;
 class POGLUniformSampler2D : public POGLDefaultUniform
 {
 public:
-	POGLUniformSampler2D(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject);
+	POGLUniformSampler2D(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject);
 	~POGLUniformSampler2D();
 
 	void Apply();

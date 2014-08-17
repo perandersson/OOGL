@@ -1,5 +1,5 @@
 #include "MemCheck.h"
-#include "POGLEffectState.h"
+#include "POGLProgramState.h"
 #include "uniforms/POGLUniformNotFound.h"
 #include "uniforms/POGLDefaultUniform.h"
 #include "uniforms/POGLUniformInt32.h"
@@ -11,17 +11,16 @@
 #include "POGLRenderState.h"
 #include "POGLDeviceContext.h"
 #include "POGLSamplerObject.h"
-#include "POGLEffectData.h"
 #include "POGLEnum.h"
 #include "POGLFactory.h"
 
-POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderState, POGLDeviceContext* context)
-: mEffect(effect), mDeviceContext(context)
+POGLProgramState::POGLProgramState(POGLProgram* program, POGLRenderState* renderState, POGLDeviceContext* context)
+: mProgram(program), mDeviceContext(context)
 {
-	const GLuint programID = effect->GetProgramID();
-	const auto data = effect->GetData();
-	auto it = effect->GetUniforms().begin();
-	auto end = effect->GetUniforms().end();
+	const GLuint programID = program->GetProgramID();
+	const auto data = program->GetData();
+	auto it = program->GetUniforms().begin();
+	auto end = program->GetUniforms().end();
 	for (; it != end; ++it) {
 		const auto* properties = it->second.get();
 		const GLint componentID = properties->componentID;
@@ -33,31 +32,31 @@ POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderStat
 		case GL_FLOAT_VEC2:
 		case GL_FLOAT_VEC3:
 		case GL_FLOAT_VEC4:
-			uniform = new POGLUniformFloat(effect, renderState, context, componentID);
+			uniform = new POGLUniformFloat(program, renderState, context, componentID);
 			break;
 		case GL_DOUBLE:
 		case GL_DOUBLE_VEC2:
 		case GL_DOUBLE_VEC3:
 		case GL_DOUBLE_VEC4:
-			uniform = new POGLUniformDouble(effect, renderState, context, componentID);
+			uniform = new POGLUniformDouble(program, renderState, context, componentID);
 			break;
 		case GL_INT:
 		case GL_INT_VEC2:
 		case GL_INT_VEC3:
 		case GL_INT_VEC4:
-			uniform = new POGLUniformInt32(effect, renderState, context, componentID);
+			uniform = new POGLUniformInt32(program, renderState, context, componentID);
 			break;
 		case GL_UNSIGNED_INT:
 		case GL_UNSIGNED_INT_VEC2:
 		case GL_UNSIGNED_INT_VEC3:
 		case GL_UNSIGNED_INT_VEC4:
-			uniform = new POGLUniformUInt32(effect, renderState, context, componentID);
+			uniform = new POGLUniformUInt32(program, renderState, context, componentID);
 			break;
 		case GL_FLOAT_MAT4:
-			uniform = new POGLUniformMat4(effect, renderState, context, componentID);
+			uniform = new POGLUniformMat4(program, renderState, context, componentID);
 			break;
 		case GL_SAMPLER_2D:
-			uniform = new POGLUniformSampler2D(effect, renderState, context, componentID, renderState->NextActiveTexture(), GenSamplerObject(renderState, properties));
+			uniform = new POGLUniformSampler2D(program, renderState, context, componentID, renderState->NextActiveTexture(), GenSamplerObject(renderState, properties));
 			break;
 		case GL_SAMPLER_CUBE:
 			break;
@@ -65,7 +64,7 @@ POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderStat
 
 		// Validate so that we actually have a uniform. If this exception is thrown then implement a new POGLUniform<x> type
 		if (uniform == nullptr) {
-			THROW_EXCEPTION(POGLEffectException, "Unknown uniform: %s of type %d", properties->name.c_str(), uniformType);
+			THROW_EXCEPTION(POGLProgramException, "Unknown uniform: %s of type %d", properties->name.c_str(), uniformType);
 		}
 
 		mUniforms.insert(std::make_pair(properties->name, uniform));
@@ -73,7 +72,7 @@ POGLEffectState::POGLEffectState(POGLEffect* effect, POGLRenderState* renderStat
 	
 }
 
-POGLEffectState::~POGLEffectState()
+POGLProgramState::~POGLProgramState()
 {
 	auto it = mUniforms.begin();
 	auto end = mUniforms.end();
@@ -82,12 +81,12 @@ POGLEffectState::~POGLEffectState()
 	}
 }
 
-IPOGLUniform* POGLEffectState::FindUniformByName(const POGL_CHAR* name)
+IPOGLUniform* POGLProgramState::FindUniformByName(const POGL_CHAR* name)
 {
 	return FindUniformByName(POGL_STRING(name));
 }
 
-IPOGLUniform* POGLEffectState::FindUniformByName(const POGL_STRING& name)
+IPOGLUniform* POGLProgramState::FindUniformByName(const POGL_STRING& name)
 {
 	IPOGLUniform* uniform = nullptr;
 	auto it = mUniforms.find(name);
@@ -98,7 +97,7 @@ IPOGLUniform* POGLEffectState::FindUniformByName(const POGL_STRING& name)
 	return it->second;
 }
 
-void POGLEffectState::ApplyUniforms()
+void POGLProgramState::ApplyUniforms()
 {
 	auto it = mUniforms.begin();
 	auto end = mUniforms.end();
@@ -109,7 +108,7 @@ void POGLEffectState::ApplyUniforms()
 	CHECK_GL("Could not apply uniforms");
 }
 
-POGLSamplerObject* POGLEffectState::GenSamplerObject(POGLRenderState* renderState, const POGLUniformProperty* uniformProperty)
+POGLSamplerObject* POGLProgramState::GenSamplerObject(POGLRenderState* renderState, const POGLUniformProperty* uniformProperty)
 {
 	const GLuint samplerID = POGLFactory::GenSamplerID();
 	POGLSamplerObject* samplerObject = new POGLSamplerObject(samplerID, renderState);

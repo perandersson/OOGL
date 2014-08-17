@@ -101,9 +101,9 @@ GLenum POGLEnum::Convert(POGLVertexType::Enum e)
 	return enums[(POGL_UINT32)e];
 }
 
-GLenum POGLEnum::Convert(POGLShaderProgramType::Enum e)
+GLenum POGLEnum::Convert(POGLShaderType::Enum e)
 {
-	static const GLenum enums[POGLShaderProgramType::COUNT] = {
+	static const GLenum enums[POGLShaderType::COUNT] = {
 		GL_GEOMETRY_SHADER,
 		GL_VERTEX_SHADER,
 		GL_FRAGMENT_SHADER
@@ -170,24 +170,6 @@ GLenum POGLEnum::Convert(POGLDstFactor::Enum dfactor)
 	};
 
 	return enums[(POGL_UINT32)dfactor];
-}
-
-GLenum POGLEnum::ConvertForMapBuffer(POGLResourceMapType::Enum e)
-{
-	static GLenum access[POGLResourceMapType::COUNT] = {
-		GL_WRITE_ONLY
-	};
-
-	return access[(POGL_UINT32)e];
-}
-
-GLbitfield POGLEnum::ConvertForMapBufferRange(POGLResourceMapType::Enum e)
-{
-	static GLenum access[POGLResourceMapType::COUNT] = {
-		GL_MAP_WRITE_BIT
-	};
-
-	return access[(POGL_UINT32)e];
 }
 
 //

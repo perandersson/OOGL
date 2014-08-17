@@ -43,7 +43,7 @@ void POGLTexture2D::Release()
 	}
 }
 
-POGLResourceType::Enum POGLTexture2D::GetResourceType() const
+POGLResourceType::Enum POGLTexture2D::GetType() const
 {
 	return POGLResourceType::TEXTURE2D;
 }

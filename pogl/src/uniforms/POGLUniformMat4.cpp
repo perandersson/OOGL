@@ -2,8 +2,8 @@
 #include "POGLUniformMat4.h"
 #include "POGLDeviceContext.h"
 
-POGLUniformMat4::POGLUniformMat4(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
-: POGLDefaultUniform(effect, state, context, componentID)
+POGLUniformMat4::POGLUniformMat4(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
+: POGLDefaultUniform(program, state, context, componentID)
 {
 	memset(&mValue, 0, sizeof(mValue));
 	mValue._11 = 1.0;

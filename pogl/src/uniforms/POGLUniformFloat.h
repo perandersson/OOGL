@@ -4,7 +4,7 @@
 class POGLUniformFloat : public POGLDefaultUniform
 {
 public:
-	POGLUniformFloat(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLUniformFloat(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
 	~POGLUniformFloat();
 
 	void Apply();

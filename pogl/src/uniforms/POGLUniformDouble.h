@@ -4,7 +4,7 @@
 class POGLUniformDouble : public POGLDefaultUniform
 {
 public:
-	POGLUniformDouble(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLUniformDouble(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
 	~POGLUniformDouble();
 
 	void Apply();

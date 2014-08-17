@@ -6,8 +6,8 @@
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
 #include "POGLTexture2D.h"
-#include "POGLShaderProgram.h"
-#include "POGLEffectData.h"
+#include "POGLShader.h"
+#include "POGLProgramData.h"
 #include "POGLStringUtils.h"
 #include "POGLFactory.h"
 #include "POGLFramebuffer.h"
@@ -34,7 +34,7 @@ IPOGLDevice* POGLDeviceContext::GetDevice()
 	return mDevice;
 }
 
-IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type)
+IPOGLShader* POGLDeviceContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
 {
 	POGL_ISTREAM stream(path);
 	if (!stream.is_open())
@@ -42,10 +42,10 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromFile(const POGL_CH
 
 	// Read the entire file into memory
 	POGL_STRING str((std::istreambuf_iterator<POGL_CHAR>(stream)), std::istreambuf_iterator<POGL_CHAR>());
-	return CreateShaderProgramFromMemory(str.c_str(), str.length(), type);
+	return CreateShaderFromMemory(str.c_str(), str.length(), type);
 }
 
-IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type)
+IPOGLShader* POGLDeviceContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
 {
 	if (size == 0 || memory == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You cannot generate a non-existing shader");
@@ -61,30 +61,30 @@ IPOGLShaderProgram* POGLDeviceContext::CreateShaderProgramFromMemory(const POGL_
 		glGetShaderInfoLog(shaderID, 2048, NULL, infoLogg);
 		glDeleteShader(shaderID);
 		switch (type) {
-		case POGLShaderProgramType::GEOMETRY_SHADER:
+		case POGLShaderType::GEOMETRY_SHADER:
 			THROW_EXCEPTION(POGLResourceException, "Could not compile geometry shader. Reason: '%s'", infoLogg);
-		case POGLShaderProgramType::VERTEX_SHADER:
+		case POGLShaderType::VERTEX_SHADER:
 			THROW_EXCEPTION(POGLResourceException, "Could not compile vertex shader. Reason: '%s'", infoLogg);
-		case POGLShaderProgramType::FRAGMENT_SHADER:
+		case POGLShaderType::FRAGMENT_SHADER:
 			THROW_EXCEPTION(POGLResourceException, "Could not compile fragment shader. Reason: '%s'", infoLogg);
 		default:
 			THROW_EXCEPTION(POGLResourceException, "Could not compile shader. Reason: '%s'", infoLogg);
 		}
 	}
 
-	return new POGLShaderProgram(shaderID, type);
+	return new POGLShader(shaderID, type);
 }
 
-IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** programs)
+IPOGLProgram* POGLDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
 {
-	assert_not_null(programs);
+	if (shaders == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You must supply at least one shader to be able to create a program");
 
 	// Attach all the shaders to the program
 	const GLuint programID = glCreateProgram();
-	IPOGLShaderProgram** ptr = programs;
-	for (IPOGLShaderProgram** ptr = programs; *ptr != nullptr; ++ptr) {
-		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(*ptr);
-		glAttachShader(programID, program->GetShaderID());
+	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
+		POGLShader* shader = static_cast<POGLShader*>(*ptr);
+		glAttachShader(programID, shader->GetShaderID());
 
 	}
 
@@ -92,9 +92,9 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 	glLinkProgram(programID);
 
 	// Detach the shaders when linking is complete: http://www.opengl.org/wiki/GLSL_Object
-	for (IPOGLShaderProgram** ptr = programs; *ptr != nullptr; ++ptr) {
-		POGLShaderProgram* program = static_cast<POGLShaderProgram*>(*ptr);
-		glDetachShader(programID, program->GetShaderID());
+	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
+		POGLShader* shader = static_cast<POGLShader*>(*ptr);
+		glDetachShader(programID, shader->GetShaderID());
 	}
 
 	// Verify program
@@ -107,7 +107,7 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 		THROW_EXCEPTION(POGLResourceException, "Could not link the supplied shader programs. Reason: %s", infoLogg);
 	}
 
-	POGLEffectData* data = new POGLEffectData;
+	POGLProgramData* data = new POGLProgramData;
 	data->depthFunc = POGLDepthFunc::DEFAULT;
 	data->colorMask = POGLColorMask::ALL;
 	data->depthMask = true;
@@ -149,7 +149,7 @@ IPOGLEffect* POGLDeviceContext::CreateEffectFromPrograms(IPOGLShaderProgram** pr
 		uniforms.insert(std::make_pair(p->name, p));
 	}
 
-	return new POGLEffect(programID, data, uniforms);
+	return new POGLProgram(programID, data, uniforms);
 }
 
 IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
@@ -348,16 +348,16 @@ void POGLDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* desti
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
+IPOGLRenderState* POGLDeviceContext::Apply(IPOGLProgram* program)
 {
-	mRenderState->Apply(effect);
+	mRenderState->Apply(program);
 	mRenderState->AddRef();
 	return mRenderState;
 }
 
 void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
-	auto type = resource->GetResourceType();
+	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 		mRenderState->BindVertexBuffer(vb);
@@ -369,7 +369,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum 
 
 void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	auto type = resource->GetResourceType();
+	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
 		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
@@ -385,7 +385,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 
 void POGLDeviceContext::Unmap(IPOGLResource* resource)
 {
-	auto type = resource->GetResourceType();
+	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 		return;

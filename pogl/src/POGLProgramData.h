@@ -2,7 +2,7 @@
 #include "uniforms/POGLUniformProperty.h"
 #include <memory>
 
-struct POGLEffectData
+struct POGLProgramData
 {
 	/* Should depth test be enabled for this effect */
 	bool depthTest;

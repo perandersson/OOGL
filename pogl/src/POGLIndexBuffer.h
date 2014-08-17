@@ -43,8 +43,8 @@ public:
 
 		\return
 	*/
-	inline GLenum GetType() const {
-		return mType;
+	inline GLenum GetElementType() const {
+		return mElementType;
 	}
 	
 	void Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex);
@@ -57,7 +57,7 @@ public:
 
 // IPOGLResource
 public:
-	virtual POGLResourceType::Enum GetResourceType() const;
+	virtual POGLResourceType::Enum GetType() const;
 
 // IPOGLIndexBuffer
 public:
@@ -69,6 +69,6 @@ private:
 	GLuint mBufferID;
 	POGL_UINT32 mNumIndices;
 	POGL_UINT32 mTypeSize;
-	GLenum mType;
+	GLenum mElementType;
 	GLenum mBufferUsage;
 };

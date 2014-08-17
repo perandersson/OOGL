@@ -1,6 +1,5 @@
 #include "MemCheck.h"
-#include "POGLEffect.h"
-#include "POGLEffectData.h"
+#include "POGLProgram.h"
 
 namespace {
 	std::atomic<POGL_UINT32> ids;
@@ -9,23 +8,23 @@ namespace {
 	}
 }
 
-POGLEffect::POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms)
+POGLProgram::POGLProgram(GLuint programID, POGLProgramData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms)
 : mRefCount(1), mProgramID(programID), mUID(GenEffectUID()), mData(data), mUniforms(uniforms)
 {
 	assert_not_null(data);
 }
 
-POGLEffect::~POGLEffect()
+POGLProgram::~POGLProgram()
 {
 
 }
 
-void POGLEffect::AddRef()
+void POGLProgram::AddRef()
 {
 	mRefCount++;
 }
 
-void POGLEffect::Release()
+void POGLProgram::Release()
 {
 	if (--mRefCount == 0) {
 		if (mProgramID != 0) {
@@ -40,85 +39,85 @@ void POGLEffect::Release()
 	}
 }
 
-POGLResourceType::Enum POGLEffect::GetResourceType() const
+POGLResourceType::Enum POGLProgram::GetType() const
 {
-	return POGLResourceType::EFFECT;
+	return POGLResourceType::PROGRAM;
 }
 
-bool POGLEffect::GetDepthTest()
+bool POGLProgram::GetDepthTest()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	return mData->depthTest;
 }
 
-void POGLEffect::SetDepthTest(bool b)
+void POGLProgram::SetDepthTest(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->depthTest = b;
 }
 
-void POGLEffect::SetDepthFunc(POGLDepthFunc::Enum depthFunc)
+void POGLProgram::SetDepthFunc(POGLDepthFunc::Enum depthFunc)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->depthFunc = depthFunc;
 }
 
-POGLDepthFunc::Enum POGLEffect::GetDepthFunc()
+POGLDepthFunc::Enum POGLProgram::GetDepthFunc()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	return mData->depthFunc;
 }
 
-bool POGLEffect::GetDepthMask()
+bool POGLProgram::GetDepthMask()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	return mData->depthMask;
 }
 
-void POGLEffect::SetDepthMask(bool b)
+void POGLProgram::SetDepthMask(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->depthMask = b;
 }
 
-POGL_UINT8 POGLEffect::GetColorMask()
+POGL_UINT8 POGLProgram::GetColorMask()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	return mData->colorMask;
 }
 
-void POGLEffect::SetColorMask(POGL_UINT8 colorMask)
+void POGLProgram::SetColorMask(POGL_UINT8 colorMask)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->colorMask = colorMask;
 }
 
-bool POGLEffect::GetStencilTest()
+bool POGLProgram::GetStencilTest()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	return mData->stencilTest;
 }
 
-void POGLEffect::SetStencilTest(bool b)
+void POGLProgram::SetStencilTest(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->stencilTest = b;
 }
 
-void POGLEffect::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
+void POGLProgram::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->srcFactor = sfactor;
 	mData->dstFactor = dfactor;
 }
 
-void POGLEffect::SetBlend(bool b)
+void POGLProgram::SetBlend(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 	mData->blending = b;
 }
 
-void POGLEffect::CopyEffectData(POGLEffectData* in)
+void POGLProgram::CopyProgramData(POGLProgramData* in)
 {
 	assert_not_null(in);
 	std::lock_guard<std::recursive_mutex> lock(mMutex);

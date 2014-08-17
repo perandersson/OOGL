@@ -43,11 +43,6 @@ void POGLFramebuffer::Release()
 	}
 }
 
-POGLResourceType::Enum POGLFramebuffer::GetResourceType() const
-{
-	return POGLResourceType::FRAMEBUFFER;
-}
-
 IPOGLTexture* POGLFramebuffer::GetTexture(POGL_UINT32 idx)
 {
 	if (mTextures.size() <= idx)

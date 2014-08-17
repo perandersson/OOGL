@@ -68,8 +68,8 @@ class IPOGLTexture2D;
 class IPOGLTexture3D;
 class IPOGLFramebuffer;
 
-class IPOGLShaderProgram;
-class IPOGLEffect;
+class IPOGLShader;
+class IPOGLProgram;
 class IPOGLUniform;
 
 //
@@ -185,7 +185,7 @@ struct POGLClearType
 	static const POGL_UINT32 ALL = COLOR | DEPTH | STENCIL;
 };
 
-struct POGLShaderProgramType
+struct POGLShaderType
 {
 	enum Enum {
 		GEOMETRY_SHADER = 0,
@@ -462,8 +462,7 @@ struct POGLResourceType
 		TEXTURE2D,
 		TEXTURE3D,
 		SHADER,
-		EFFECT,
-		FRAMEBUFFER
+		PROGRAM
 	};
 };
 
@@ -794,7 +793,7 @@ public:
 	/*!
 		\brief Retrieves the resource type
 	*/
-	virtual POGLResourceType::Enum GetResourceType() const = 0;
+	virtual POGLResourceType::Enum GetType() const = 0;
 };
 
 /*!
@@ -860,7 +859,7 @@ public:
 				Exception thrown if the shader source code is not found or is invalid
 		\return A shader program
 	*/
-	virtual IPOGLShaderProgram* CreateShaderProgramFromFile(const POGL_CHAR* path, POGLShaderProgramType::Enum type) = 0;
+	virtual IPOGLShader* CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type) = 0;
 
 	/*!
 		\brief Creates a shader program based on the memory buffer
@@ -875,22 +874,22 @@ public:
 				Exception thrown if the shader source code is invalid
 		\return A shader program
 	*/
-	virtual IPOGLShaderProgram* CreateShaderProgramFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderProgramType::Enum type) = 0;
+	virtual IPOGLShader* CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type) = 0;
 
 	/*!
-		\brief Creates an effect based on the supplied programs
+		\brief Creates a GPU program based on the supplied programs
 
-		\param programs
-				The programs we want to link when creating the effect. The array must end with a nullptr or 0. 
+		\param shaders
+				The shaders we want to link when creating the program. The array must end with a nullptr or 0. 
 				{@code
-					IPOGLShaderProgram** programs = {shader1, shader2, nullptr};
-					context->CreateEffectFromPrograms(programs);
+					IPOGLShader** shaders = {shader1, shader2, nullptr};
+					IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 				}
 		\throwd POGLResourceException 
 				Exception is thrown if the exception failed to be loaded by some reason.
 		\return An effect instance
 	*/
-	virtual IPOGLEffect* CreateEffectFromPrograms(IPOGLShaderProgram** programs) = 0;
+	virtual IPOGLProgram* CreateProgramFromShaders(IPOGLShader** shaders) = 0;
 
 	/*!
 		\brief Creates a 3D texture
@@ -1048,12 +1047,12 @@ public:
 	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size) = 0;
 
 	/*!
-		\brief Apply the supplied effect to the current context
+		\brief Apply the supplied program to the current context
 
 		\param effect
 		\return
 	*/
-	virtual IPOGLRenderState* Apply(IPOGLEffect* effect) = 0;
+	virtual IPOGLRenderState* Apply(IPOGLProgram* program) = 0;
 
 	/*!
 		\brief Map the data to a memory location and return a pointer to it
@@ -1208,7 +1207,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLShaderProgram : public IPOGLResource
+class IPOGLShader : public IPOGLResource
 {
 public:
 };
@@ -1216,7 +1215,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLEffect : public IPOGLResource
+class IPOGLProgram : public IPOGLResource
 {
 public:
 	/*!
@@ -1462,7 +1461,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLFramebuffer : public IPOGLResource
+class IPOGLFramebuffer : public IPOGLInterface
 {
 public:
 	/*!
@@ -1570,12 +1569,12 @@ public:
 };
 
 /*!
-	\brief Exception thrown if a fatal fault happened when initializing or using an effect
+	\brief Exception thrown if a fatal fault happened when initializing or using a program
 */
-class POGLEffectException : public POGLException {
+class POGLProgramException : public POGLException {
 public:
-	POGLEffectException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLEffectException();
+	POGLProgramException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
+	~POGLProgramException();
 };
 
 /*!

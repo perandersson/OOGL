@@ -1,13 +1,13 @@
 #pragma once
 #include "config.h"
 
-class POGLEffect;
+class POGLProgram;
 class POGLRenderState;
 class POGLDeviceContext;
 class POGLDefaultUniform : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
-	POGLDefaultUniform(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLDefaultUniform(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
 	~POGLDefaultUniform();
 
 	/*!

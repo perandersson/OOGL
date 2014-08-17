@@ -1,15 +1,15 @@
 #pragma once
 #include "config.h"
+#include "POGLProgramData.h"
 #include <mutex>
 #include <memory>
 
-struct POGLEffectData;
 struct POGLUniformProperty; 
-class POGLEffect : public IPOGLEffect
+class POGLProgram : public IPOGLProgram
 {
 public:
-	POGLEffect(GLuint programID, POGLEffectData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms);
-	~POGLEffect();
+	POGLProgram(GLuint programID, POGLProgramData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms);
+	virtual ~POGLProgram();
 	
 	/*!
 		\brief Retrieves a unique ID for this effect
@@ -30,14 +30,14 @@ public:
 	/*!
 		\brief Copy the effect data to the supplied instance
 	*/
-	void CopyEffectData(POGLEffectData* in);
+	void CopyProgramData(POGLProgramData* in);
 
 	/*!
 		\brief Retrieves the data
 
 		\return
 	*/
-	inline const POGLEffectData* GetData() const {
+	inline const POGLProgramData* GetData() const {
 		return mData;
 	}
 	
@@ -68,13 +68,13 @@ public:
 
 // IPOGLResource
 public:
-	virtual POGLResourceType::Enum GetResourceType() const;
+	virtual POGLResourceType::Enum GetType() const;
 
 private:
 	REF_COUNTER mRefCount;
 	GLuint mProgramID;
 	POGL_UINT32 mUID;
 	std::recursive_mutex mMutex;
-	POGLEffectData* mData;
+	POGLProgramData* mData;
 	std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> mUniforms;
 };

@@ -50,10 +50,10 @@ int main()
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
 		// Create an effect based on the supplied vertex- and fragment shader
-		IPOGLShaderProgram* vertexShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderProgramType::VERTEX_SHADER);
-		IPOGLShaderProgram* fragmentShader = context->CreateShaderProgramFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderProgramType::FRAGMENT_SHADER);
-		IPOGLShaderProgram* programs[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLEffect* simpleEffect = context->CreateEffectFromPrograms(programs);
+		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -218,7 +218,7 @@ int main()
 			// Draw the vertex buffer using the "simple effect"
 			//
 
-			IPOGLRenderState* state = context->Apply(simpleEffect);
+			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			state->Draw(vertexBuffer);
 			state->Release();
@@ -238,7 +238,7 @@ int main()
 
 		// Release resources
 		vertexBuffer->Release();
-		simpleEffect->Release();
+		program->Release();
 		t1context->Release();
 		t2context->Release();
 		context->Release();

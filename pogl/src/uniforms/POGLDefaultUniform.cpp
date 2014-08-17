@@ -1,10 +1,10 @@
 #include "MemCheck.h"
 #include "POGLDefaultUniform.h"
-#include "POGLEffect.h"
+#include "POGLProgram.h"
 #include "POGLRenderState.h"
 
-POGLDefaultUniform::POGLDefaultUniform(const POGLEffect* effect, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
-: mEffectUID(effect->GetUID()), mRenderState(state), mDeviceContext(context), mComponentID(componentID)
+POGLDefaultUniform::POGLDefaultUniform(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
+: mEffectUID(program->GetUID()), mRenderState(state), mDeviceContext(context), mComponentID(componentID)
 {
 }
 
@@ -14,7 +14,7 @@ POGLDefaultUniform::~POGLDefaultUniform()
 
 bool POGLDefaultUniform::IsEffectActive() const
 {
-	return mRenderState->IsEffectActive(mEffectUID);
+	return mRenderState->IsProgramActive(mEffectUID);
 }
 
 void POGLDefaultUniform::SetInt32(POGL_INT32 a)

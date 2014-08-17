@@ -119,7 +119,7 @@ POGLResourceException::~POGLResourceException()
 {
 }
 
-POGLEffectException::POGLEffectException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...)
+POGLProgramException::POGLProgramException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...)
 : POGLException(function, line, file)
 {
 	va_list arglist;
@@ -128,7 +128,7 @@ POGLEffectException::POGLEffectException(const POGL_CHAR* function, const POGL_U
 	va_end(arglist);
 }
 
-POGLEffectException::~POGLEffectException()
+POGLProgramException::~POGLProgramException()
 {
 }
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "POGLEffect.h"
+#include "POGLProgram.h"
 
 class POGLDefaultUniform;
 class POGLRenderState;
@@ -7,13 +7,13 @@ class POGLDeviceContext;
 class POGLSamplerObject;
 struct POGLUniformProperty;
 
-class POGLEffectState
+class POGLProgramState
 {
 	typedef std::hash_map<POGL_STRING, POGLDefaultUniform*> Uniforms;
 
 public:
-	POGLEffectState(POGLEffect* effect, POGLRenderState* renderState, POGLDeviceContext* context);
-	~POGLEffectState();
+	POGLProgramState(POGLProgram* program, POGLRenderState* renderState, POGLDeviceContext* context);
+	~POGLProgramState();
 	
 	/*!
 		\brief Retrieves a uniform by the given name
@@ -48,7 +48,7 @@ private:
 
 
 private:
-	POGLEffect* mEffect;
+	POGLProgram* mProgram;
 	POGLDeviceContext* mDeviceContext;
 	Uniforms mUniforms;
 };
