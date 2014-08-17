@@ -1007,6 +1007,45 @@ public:
 		\param bufferUsage
 	*/
 	virtual IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage) = 0;
+	
+	/*!
+		\brief Clones the supplied resource and returns a new resource based of it
+
+		\param resource
+				Resource we want to clone
+	*/
+	virtual IPOGLResource* CloneResource(IPOGLResource* resource) = 0;
+
+	/*!
+		\brief Copy the source resource into the destination resource
+
+		The destination resource will be resized to fit the source resource if they are different
+
+		\param source
+				Resource where the data will be copied from
+		\param destination
+				Resource where the data will be copied to
+	*/
+	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination) = 0;
+	
+	/*!
+		\brief Copy the source resource into the destination resource
+
+		\param source
+				Resource where the data will be copied from
+		\param destination
+				Resource where the data will be copied to
+		\param sourceOffset
+				Offset, in bytes, where we start copying data from the source resource
+		\param destinationOffset
+				Offset, in bytes, where we start copying data to the source resource
+		\param size
+				How many bytes we are trying to copy
+		\throw POGLResourceException
+				If the source or destination buffer is invalid. If the sourceOffset + size is larger than the source resources memory. If 
+				the destinationOffset + size is larger than the destination resource memory.
+	*/
+	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size) = 0;
 
 	/*!
 		\brief Apply the supplied effect to the current context

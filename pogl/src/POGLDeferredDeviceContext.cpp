@@ -216,6 +216,21 @@ IPOGLIndexBuffer* POGLDeferredDeviceContext::CreateIndexBuffer(const void* memor
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
+IPOGLResource* POGLDeferredDeviceContext::CloneResource(IPOGLResource* resource)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLDeferredDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLDeferredDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
 IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLEffect* effect)
 {
 	if (effect == nullptr)

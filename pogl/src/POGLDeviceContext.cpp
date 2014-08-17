@@ -333,6 +333,21 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	return ib;
 }
 
+IPOGLResource* POGLDeviceContext::CloneResource(IPOGLResource* resource)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
 IPOGLRenderState* POGLDeviceContext::Apply(IPOGLEffect* effect)
 {
 	mRenderState->Apply(effect);

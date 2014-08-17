@@ -1,6 +1,5 @@
 #pragma once
 #include "config.h"
-#include <gl/pogl.h>
 
 class POGLTextureResource : public IPOGLInterface
 {
