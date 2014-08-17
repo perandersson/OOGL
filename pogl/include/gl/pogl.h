@@ -849,7 +849,7 @@ public:
 	virtual IPOGLDevice* GetDevice() = 0;
 	
 	/*!
-		\brief Creates a shader program based on the supplied file
+		\brief Creates a shader based on the supplied file
 
 		\param path
 				The path to the file where the shader source code is located
@@ -857,12 +857,12 @@ public:
 				The shader type
 		\throws POGLResourceException
 				Exception thrown if the shader source code is not found or is invalid
-		\return A shader program
+		\return A shader resource
 	*/
 	virtual IPOGLShader* CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type) = 0;
 
 	/*!
-		\brief Creates a shader program based on the memory buffer
+		\brief Creates a shader based on the memory buffer
 
 		\param memory
 				String containing the shader source code
@@ -872,12 +872,12 @@ public:
 				The shader type
 		\throws POGLResourceException
 				Exception thrown if the shader source code is invalid
-		\return A shader program
+		\return A shader resource
 	*/
 	virtual IPOGLShader* CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type) = 0;
 
 	/*!
-		\brief Creates a GPU program based on the supplied programs
+		\brief Creates a GPU program based on the supplied shaders
 
 		\param shaders
 				The shaders we want to link when creating the program. The array must end with a nullptr or 0. 
@@ -887,7 +887,7 @@ public:
 				}
 		\throwd POGLResourceException 
 				Exception is thrown if the exception failed to be loaded by some reason.
-		\return An effect instance
+		\return A GPU program that you can use when render geometry onto the screen
 	*/
 	virtual IPOGLProgram* CreateProgramFromShaders(IPOGLShader** shaders) = 0;
 
@@ -1205,7 +1205,10 @@ public:
 };
 
 /*!
-	\brief
+	\brief Interface representing a shader resource
+
+	A shader resource is a part of a GPU program. By linking one or many shaders using the 
+	IPOGLDeviceContext you get a GPU program
 */
 class IPOGLShader : public IPOGLResource
 {
@@ -1213,13 +1216,16 @@ public:
 };
 
 /*!
-	\brief
+	\brief Interface representing a GPU program resource
+
+	A GPU program is required if you want to draw geometry onto the screen. You link one or many shader resources
+	using the IPOGLDeviceContext to get a GPU program
 */
 class IPOGLProgram : public IPOGLResource
 {
 public:
 	/*!
-		\brief
+		\brief Retrieves if this program enables or disables depth testing
 	*/
 	virtual bool GetDepthTest() = 0;
 
