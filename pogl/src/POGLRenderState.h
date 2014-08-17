@@ -142,7 +142,7 @@ private:
 	POGLProgram* mProgram;
 	POGL_UINT32 mProgramUID;
 	POGLProgramState* mCurrentProgramState;
-	EffectStates mEffectStates;
+	EffectStates mProgramStates;
 	bool mApplyCurrentProgramState;
 
 	POGLVertexBuffer *mVertexBuffer;

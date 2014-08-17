@@ -48,7 +48,7 @@ void POGLRenderState::Release()
 		}
 
 		// Clear all effect states
-		mEffectStates.clear();
+		mProgramStates.clear();
 		delete this;
 	}
 }
@@ -271,13 +271,12 @@ void POGLRenderState::Apply(IPOGLProgram* program)
 	if (program == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing program");
 
-	// Bind the effect if neccessary
-	POGLProgram* programImpl = static_cast<POGLProgram*>(program);
-	BindProgram(programImpl);
+	// Bind the program if neccessary
+	BindProgram(static_cast<POGLProgram*>(program));
 
-	// Retrieve the effect data
+	// Retrieve the program data
 	POGLProgramData data;
-	programImpl->CopyProgramData(&data);
+	mProgram->CopyProgramData(&data);
 
 	//
 	// Update the render state with the (potentially) new properties
@@ -295,10 +294,10 @@ void POGLRenderState::Apply(IPOGLProgram* program)
 POGLProgramState* POGLRenderState::GetProgramState(POGLProgram* program)
 {
 	const POGL_UINT32 uid = program->GetUID();
-	auto it = mEffectStates.find(uid);
-	if (it == mEffectStates.end()) {
+	auto it = mProgramStates.find(uid);
+	if (it == mProgramStates.end()) {
 		POGLProgramState* state = new POGLProgramState(program, this, mDeviceContext);
-		mEffectStates.insert(std::make_pair(uid, std::shared_ptr<POGLProgramState>(state)));
+		mProgramStates.insert(std::make_pair(uid, std::shared_ptr<POGLProgramState>(state)));
 		return state;
 	}
 
@@ -335,7 +334,7 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 	mCurrentProgramState = GetProgramState(program);
 	mApplyCurrentProgramState = true;
 
-	CHECK_GL("Could not bind the supplied effect");
+	CHECK_GL("Could not bind the supplied program");
 }
 
 void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer)
