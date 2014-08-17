@@ -429,7 +429,37 @@ struct POGLDstFactor
 
 	/* Default destination factor used by the rendering engine */
 	static const Enum DEFAULT = ZERO;
+};
 
+struct POGLFrontFace
+{
+	enum Enum {
+		CW = 0,
+		CCW,
+
+		COUNT
+	};
+
+	/* Default front face used by the rendering engine */
+	static const Enum DEFAULT = CCW;
+};
+
+/*!
+	\brief
+*/
+struct POGLCullFace
+{
+	enum Enum {
+		DISABLED = 0,
+		FRONT,
+		BACK,
+		FRONT_AND_BACK,
+
+		COUNT,
+	};
+
+	/* Default cull face used by the rendering engine */
+	static const Enum DEFAULT = DISABLED;
 };
 
 /*!
@@ -1321,6 +1351,30 @@ public:
 		\brief
 	*/
 	virtual void SetBlend(bool b) = 0;
+
+	/*!
+		\brief 
+
+		\param e
+	*/
+	virtual void SetFrontFace(POGLFrontFace::Enum e) = 0;
+
+	/*!
+		\brief
+	*/
+	virtual POGLFrontFace::Enum GetFrontFace() = 0;
+
+	/*!
+		\brief
+
+		\param e
+	*/
+	virtual void SetCullFace(POGLCullFace::Enum e) = 0;
+
+	/*!
+		\brief
+	*/
+	virtual POGLCullFace::Enum GetCullFace() = 0;
 };
 
 /*!
@@ -1425,6 +1479,20 @@ public:
 	*/
 	virtual void SetBlend(bool b) = 0;
 	
+	/*!
+		\brief
+
+		\param e
+	*/
+	virtual void SetFrontFace(POGLFrontFace::Enum e) = 0;
+
+	/*!
+		\brief
+
+		\param e
+	*/
+	virtual void SetCullFace(POGLCullFace::Enum e) = 0;
+
 	/*!
 		\brief A rectangle specifying the viewport area
 

@@ -172,29 +172,29 @@ GLenum POGLEnum::Convert(POGLDstFactor::Enum dfactor)
 	return enums[(POGL_UINT32)dfactor];
 }
 
-//
-//GLenum OGLEnum::Convert(FrontFace::Enum frontFace)
-//{
-//	static const GLenum enums[FrontFace::SIZE] = {
-//		GL_CW,
-//		GL_CCW
-//	};
-//
-//	return enums[(uint32)frontFace];
-//}
-//
-//GLenum OGLEnum::Convert(CullFace::Enum cullFace)
-//{
-//	static const GLenum enums[CullFace::SIZE] = {
-//		0,
-//		GL_FRONT,
-//		GL_BACK,
-//		GL_FRONT_AND_BACK,
-//	};
-//
-//	return enums[(uint32)cullFace];
-//}
-//
+
+GLenum POGLEnum::Convert(POGLFrontFace::Enum frontFace)
+{
+	static const GLenum enums[POGLFrontFace::COUNT] = {
+		GL_CW,
+		GL_CCW
+	};
+
+	return enums[(POGL_UINT32)frontFace];
+}
+
+GLenum POGLEnum::Convert(POGLCullFace::Enum cullFace)
+{
+	static const GLenum enums[POGLCullFace::COUNT] = {
+		0,
+		GL_FRONT,
+		GL_BACK,
+		GL_FRONT_AND_BACK,
+	};
+
+	return enums[(POGL_UINT32)cullFace];
+}
+
 //GLenum OGLEnum::Convert(PolygonMode::Enum mode)
 //{
 //	static const GLenum enums[PolygonMode::SIZE] = {

@@ -30,4 +30,10 @@ struct POGLProgramData
 
 	/* Is blending enabled or not? */
 	bool blending;
+
+	/* */
+	POGLFrontFace::Enum frontFace;
+
+	/* */
+	POGLCullFace::Enum cullFace;
 };

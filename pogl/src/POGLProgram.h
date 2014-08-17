@@ -64,6 +64,10 @@ public:
 	virtual void SetStencilMask(POGL_UINT32 mask);
 	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
 	virtual void SetBlend(bool b);
+	virtual void SetFrontFace(POGLFrontFace::Enum e);
+	virtual POGLFrontFace::Enum GetFrontFace();
+	virtual void SetCullFace(POGLCullFace::Enum e);
+	virtual POGLCullFace::Enum GetCullFace();
 
 // IPOGLInterface
 public:

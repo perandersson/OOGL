@@ -218,6 +218,36 @@ struct POGLSetBlendFuncCommand
 extern void POGLSetBlendFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetBlendFuncCommand));
 
+struct POGLSetFrontFaceCommand
+{
+	union {
+		POGLDeferredCommand _memory;
+		struct {
+			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
+			POGLFrontFace::Enum frontFace;
+		};
+	};
+};
+extern void POGLSetFrontFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetFrontFaceCommand));
+
+struct POGLSetCullFaceCommand
+{
+	union {
+		POGLDeferredCommand _memory;
+		struct {
+			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
+			POGLCullFace::Enum cullFace;
+		};
+	};
+};
+extern void POGLSetCullFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetCullFaceCommand));
+
 struct POGLSetViewportCommand
 {
 	union {

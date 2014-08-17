@@ -13,7 +13,9 @@ POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mCurrentProgramState(nullptr), mApplyCurrentProgramState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
-mColorMask(POGLColorMask::ALL), mStencilTest(false), mStencilMask(BIT_ALL), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), mViewport(0, 0, 0, 0),
+mColorMask(POGLColorMask::ALL), mStencilTest(false), mStencilMask(BIT_ALL), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), 
+mFrontFace(POGLFrontFace::DEFAULT), mCullFace(POGLCullFace::DEFAULT),
+mViewport(0, 0, 0, 0),
 mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0),
 mFramebuffer(nullptr), mFramebufferUID(0)
 {
@@ -267,6 +269,34 @@ void POGLRenderState::SetBlend(bool b)
 	CHECK_GL("Cannot enable/disable blendng");
 }
 
+void POGLRenderState::SetFrontFace(POGLFrontFace::Enum e)
+{
+	if (mFrontFace == e)
+		return;
+
+	glFrontFace(POGLEnum::Convert(e));
+	mFrontFace = e;
+
+	CHECK_GL("Cannot change the front faces using when render vertices onto the screen");
+}
+
+void POGLRenderState::SetCullFace(POGLCullFace::Enum e)
+{
+	if (mCullFace == e)
+		return;
+
+	if (e == POGLCullFace::DISABLED)
+		glDisable(GL_CULL_FACE);
+	else
+	{
+		glEnable(GL_CULL_FACE);
+		glCullFace(POGLEnum::Convert(e));
+	}
+	mCullFace = e;
+
+	CHECK_GL("Could not change the cull faces used when render faces on the screen");
+}
+
 void POGLRenderState::SetViewport(const POGL_RECT& viewport)
 {
 	if (mViewport.x == viewport.x && mViewport.y == viewport.y && mViewport.width == viewport.width && mViewport.height == viewport.height)
@@ -301,6 +331,8 @@ void POGLRenderState::Apply(IPOGLProgram* program)
 	SetStencilMask(data.stencilMask);
 	SetBlend(data.blending);
 	SetBlendFunc(data.srcFactor, data.dstFactor);
+	SetFrontFace(data.frontFace);
+	SetCullFace(data.cullFace);
 }
 
 POGLProgramState* POGLRenderState::GetProgramState(POGLProgram* program)

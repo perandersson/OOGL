@@ -18,8 +18,8 @@ public:
 	static GLenum Convert(POGLDepthFunc::Enum e);
 	static GLenum Convert(POGLSrcFactor::Enum e);
 	static GLenum Convert(POGLDstFactor::Enum e);
-	//static GLenum Convert(FrontFace::Enum e);
-	//static GLenum Convert(CullFace::Enum e);
+	static GLenum Convert(POGLFrontFace::Enum e);
+	static GLenum Convert(POGLCullFace::Enum e);
 	//static GLenum Convert(PolygonMode::Enum e);
 	static GLenum Convert(POGLPrimitiveType::Enum e);
 	//static GLenum Convert(TextureCubeSide::Enum e);

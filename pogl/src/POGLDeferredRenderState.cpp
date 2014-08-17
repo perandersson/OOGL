@@ -128,6 +128,18 @@ void POGLDeferredRenderState::SetBlend(bool b)
 	cmd->value = b;
 }
 
+void POGLDeferredRenderState::SetFrontFace(POGLFrontFace::Enum e)
+{
+	POGLSetFrontFaceCommand* cmd = (POGLSetFrontFaceCommand*)mDeviceContext->AddCommand(&POGLSetFrontFace_Command, &POGLNothing_Release);
+	cmd->frontFace = e;
+}
+
+void POGLDeferredRenderState::SetCullFace(POGLCullFace::Enum e)
+{
+	POGLSetCullFaceCommand* cmd = (POGLSetCullFaceCommand*)mDeviceContext->AddCommand(&POGLSetCullFace_Command, &POGLNothing_Release);
+	cmd->cullFace = e;
+}
+
 void POGLDeferredRenderState::SetViewport(const POGL_RECT& viewport)
 {
 	POGLSetViewportCommand* cmd = (POGLSetViewportCommand*)mDeviceContext->AddCommand(&POGLSetViewport_Command, &POGLNothing_Release);

@@ -207,6 +207,18 @@ void POGLSetBlendFunc_Command(class POGLDeferredDeviceContext* context, POGLRend
 	state->SetBlendFunc(cmd->sfactor, cmd->dfactor);
 }
 
+void POGLSetFrontFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+{
+	POGLSetFrontFaceCommand* cmd = (POGLSetFrontFaceCommand*)command;
+	state->SetFrontFace(cmd->frontFace);
+}
+
+void POGLSetCullFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+{
+	POGLSetCullFaceCommand* cmd = (POGLSetCullFaceCommand*)command;
+	state->SetCullFace(cmd->cullFace);
+}
+
 void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLSetViewportCommand* cmd = (POGLSetViewportCommand*)command;

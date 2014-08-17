@@ -121,6 +121,8 @@ public:
 	virtual void SetStencilMask(POGL_UINT32 mask);
 	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
 	virtual void SetBlend(bool b);
+	virtual void SetFrontFace(POGLFrontFace::Enum e);
+	virtual void SetCullFace(POGLCullFace::Enum e);
 	virtual void SetViewport(const POGL_RECT& viewport);
 
 private:
@@ -164,6 +166,8 @@ private:
 	POGLSrcFactor::Enum mSrcFactor;
 	POGLDstFactor::Enum mDstFactor;
 	bool mBlending;
+	POGLFrontFace::Enum mFrontFace;
+	POGLCullFace::Enum mCullFace;
 	POGL_RECT mViewport;
 
 	//

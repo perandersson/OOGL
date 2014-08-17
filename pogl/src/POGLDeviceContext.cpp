@@ -117,6 +117,8 @@ IPOGLProgram* POGLDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
 	data->blending = false;
 	data->srcFactor = POGLSrcFactor::DEFAULT;
 	data->dstFactor = POGLDstFactor::DEFAULT;
+	data->frontFace = POGLFrontFace::DEFAULT;
+	data->cullFace = POGLCullFace::DEFAULT;
 
 	// Prepare uniforms
 	GLint numUniforms = 0;

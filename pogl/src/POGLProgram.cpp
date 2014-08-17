@@ -129,6 +129,30 @@ void POGLProgram::SetBlend(bool b)
 	mData->blending = b;
 }
 
+void POGLProgram::SetFrontFace(POGLFrontFace::Enum e)
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	mData->frontFace = e;
+}
+
+POGLFrontFace::Enum POGLProgram::GetFrontFace()
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	return mData->frontFace;
+}
+
+void POGLProgram::SetCullFace(POGLCullFace::Enum e)
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	mData->cullFace = e;
+}
+
+POGLCullFace::Enum POGLProgram::GetCullFace()
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	return mData->cullFace;
+}
+
 void POGLProgram::CopyProgramData(POGLProgramData* in)
 {
 	assert_not_null(in);
