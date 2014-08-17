@@ -3,13 +3,13 @@
 
 namespace {
 	std::atomic<POGL_UINT32> ids;
-	POGL_UINT32 GenEffectUID() {
+	POGL_UINT32 GenProgramUID() {
 		return ++ids;
 	}
 }
 
 POGLProgram::POGLProgram(GLuint programID, POGLProgramData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms)
-: mRefCount(1), mProgramID(programID), mUID(GenEffectUID()), mData(data), mUniforms(uniforms)
+: mRefCount(1), mProgramID(programID), mUID(GenProgramUID()), mData(data), mUniforms(uniforms)
 {
 	assert_not_null(data);
 }

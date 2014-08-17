@@ -38,7 +38,7 @@ IPOGLShader* POGLDeviceContext::CreateShaderFromFile(const POGL_CHAR* path, POGL
 {
 	POGL_ISTREAM stream(path);
 	if (!stream.is_open())
-		THROW_EXCEPTION(POGLResourceException, "Effect at path: '%s' could not be found", path);
+		THROW_EXCEPTION(POGLResourceException, "Shader at path: '%s' could not be found", path);
 
 	// Read the entire file into memory
 	POGL_STRING str((std::istreambuf_iterator<POGL_CHAR>(stream)), std::istreambuf_iterator<POGL_CHAR>());

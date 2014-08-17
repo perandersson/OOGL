@@ -64,7 +64,7 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a)
 	mValues[2] = FLT_MAX;
 	mValues[3] = FLT_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformFloat::Apply();
 }
 
@@ -76,7 +76,7 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 	mValues[2] = FLT_MAX;
 	mValues[3] = FLT_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformFloat::Apply();
 }
 
@@ -88,7 +88,7 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 	mValues[2] = c;
 	mValues[3] = FLT_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformFloat::Apply();
 }
 
@@ -100,7 +100,7 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_F
 	mValues[2] = c;
 	mValues[3] = d;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformFloat::Apply();
 }
 

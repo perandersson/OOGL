@@ -20,7 +20,7 @@ public:
 
 		\return
 	*/
-	bool IsEffectActive() const;
+	bool IsProgramActive() const;
 
 	void SetInt32(POGL_INT32 a);
 	void SetInt32(POGL_INT32 a, POGL_INT32 b);
@@ -64,7 +64,7 @@ public:
 	void SetCompareMode(POGLCompareMode::Enum compareMode);
 
 private:
-	POGL_UINT32 mEffectUID;
+	POGL_UINT32 mProgramUID;
 
 protected:
 	POGLRenderState* mRenderState;

@@ -91,7 +91,7 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a)
 	mValues[2] = DBL_MAX;
 	mValues[3] = DBL_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformDouble::Apply();
 }
 
@@ -103,7 +103,7 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 	mValues[2] = DBL_MAX;
 	mValues[3] = DBL_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformDouble::Apply();
 }
 
@@ -115,7 +115,7 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 	mValues[2] = c;
 	mValues[3] = DBL_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformDouble::Apply();
 }
 
@@ -127,7 +127,7 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, P
 	mValues[2] = c;
 	mValues[3] = d;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformDouble::Apply();
 }
 

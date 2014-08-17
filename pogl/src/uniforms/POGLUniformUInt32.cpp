@@ -91,7 +91,7 @@ void POGLUniformUInt32::SetUInt32(POGL_UINT32 a)
 	mValues[2] = UINT_MAX;
 	mValues[3] = UINT_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformUInt32::Apply();
 }
 
@@ -103,7 +103,7 @@ void POGLUniformUInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 	mValues[2] = UINT_MAX;
 	mValues[3] = UINT_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformUInt32::Apply();
 }
 
@@ -115,7 +115,7 @@ void POGLUniformUInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 	mValues[2] = c;
 	mValues[3] = UINT_MAX;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformUInt32::Apply();
 }
 
@@ -127,7 +127,7 @@ void POGLUniformUInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, P
 	mValues[2] = c;
 	mValues[3] = c;
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformUInt32::Apply();
 }
 

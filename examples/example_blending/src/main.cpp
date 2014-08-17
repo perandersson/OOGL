@@ -74,8 +74,8 @@ int main()
 		IPOGLVertexBuffer* vertexBufferInv = context->CreateVertexBuffer(VERTICES_INV, sizeof(VERTICES_INV), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
 
 		//
-		// Setup effect properties. This can be done on the associated RenderState as well, but since we want this to be applied for all
-		// contexts when this applied we do it on the effect instead. 
+		// Setup program properties. This can be done on the associated RenderState as well, but we do it on the program since 
+		// we want this to be applied globally for this program.
 		//
 		// Changes made on the program will NOT be applied until the next time we call IPOGLDeviceContext::Apply(IPOGLProgram*)
 		//

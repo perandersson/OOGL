@@ -53,14 +53,16 @@ int main()
 
 	try {
 		//
-		// Retrieves a device context for this thread. If no device context exists then one is created for you
+		// Retrieves the immediately device context.
 		//
 
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
 		//
-		// Load a very simple vertex- and fragment shader and link them into an effect resource 
-		// usable when drawing the geometry onto the screen. The array of IPOGLShaderProgram's must end with a nullptr (or 0).
+		// Load a very simple vertex- and fragment shader and link them into a a GPU program
+		// usable when drawing the geometry onto the screen. 
+		//
+		// The array of IPOGLShader's must end with a nullptr (or 0).
 		//
 
 		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
@@ -69,8 +71,8 @@ int main()
 		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 
 		//
-		// The vertex- and fragment shaders are no longer needed. You can reuse the vertex- and fragment shader resources 
-		// for as many effects as you want.
+		// We release the shader resources, since they are not needed anymore. You are allowed to reuse the shader resources 
+		// for other programs if you want to.
 		// 
 
 		vertexShader->Release();
@@ -110,8 +112,7 @@ int main()
 		while (POGLProcessEvents()) {
 			
 			//
-			// Prepare the simple effect. The result is a context-specific state which is responsible for 
-			// preventing unneccessary OpenGL state changes. It is also used to help you synchronize resources between concurrent contexts.
+			// Prepare the program. The result is a state which is responsible for preventing unneccessary OpenGL state changes.
 			//
 
 			IPOGLRenderState* state = context->Apply(program);
@@ -129,14 +130,13 @@ int main()
 			state->Draw(vertexBuffer);
 
 			//
-			// Nofiy the rendering engine that we are finished using the bound effect this frame.
-			// This unlocks any attached framebuffers.
+			// Nofiy the rendering engine that we are finished using the bound program this frame.
 			//
 
 			state->Release();
 
 			//
-			// End the frame, execute command lists and swap the back buffer with the front buffer so that we can see the result onto the screen
+			// End the frame and swap the back buffer with the front buffer so that we can see the result onto the screen
 			//
 
 			device->EndFrame();

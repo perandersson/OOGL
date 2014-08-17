@@ -4,7 +4,7 @@
 #include "POGLRenderState.h"
 
 POGLDefaultUniform::POGLDefaultUniform(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
-: mEffectUID(program->GetUID()), mRenderState(state), mDeviceContext(context), mComponentID(componentID)
+: mProgramUID(program->GetUID()), mRenderState(state), mDeviceContext(context), mComponentID(componentID)
 {
 }
 
@@ -12,9 +12,9 @@ POGLDefaultUniform::~POGLDefaultUniform()
 {
 }
 
-bool POGLDefaultUniform::IsEffectActive() const
+bool POGLDefaultUniform::IsProgramActive() const
 {
-	return mRenderState->IsProgramActive(mEffectUID);
+	return mRenderState->IsProgramActive(mProgramUID);
 }
 
 void POGLDefaultUniform::SetInt32(POGL_INT32 a)

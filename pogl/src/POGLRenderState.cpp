@@ -10,7 +10,7 @@
 #include "POGLFramebuffer.h"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
-: mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mCurrentProgramState(nullptr), mApplyCurrentEffectState(false),
+: mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mCurrentProgramState(nullptr), mApplyCurrentProgramState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), mViewport(0, 0, 0, 0),
@@ -34,7 +34,7 @@ void POGLRenderState::AddRef()
 
 void POGLRenderState::Release()
 {
-	mApplyCurrentEffectState = true;
+	mApplyCurrentProgramState = true;
 	if (--mRefCount == 0) {
 		POGL_SAFE_RELEASE_UID(mProgram);
 		POGL_SAFE_RELEASE_UID(mVertexBuffer);
@@ -333,16 +333,16 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 	mProgramUID = uid;
 	glUseProgram(mProgram->GetProgramID());
 	mCurrentProgramState = GetProgramState(program);
-	mApplyCurrentEffectState = true;
+	mApplyCurrentProgramState = true;
 
 	CHECK_GL("Could not bind the supplied effect");
 }
 
 void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer)
 {
-	if (mApplyCurrentEffectState) {
+	if (mApplyCurrentProgramState) {
 		mCurrentProgramState->ApplyUniforms();
-		mApplyCurrentEffectState = false;
+		mApplyCurrentProgramState = false;
 	}
 
 	BindVertexBuffer(vertexBuffer);

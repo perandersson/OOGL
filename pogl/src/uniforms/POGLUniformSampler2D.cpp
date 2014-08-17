@@ -87,6 +87,6 @@ void POGLUniformSampler2D::SetTextureResource(POGLTextureResource* texture)
 	if (mTextureResource != nullptr)
 		mTextureResource->AddRef();
 
-	if (IsEffectActive())
+	if (IsProgramActive())
 		POGLUniformSampler2D::Apply();
 }
