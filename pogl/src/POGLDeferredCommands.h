@@ -157,7 +157,6 @@ extern void POGLSetStencilTest_Command(class POGLDeferredDeviceContext* context,
 extern void POGLSetBlend_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLBooleanCommand));
 
-
 struct POGLColorMaskCommand
 {
 	union {
@@ -173,6 +172,20 @@ struct POGLColorMaskCommand
 extern void POGLColorMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
 _STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLColorMaskCommand));
 
+struct POGLStencilMaskCommand
+{
+	union {
+		POGLDeferredCommand _memory;
+		struct {
+			POGLCommandFuncPtr function;
+			POGLCommandReleaseFuncPtr releaseFunction;
+
+			POGL_UINT32 mask;
+		};
+	};
+};
+extern void POGLStencilMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
+_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLStencilMaskCommand));
 
 struct POGLSetDepthFuncCommand
 {

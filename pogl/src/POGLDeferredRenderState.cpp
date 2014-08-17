@@ -109,6 +109,12 @@ void POGLDeferredRenderState::SetStencilTest(bool b)
 	cmd->value = b;
 }
 
+void POGLDeferredRenderState::SetStencilMask(POGL_UINT32 mask)
+{
+	POGLStencilMaskCommand* cmd = (POGLStencilMaskCommand*)mDeviceContext->AddCommand(&POGLStencilMask_Command, &POGLNothing_Release);
+	cmd->mask = mask;
+}
+
 void POGLDeferredRenderState::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
 {
 	POGLSetBlendFuncCommand* cmd = (POGLSetBlendFuncCommand*)mDeviceContext->AddCommand(&POGLSetBlendFunc_Command, &POGLNothing_Release);

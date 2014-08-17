@@ -1298,6 +1298,18 @@ public:
 	virtual void SetStencilTest(bool b) = 0;
 
 	/*!
+		\brief 
+	*/
+	virtual POGL_UINT32 GetStencilMask() = 0;
+
+	/*!
+		\brief
+
+		\param mask
+	*/
+	virtual void SetStencilMask(POGL_UINT32 mask) = 0;
+
+	/*!
 		\brief Set the blending factor
 
 		\param sfactor
@@ -1395,7 +1407,14 @@ public:
 			TRUE or FALSE
 	*/
 	virtual void SetStencilTest(bool b) = 0;
-	
+
+	/*!
+		\brief
+
+		\param mask
+	*/
+	virtual void SetStencilMask(POGL_UINT32 mask) = 0;
+
 	/*!
 		\brief
 	*/

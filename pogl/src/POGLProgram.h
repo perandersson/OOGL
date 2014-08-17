@@ -48,18 +48,22 @@ public:
 		return mUniforms;
 	}
 
-	bool GetDepthTest();
-	void SetDepthTest(bool b);
-	void SetDepthFunc(POGLDepthFunc::Enum depthFunc);
-	POGLDepthFunc::Enum GetDepthFunc();
-	bool GetDepthMask();
-	void SetDepthMask(bool b);
-	void SetColorMask(POGL_UINT8 colorMask);
-	POGL_UINT8 GetColorMask();
-	bool GetStencilTest();
-	void SetStencilTest(bool b);
-	void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
-	void SetBlend(bool b);
+// IPOGLProgram
+public:
+	virtual bool GetDepthTest();
+	virtual void SetDepthTest(bool b);
+	virtual void SetDepthFunc(POGLDepthFunc::Enum depthFunc);
+	virtual POGLDepthFunc::Enum GetDepthFunc();
+	virtual bool GetDepthMask();
+	virtual void SetDepthMask(bool b);
+	virtual void SetColorMask(POGL_UINT8 colorMask);
+	virtual POGL_UINT8 GetColorMask();
+	virtual bool GetStencilTest();
+	virtual void SetStencilTest(bool b);
+	virtual POGL_UINT32 GetStencilMask();
+	virtual void SetStencilMask(POGL_UINT32 mask);
+	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
+	virtual void SetBlend(bool b);
 
 // IPOGLInterface
 public:

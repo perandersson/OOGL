@@ -104,6 +104,18 @@ void POGLProgram::SetStencilTest(bool b)
 	mData->stencilTest = b;
 }
 
+POGL_UINT32 POGLProgram::GetStencilMask()
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	return mData->stencilMask;
+}
+
+void POGLProgram::SetStencilMask(POGL_UINT32 mask)
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	mData->stencilMask = mask;
+}
+
 void POGLProgram::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);

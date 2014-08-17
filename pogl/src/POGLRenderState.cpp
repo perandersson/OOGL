@@ -13,7 +13,7 @@ POGLRenderState::POGLRenderState(POGLDeviceContext* context)
 : mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mCurrentProgramState(nullptr), mApplyCurrentProgramState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
-mColorMask(POGLColorMask::ALL), mStencilTest(false), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), mViewport(0, 0, 0, 0),
+mColorMask(POGLColorMask::ALL), mStencilTest(false), mStencilMask(BIT_ALL), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), mViewport(0, 0, 0, 0),
 mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0),
 mFramebuffer(nullptr), mFramebufferUID(0)
 {
@@ -229,6 +229,17 @@ void POGLRenderState::SetStencilTest(bool b)
 	CHECK_GL("Cannot enable/disable stencil test");
 }
 
+void POGLRenderState::SetStencilMask(POGL_UINT32 mask)
+{
+	if (mStencilMask == mask)
+		return;
+
+	glStencilMask((GLuint)mask);
+	mStencilMask = mask;
+
+	CHECK_GL("Cannot set new stencil mask");
+}
+
 void POGLRenderState::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
 {
 	if (mSrcFactor == sfactor && mDstFactor == dfactor) {
@@ -287,6 +298,7 @@ void POGLRenderState::Apply(IPOGLProgram* program)
 	SetDepthMask(data.depthMask);
 	SetColorMask(data.colorMask);
 	SetStencilTest(data.stencilTest);
+	SetStencilMask(data.stencilMask);
 	SetBlend(data.blending);
 	SetBlendFunc(data.srcFactor, data.dstFactor);
 }

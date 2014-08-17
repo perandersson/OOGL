@@ -19,6 +19,9 @@ struct POGLProgramData
 	/* Should we write to the stencil buffer or not */
 	bool stencilTest;
 
+	/* What parts of the stencil buffer should we draw to */
+	POGL_UINT32 stencilMask;
+
 	/* Source blending factor */
 	POGLSrcFactor::Enum srcFactor;
 

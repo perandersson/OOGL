@@ -113,6 +113,7 @@ IPOGLProgram* POGLDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
 	data->depthMask = true;
 	data->depthTest = false;
 	data->stencilTest = false;
+	data->stencilMask = BIT_ALL;
 	data->blending = false;
 	data->srcFactor = POGLSrcFactor::DEFAULT;
 	data->dstFactor = POGLDstFactor::DEFAULT;

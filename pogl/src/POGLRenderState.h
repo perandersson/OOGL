@@ -118,6 +118,7 @@ public:
 	virtual void SetDepthMask(bool b);
 	virtual void SetColorMask(POGL_UINT8 mask);
 	virtual void SetStencilTest(bool b);
+	virtual void SetStencilMask(POGL_UINT32 mask);
 	virtual void SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor);
 	virtual void SetBlend(bool b);
 	virtual void SetViewport(const POGL_RECT& viewport);
@@ -159,6 +160,7 @@ private:
 	bool mDepthMask;
 	POGL_UINT8 mColorMask;
 	bool mStencilTest;
+	POGL_UINT32 mStencilMask;
 	POGLSrcFactor::Enum mSrcFactor;
 	POGLDstFactor::Enum mDstFactor;
 	bool mBlending;

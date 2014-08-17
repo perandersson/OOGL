@@ -189,6 +189,12 @@ void POGLColorMask_Command(class POGLDeferredDeviceContext* context, POGLRenderS
 	state->SetColorMask(cmd->mask);
 }
 
+void POGLStencilMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+{
+	POGLStencilMaskCommand* cmd = (POGLStencilMaskCommand*)command;
+	state->SetStencilMask(cmd->mask);
+}
+
 void POGLSetDepthFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
 {
 	POGLSetDepthFuncCommand* cmd = (POGLSetDepthFuncCommand*)command;
