@@ -118,7 +118,7 @@ static const POGL_UINT32 CIRCLE_PTS = 365;
 
 int main()
 {
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: Custom Vertex Type"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Custom Vertex Type"));
 
 	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG

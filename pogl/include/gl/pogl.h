@@ -88,16 +88,11 @@ typedef void* POGL_HANDLE;
 typedef float POGL_FLOAT;
 typedef double POGL_DOUBLE;
 
-#include <string>
 #ifdef UNICODE
 typedef wchar_t POGL_CHAR;
-typedef std::wstring POGL_STRING;
-#define POGL_TOSTRING(x) L##x
 #define POGL_TOCHAR(x) L##x
 #else
 typedef char POGL_CHAR;
-typedef std::string POGL_STRING;
-#define POGL_TOSTRING(x) POGL_STRING(POGL_TOCHAR(x))
 #define POGL_TOCHAR(x) x
 #endif
 
@@ -1253,7 +1248,12 @@ public:
 */
 class IPOGLProgram : public IPOGLResource
 {
-public:
+public:	
+	/*!
+		\brief Locate the uniform with the given name
+	*/
+	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name) = 0;
+
 	/*!
 		\brief Retrieves if this program enables or disables depth testing
 	*/

@@ -32,7 +32,7 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 
 int main()
 {
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: Blending"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Blending"));
 	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG
 	deviceInfo.flags = POGLDeviceInfoFlags::DEBUG_MODE;

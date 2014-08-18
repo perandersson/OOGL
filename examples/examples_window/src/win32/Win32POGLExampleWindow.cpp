@@ -4,13 +4,22 @@
 #include <chrono>
 using namespace std::chrono;
 
+#include <string>
+#ifdef UNICODE
+typedef std::wstring POGL_STRING;
+#define POGL_TOSTRING(x) L##x
+#else
+typedef std::string POGL_STRING;
+#define POGL_TOSTRING(x) POGL_STRING(POGL_TOCHAR(x))
+#endif
+
 POGL_HANDLE gPOGLWindowHandle = nullptr;
 const POGL_CHAR* EXAMPLE_WINDOW_CLASS_NAME = POGL_TOCHAR("POGLExampleWindow");
-POGL_STRING gTitle;
 
 high_resolution_clock::time_point gPrev;
 POGL_FLOAT gTotalTime = 0.0f;
 POGL_FLOAT gTimeSinceLastTick = 0.0f;
+POGL_STRING gTitle;
 POGL_UINT32 gNumFPS = 0;
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam)
@@ -27,7 +36,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT message, WPARAM wparam, LPARAM lpara
 	return DefWindowProc(hwnd, message, wparam, lparam);
 }
 
-POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZE& size, const POGL_STRING& title)
+POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZE& size, const POGL_CHAR* title)
 {
 	HINSTANCE applicationHandle = GetModuleHandle(NULL);
 
@@ -46,7 +55,7 @@ POGL_HANDLE POGLCreateExampleWindow(const POGL_SIZE& size, const POGL_STRING& ti
 	RECT windowSize = { 0, 0, (LONG)size.x, (LONG)size.y };
 	AdjustWindowRectEx(&windowSize, style, false, exStyle);
 
-	HWND window = CreateWindowEx(exStyle, EXAMPLE_WINDOW_CLASS_NAME, title.c_str(), style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0,
+	HWND window = CreateWindowEx(exStyle, EXAMPLE_WINDOW_CLASS_NAME, title, style | WS_CLIPSIBLINGS | WS_CLIPCHILDREN, 0, 0,
 		windowSize.right - windowSize.left, windowSize.bottom - windowSize.top,
 		NULL, NULL, applicationHandle, NULL);
 

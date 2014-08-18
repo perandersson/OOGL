@@ -50,6 +50,7 @@ public:
 
 // IPOGLProgram
 public:
+	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
 	virtual bool GetDepthTest();
 	virtual void SetDepthTest(bool b);
 	virtual void SetDepthFunc(POGLDepthFunc::Enum depthFunc);

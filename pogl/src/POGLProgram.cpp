@@ -39,6 +39,11 @@ void POGLProgram::Release()
 	}
 }
 
+IPOGLUniform* POGLProgram::FindUniformByName(const POGL_CHAR* name)
+{
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
 POGLResourceType::Enum POGLProgram::GetType() const
 {
 	return POGLResourceType::PROGRAM;

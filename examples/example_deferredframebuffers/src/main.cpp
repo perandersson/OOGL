@@ -72,7 +72,7 @@ static const POGL_CHAR TEXTURING_FS[] = { R"(
 int main()
 {
 	// Create a window
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: Deferred Framebuffers"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Deferred Framebuffers"));
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo = { 0 };

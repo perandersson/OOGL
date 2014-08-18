@@ -11,6 +11,15 @@ namespace std { using namespace __gnu_cxx; }
 #include <hash_map>
 #endif
 
+#include <string>
+#ifdef UNICODE
+typedef std::wstring POGL_STRING;
+#define POGL_TOSTRING(x) L##x
+#else
+typedef std::string POGL_STRING;
+#define POGL_TOSTRING(x) POGL_STRING(POGL_TOCHAR(x))
+#endif
+
 #ifndef FLT_EQ
 #define FLT_EQ(val1, val2) (abs(val2 - val1) <= FLT_EPSILON)
 #endif

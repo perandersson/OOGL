@@ -37,7 +37,7 @@ int main()
 	// You are responsible for creating a valid window to be drawn to on your own. 
 	//
 
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: Draw Triangle"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Draw Triangle"));
 
 	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG

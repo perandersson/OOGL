@@ -46,7 +46,7 @@ static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
 int main()
 {
 	// Create a window
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOSTRING("Example: Load Textures from thread"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Load Textures from thread"));
 
 	// Create a POGL device based on the supplied information
 	POGL_DEVICE_INFO deviceInfo = { 0 };
