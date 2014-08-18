@@ -1,5 +1,5 @@
 #pragma once
-#include "POGLProgramState.h"
+#include "config.h"
 #include <memory>
 
 class POGLDeviceContext;
@@ -8,10 +8,9 @@ class POGLIndexBuffer;
 class POGLTextureResource;
 class POGLSamplerObject;
 class POGLFramebuffer;
+class POGLProgram;
 class POGLRenderState : public IPOGLRenderState
 {
-	typedef std::hash_map<POGL_UINT32, std::shared_ptr<POGLProgramState>> EffectStates;
-
 public:
 	POGLRenderState(POGLDeviceContext* context);
 	virtual ~POGLRenderState();
@@ -24,18 +23,10 @@ public:
 	void Apply(IPOGLProgram* program);
 
 	/*!
-		\brief Retrieves the state for the supplied program
-
-		\return program
-	*/
-	POGLProgramState* GetProgramState(POGLProgram* program);
-
-
-	/*!
 		\brief Check to see if the current program is of the supplied type
 	*/
-	inline bool IsProgramActive(POGL_UINT32 effectUID) const {
-		return mProgramUID == effectUID;
+	inline bool IsProgramActive(POGL_UINT32 programUID) const {
+		return mProgramUID == programUID;
 	}
 
 	/*!
@@ -107,7 +98,6 @@ public:
 public:
 	virtual void Clear(POGL_UINT32 clearBits);
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
-	virtual IPOGLUniform* FindUniformByName(const POGL_STRING& name);
 	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer);
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
@@ -144,8 +134,6 @@ private:
 
 	POGLProgram* mProgram;
 	POGL_UINT32 mProgramUID;
-	POGLProgramState* mCurrentProgramState;
-	EffectStates mProgramStates;
 	bool mApplyCurrentProgramState;
 
 	POGLVertexBuffer *mVertexBuffer;

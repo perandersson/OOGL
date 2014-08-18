@@ -1,6 +1,5 @@
 #pragma once
-#include "uniforms/POGLUniformProperty.h"
-#include <memory>
+#include "config.h"
 
 struct POGLProgramData
 {
@@ -36,4 +35,10 @@ struct POGLProgramData
 
 	/* */
 	POGLCullFace::Enum cullFace;
+
+	POGLProgramData()
+		: depthTest(false), depthFunc(POGLDepthFunc::DEFAULT), depthMask(true), colorMask(POGLColorMask::ALL), stencilTest(false),
+		stencilMask(BIT_ALL), srcFactor(POGLSrcFactor::DEFAULT), dstFactor(POGLDstFactor::DEFAULT), blending(false), frontFace(POGLFrontFace::DEFAULT),
+		cullFace(POGLCullFace::DEFAULT)
+	{}
 };

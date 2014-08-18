@@ -1,5 +1,19 @@
 #include "MemCheck.h"
 #include "POGLProgram.h"
+#include "uniforms/POGLDefaultUniform.h"
+#include "uniforms/POGLUniformNotFound.h"
+#include "uniforms/POGLUniformInt32.h"
+#include "uniforms/POGLUniformUInt32.h"
+#include "uniforms/POGLUniformFloat.h"
+#include "uniforms/POGLUniformDouble.h"
+#include "uniforms/POGLUniformMat4.h"
+#include "uniforms/POGLUniformSampler2D.h"
+#include "POGLDeviceContext.h"
+#include "POGLRenderState.h"
+#include "POGLFactory.h"
+#include "POGLEnum.h"
+#include "POGLSamplerObject.h"
+#include "POGLStringUtils.h"
 
 namespace {
 	std::atomic<POGL_UINT32> ids;
@@ -8,10 +22,9 @@ namespace {
 	}
 }
 
-POGLProgram::POGLProgram(GLuint programID, POGLProgramData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms)
-: mRefCount(1), mProgramID(programID), mUID(GenProgramUID()), mData(data), mUniforms(uniforms)
+POGLProgram::POGLProgram()
+: mRefCount(1), mProgramID(0), mUID(0), mData(new POGLProgramData)
 {
-	assert_not_null(data);
 }
 
 POGLProgram::~POGLProgram()
@@ -27,6 +40,11 @@ void POGLProgram::AddRef()
 void POGLProgram::Release()
 {
 	if (--mRefCount == 0) {
+		auto it = mUniforms.begin();
+		auto end = mUniforms.end();
+		for (; it != end; ++it) {
+			delete it->second;
+		}
 		if (mProgramID != 0) {
 			glDeleteProgram(mProgramID);
 			mProgramID = 0;
@@ -39,9 +57,122 @@ void POGLProgram::Release()
 	}
 }
 
+void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
+{
+	mProgramID = programID;
+	const POGL_UINT32 programUID = GenProgramUID();
+
+	POGLRenderState* renderState = context->GetRenderState();
+
+	//
+	// Prepare uniforms
+	//
+
+	GLint numUniforms = 0;
+	glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &numUniforms);
+	GLchar nameData[256] = { 0 };
+	for (GLint uniformIndex = 0; uniformIndex < numUniforms; ++uniformIndex) {
+		GLint arraySize = 0;
+		GLenum uniformType = 0;
+		GLsizei actualLength = 0;
+
+		//
+		// http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniform.xml
+		// 
+
+		glGetActiveUniform(programID, uniformIndex, sizeof(nameData), &actualLength, &arraySize, &uniformType, nameData);
+		nameData[actualLength] = 0;
+
+		const POGL_STRING name = POGLStringUtils::ToString(nameData);
+		const GLint componentID = glGetUniformLocation(programID, nameData);
+
+		// Set default properties????
+
+		POGLDefaultUniform* uniform = nullptr;
+		switch (uniformType) {
+		case GL_FLOAT:
+		case GL_FLOAT_VEC2:
+		case GL_FLOAT_VEC3:
+		case GL_FLOAT_VEC4:
+			uniform = new POGLUniformFloat(programUID, renderState, componentID);
+			break;
+		case GL_DOUBLE:
+		case GL_DOUBLE_VEC2:
+		case GL_DOUBLE_VEC3:
+		case GL_DOUBLE_VEC4:
+			uniform = new POGLUniformDouble(programUID, renderState, componentID);
+			break;
+		case GL_INT:
+		case GL_INT_VEC2:
+		case GL_INT_VEC3:
+		case GL_INT_VEC4:
+			uniform = new POGLUniformInt32(programUID, renderState, componentID);
+			break;
+		case GL_UNSIGNED_INT:
+		case GL_UNSIGNED_INT_VEC2:
+		case GL_UNSIGNED_INT_VEC3:
+		case GL_UNSIGNED_INT_VEC4:
+			uniform = new POGLUniformUInt32(programUID, renderState, componentID);
+			break;
+		case GL_FLOAT_MAT4:
+			uniform = new POGLUniformMat4(programUID, renderState, componentID);
+			break;
+		case GL_SAMPLER_2D:
+			uniform = new POGLUniformSampler2D(programUID, renderState, componentID, renderState->NextActiveTexture(), GenSamplerObject(renderState));
+			break;
+		case GL_SAMPLER_CUBE:
+			break;
+		}
+
+		// Validate so that we actually have a uniform. If this exception is thrown then implement a new POGLUniform<x> type
+		if (uniform == nullptr) {
+			THROW_EXCEPTION(POGLProgramException, "Unknown uniform: %s of type 0x%x", name.c_str(), uniformType);
+		}
+
+		mUniforms.insert(std::make_pair(name, uniform));
+	}
+
+	mUID = programUID;
+}
+
+void POGLProgram::ApplyUniforms()
+{
+	auto it = mUniforms.begin();
+	auto end = mUniforms.end();
+	for (; it != end; ++it) {
+		it->second->Apply();
+	}
+
+	CHECK_GL("Could not apply default uniforms");
+}
+
+POGLSamplerObject* POGLProgram::GenSamplerObject(POGLRenderState* renderState)
+{
+	const GLuint samplerID = POGLFactory::GenSamplerID();
+	POGLSamplerObject* samplerObject = new POGLSamplerObject(samplerID, renderState);
+
+	glSamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(POGLMinFilter::DEFAULT));
+	glSamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(POGLMagFilter::DEFAULT));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(POGLTextureWrap::DEFAULT));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(POGLTextureWrap::DEFAULT));
+	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_R, POGLEnum::Convert(POGLTextureWrap::DEFAULT));
+	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(POGLCompareFunc::DEFAULT));
+	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(POGLCompareMode::DEFAULT));
+
+	CHECK_GL("Could not set sampler parameters");
+	return samplerObject;
+}
+
 IPOGLUniform* POGLProgram::FindUniformByName(const POGL_CHAR* name)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+	IPOGLUniform* uniform = nullptr;
+	auto it = mUniforms.find(POGL_STRING(name));
+	if (it == mUniforms.end()) {
+		static POGLUniformNotFound uniformNotFound;
+		return &uniformNotFound;
+	}
+	return it->second;
 }
 
 POGLResourceType::Enum POGLProgram::GetType() const
@@ -158,10 +289,9 @@ POGLCullFace::Enum POGLProgram::GetCullFace()
 	return mData->cullFace;
 }
 
-void POGLProgram::CopyProgramData(POGLProgramData* in)
+void POGLProgram::CopyProgramData(POGLProgramData* _out_Data)
 {
-	assert_not_null(in);
+	assert_not_null(_out_Data);
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	// Copy!!
-	*in = *mData;
+	*_out_Data = *mData;
 }

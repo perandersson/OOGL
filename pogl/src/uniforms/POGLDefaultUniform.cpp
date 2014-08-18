@@ -3,8 +3,8 @@
 #include "POGLProgram.h"
 #include "POGLRenderState.h"
 
-POGLDefaultUniform::POGLDefaultUniform(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
-: mProgramUID(program->GetUID()), mRenderState(state), mDeviceContext(context), mComponentID(componentID)
+POGLDefaultUniform::POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID)
+: mProgramUID(programUID), mRenderState(state), mComponentID(componentID)
 {
 }
 

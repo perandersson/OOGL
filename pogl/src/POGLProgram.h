@@ -1,15 +1,32 @@
 #pragma once
-#include "config.h"
 #include "POGLProgramData.h"
 #include <mutex>
 #include <memory>
 
-struct POGLUniformProperty; 
+struct POGLUniformProperty;
+class POGLDefaultUniform;
+class POGLDeviceContext;
+class POGLRenderState;
+class POGLSamplerObject;
 class POGLProgram : public IPOGLProgram
 {
+	typedef std::hash_map<POGL_STRING, POGLDefaultUniform*> Uniforms;
+
 public:
-	POGLProgram(GLuint programID, POGLProgramData* data, std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms);
+	POGLProgram();
 	virtual ~POGLProgram();
+
+	/*!
+		\brief Method called after the program is constructed
+		
+		This method is only allowed to be invoked from the main thread.
+
+		\param programID
+				The OpenGL program ID
+		\param context
+				The immediately POGLDeviceContext
+	*/
+	void PostConstruct(GLuint programID, POGLDeviceContext* context);
 	
 	/*!
 		\brief Retrieves a unique ID for this effect
@@ -29,24 +46,25 @@ public:
 	
 	/*!
 		\brief Copy the effect data to the supplied instance
+
+		\param _out_Data
+				The target instance we want to set the program data to
 	*/
-	void CopyProgramData(POGLProgramData* in);
+	void CopyProgramData(POGLProgramData* _out_Data);
 
 	/*!
-		\brief Retrieves the data
-
-		\return
+		\brief Apply all default uniform properties
 	*/
-	inline const POGLProgramData* GetData() const {
-		return mData;
-	}
+	void ApplyUniforms();
 	
 	/*!
-		\brief Retrieves the uniforms for this effect
+		\brief Generate a sampler object based on the supplied property
+
+		\param renderState
+		\param property
+					The uniform property
 	*/
-	inline std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>>& GetUniforms() {
-		return mUniforms;
-	}
+	POGLSamplerObject* GenSamplerObject(POGLRenderState* renderState);
 
 // IPOGLProgram
 public:
@@ -85,5 +103,6 @@ private:
 	POGL_UINT32 mUID;
 	std::recursive_mutex mMutex;
 	POGLProgramData* mData;
-	std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> mUniforms;
+
+	Uniforms mUniforms;
 };

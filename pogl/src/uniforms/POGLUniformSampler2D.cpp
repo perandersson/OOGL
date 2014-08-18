@@ -6,8 +6,8 @@
 #include "POGLTexture2D.h"
 #include "POGLEnum.h"
 
-POGLUniformSampler2D::POGLUniformSampler2D(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
-: POGLDefaultUniform(program, state, context, componentID),
+POGLUniformSampler2D::POGLUniformSampler2D(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
+: POGLDefaultUniform(programUID, state, componentID),
 mTextureResource(nullptr), mTextureUID(0), mActiveTexture(activeTexture), mSamplerObject(samplerObject)
 {
 	assert_not_null(mSamplerObject);
@@ -37,6 +37,8 @@ void POGLUniformSampler2D::Apply()
 
 void POGLUniformSampler2D::SetTexture(IPOGLTexture* texture)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	if (texture == nullptr)
 		SetTextureResource(nullptr);
 	else {
@@ -48,18 +50,24 @@ void POGLUniformSampler2D::SetTexture(IPOGLTexture* texture)
 
 void POGLUniformSampler2D::SetMinFilter(POGLMinFilter::Enum minFilter)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
 	glSamplerParameteri(samplerID, GL_TEXTURE_MIN_FILTER, POGLEnum::Convert(minFilter));
 }
 
 void POGLUniformSampler2D::SetMagFilter(POGLMagFilter::Enum magFilter)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
 	glSamplerParameteri(samplerID, GL_TEXTURE_MAG_FILTER, POGLEnum::Convert(magFilter));
 }
 
 void POGLUniformSampler2D::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
 	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_S, POGLEnum::Convert(s));
 	glSamplerParameteri(samplerID, GL_TEXTURE_WRAP_T, POGLEnum::Convert(t));
@@ -67,12 +75,16 @@ void POGLUniformSampler2D::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWr
 
 void POGLUniformSampler2D::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
 	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_FUNC, POGLEnum::Convert(compareFunc));
 }
 
 void POGLUniformSampler2D::SetCompareMode(POGLCompareMode::Enum compareMode)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const GLuint samplerID = mSamplerObject->GetSamplerID();
 	glSamplerParameteri(samplerID, GL_TEXTURE_COMPARE_MODE, POGLEnum::Convert(compareMode));
 }

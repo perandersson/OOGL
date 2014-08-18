@@ -1,13 +1,11 @@
 #pragma once
 #include "config.h"
 
-class POGLProgram;
 class POGLRenderState;
-class POGLDeviceContext;
 class POGLDefaultUniform : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
-	POGLDefaultUniform(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);
 	~POGLDefaultUniform();
 
 	/*!
@@ -68,6 +66,5 @@ private:
 
 protected:
 	POGLRenderState* mRenderState;
-	POGLDeviceContext* mDeviceContext;
 	GLint mComponentID;
 };

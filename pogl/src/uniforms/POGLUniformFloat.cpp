@@ -2,8 +2,8 @@
 #include "POGLUniformFloat.h"
 #include "POGLDeviceContext.h"
 
-POGLUniformFloat::POGLUniformFloat(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
-: POGLDefaultUniform(program, state, context, componentID), mCount(0)
+POGLUniformFloat::POGLUniformFloat(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID)
+: POGLDefaultUniform(programUID, state, componentID), mCount(0)
 {
 	mValues[0] = 0;
 	mValues[1] = 0;
@@ -58,6 +58,8 @@ void POGLUniformFloat::Apply()
 
 void POGLUniformFloat::SetFloat(POGL_FLOAT a)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	mCount = 1;
 	mValues[0] = a;
 	mValues[1] = FLT_MAX;
@@ -70,6 +72,8 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a)
 
 void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	mCount = 2;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -82,6 +86,8 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 
 void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	mCount = 3;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -94,6 +100,8 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 
 void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	mCount = 4;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -106,9 +114,14 @@ void POGLUniformFloat::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_F
 
 void POGLUniformFloat::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = ptr[i];
+
+	if (IsProgramActive())
+		POGLUniformFloat::Apply();
 }
 
 void POGLUniformFloat::SetDouble(POGL_DOUBLE a)
@@ -133,9 +146,14 @@ void POGLUniformFloat::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, PO
 
 void POGLUniformFloat::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = (POGL_FLOAT)ptr[i];
+
+	if (IsProgramActive())
+		POGLUniformFloat::Apply();
 }
 
 void POGLUniformFloat::SetVector2(const POGL_VECTOR2& vec)

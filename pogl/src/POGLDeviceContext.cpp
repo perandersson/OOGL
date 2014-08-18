@@ -8,9 +8,9 @@
 #include "POGLTexture2D.h"
 #include "POGLShader.h"
 #include "POGLProgramData.h"
-#include "POGLStringUtils.h"
 #include "POGLFactory.h"
 #include "POGLFramebuffer.h"
+#include "POGLProgram.h"
 #include <gl/poglext.h>
 #include <algorithm>
 
@@ -107,52 +107,9 @@ IPOGLProgram* POGLDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
 		THROW_EXCEPTION(POGLResourceException, "Could not link the supplied shader programs. Reason: %s", infoLogg);
 	}
 
-	POGLProgramData* data = new POGLProgramData;
-	data->depthFunc = POGLDepthFunc::DEFAULT;
-	data->colorMask = POGLColorMask::ALL;
-	data->depthMask = true;
-	data->depthTest = false;
-	data->stencilTest = false;
-	data->stencilMask = BIT_ALL;
-	data->blending = false;
-	data->srcFactor = POGLSrcFactor::DEFAULT;
-	data->dstFactor = POGLDstFactor::DEFAULT;
-	data->frontFace = POGLFrontFace::DEFAULT;
-	data->cullFace = POGLCullFace::DEFAULT;
-
-	// Prepare uniforms
-	GLint numUniforms = 0;
-	glGetProgramiv(programID, GL_ACTIVE_UNIFORMS, &numUniforms);
-	GLchar nameData[256] = { 0 };
-	std::hash_map<POGL_STRING, std::shared_ptr<POGLUniformProperty>> uniforms;
-	for (GLint uniformIndex = 0; uniformIndex < numUniforms; ++uniformIndex) {
-		GLint arraySize = 0;
-		GLenum type = 0;
-		GLsizei actualLength = 0;
-
-		//
-		// http://www.opengl.org/sdk/docs/man/xhtml/glGetActiveUniform.xml
-		// 
-
-		glGetActiveUniform(programID, uniformIndex, sizeof(nameData), &actualLength, &arraySize, &type, nameData);
-		nameData[actualLength] = 0;
-
-		const POGL_STRING name = POGLStringUtils::ToString(nameData);
-		const GLint componentID = glGetUniformLocation(programID, nameData);
-
-		std::shared_ptr<POGLUniformProperty> p(new POGLUniformProperty());
-		p->name = name;
-		p->componentID = componentID;
-		p->uniformType = type;
-		p->minFilter = POGLMinFilter::DEFAULT;
-		p->magFilter = POGLMagFilter::DEFAULT;
-		p->wrap[0] = p->wrap[1] = p->wrap[3] = POGLTextureWrap::DEFAULT;
-		p->compareFunc = POGLCompareFunc::DEFAULT;
-		p->compareMode = POGLCompareMode::DEFAULT;
-		uniforms.insert(std::make_pair(p->name, p));
-	}
-
-	return new POGLProgram(programID, data, uniforms);
+	POGLProgram* program = new POGLProgram();
+	program->PostConstruct(programID, this);
+	return program;
 }
 
 IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()

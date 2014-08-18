@@ -1,10 +1,11 @@
 #pragma once
 #include "POGLDefaultUniform.h"
+#include <mutex>
 
 class POGLUniformInt32 : public POGLDefaultUniform
 {
 public:
-	POGLUniformInt32(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLUniformInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);
 	~POGLUniformInt32();
 
 	void Apply();
@@ -25,4 +26,5 @@ private:
 	POGL_INT32 mCount;
 	POGL_INT32 mValues[4];
 	POGL_INT32 mValuesSet[4];
+	std::mutex mMutex;
 };

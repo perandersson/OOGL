@@ -2,8 +2,8 @@
 #include "POGLUniformMat4.h"
 #include "POGLDeviceContext.h"
 
-POGLUniformMat4::POGLUniformMat4(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID)
-: POGLDefaultUniform(program, state, context, componentID)
+POGLUniformMat4::POGLUniformMat4(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID)
+: POGLDefaultUniform(programUID, state, componentID)
 {
 	memset(&mValue, 0, sizeof(mValue));
 	mValue._11 = 1.0;
@@ -25,6 +25,8 @@ void POGLUniformMat4::Apply()
 
 void POGLUniformMat4::SetMatrix(const POGL_MAT4& mat4)
 {
+	std::lock_guard<std::mutex> lock(mMutex);
+
 	mValue._11 = mat4._11;
 	mValue._12 = mat4._12;
 	mValue._13 = mat4._13;
@@ -44,4 +46,7 @@ void POGLUniformMat4::SetMatrix(const POGL_MAT4& mat4)
 	mValue._42 = mat4._42;
 	mValue._43 = mat4._43;
 	mValue._44 = mat4._44;
+
+	if (IsProgramActive())
+		POGLUniformMat4::Apply();
 }

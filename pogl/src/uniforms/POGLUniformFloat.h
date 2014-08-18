@@ -1,10 +1,11 @@
 #pragma once
 #include "POGLDefaultUniform.h"
+#include <mutex>
 
 class POGLUniformFloat : public POGLDefaultUniform
 {
 public:
-	POGLUniformFloat(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID);
+	POGLUniformFloat(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);
 	~POGLUniformFloat();
 
 	void Apply();
@@ -29,4 +30,5 @@ private:
 	POGL_INT32 mCount;
 	POGL_FLOAT mValues[4];
 	POGL_FLOAT mValuesSet[4];
+	std::mutex mMutex;
 };

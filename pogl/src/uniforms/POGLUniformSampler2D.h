@@ -1,12 +1,13 @@
 #pragma once
 #include "POGLDefaultUniform.h"
+#include <mutex>
 
 class POGLSamplerObject;
 class POGLTextureResource;
 class POGLUniformSampler2D : public POGLDefaultUniform
 {
 public:
-	POGLUniformSampler2D(const POGLProgram* program, POGLRenderState* state, POGLDeviceContext* context, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject);
+	POGLUniformSampler2D(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject);
 	~POGLUniformSampler2D();
 
 	void Apply();
@@ -29,4 +30,5 @@ private:
 	POGL_UINT32 mTextureUID;
 	GLuint mActiveTexture;
 	POGLSamplerObject* mSamplerObject;
+	std::mutex mMutex;
 };

@@ -8,9 +8,10 @@
 #include "POGLTextureResource.h"
 #include "POGLSamplerObject.h"
 #include "POGLFramebuffer.h"
+#include "POGLProgram.h"
 
 POGLRenderState::POGLRenderState(POGLDeviceContext* context)
-: mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mCurrentProgramState(nullptr), mApplyCurrentProgramState(false),
+: mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mApplyCurrentProgramState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mStencilMask(BIT_ALL), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), 
@@ -44,13 +45,11 @@ void POGLRenderState::Release()
 		POGL_SAFE_RELEASE_UID(mFramebuffer);
 
 		auto size = mTextures.size();
-		for (size_t i = 0; i < size; ++i) {
+		for (POGL_UINT32 i = 0; i < size; ++i) {
 			POGL_SAFE_RELEASE(mTextures[i]);
 			mTextureUID[i] = 0;
 		}
 
-		// Clear all effect states
-		mProgramStates.clear();
 		delete this;
 	}
 }
@@ -74,12 +73,7 @@ void POGLRenderState::Clear(POGL_UINT32 clearBits)
 
 IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_CHAR* name)
 {
-	return mCurrentProgramState->FindUniformByName(POGL_STRING(name));
-}
-
-IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_STRING& name)
-{
-	return mCurrentProgramState->FindUniformByName(name);
+	return mProgram->FindUniformByName(name);
 }
 
 void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
@@ -335,19 +329,6 @@ void POGLRenderState::Apply(IPOGLProgram* program)
 	SetCullFace(data.cullFace);
 }
 
-POGLProgramState* POGLRenderState::GetProgramState(POGLProgram* program)
-{
-	const POGL_UINT32 uid = program->GetUID();
-	auto it = mProgramStates.find(uid);
-	if (it == mProgramStates.end()) {
-		POGLProgramState* state = new POGLProgramState(program, this, mDeviceContext);
-		mProgramStates.insert(std::make_pair(uid, std::shared_ptr<POGLProgramState>(state)));
-		return state;
-	}
-
-	return it->second.get();
-}
-
 void POGLRenderState::BindSamplerObject(POGLSamplerObject* samplerObject, POGL_UINT32 idx)
 {
 	assert_not_null(samplerObject);
@@ -375,7 +356,6 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 	mProgram->AddRef();
 	mProgramUID = uid;
 	glUseProgram(mProgram->GetProgramID());
-	mCurrentProgramState = GetProgramState(program);
 	mApplyCurrentProgramState = true;
 
 	CHECK_GL("Could not bind the supplied program");
@@ -384,7 +364,7 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer)
 {
 	if (mApplyCurrentProgramState) {
-		mCurrentProgramState->ApplyUniforms();
+		mProgram->ApplyUniforms();
 		mApplyCurrentProgramState = false;
 	}
 
