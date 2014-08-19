@@ -3,36 +3,6 @@
 #include <thread>
 #include "POGLExampleWindow.h"
 
-static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
-	#version 330
-
-	layout(location = 0) in vec3 position;
-	layout(location = 2) in vec2 texCoord;
-
-	out vec2 vs_TexCoord;
-
-	void main()
-	{
-		vs_TexCoord = texCoord;
-		gl_Position = vec4(position, 1.0);
-	}
-)"};
-
-static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
-	#version 330
-
-	uniform sampler2D Texture;
-
-	in vec2 vs_TexCoord;
-
-	layout(location = 0) out vec4 color;
-
-	void main()
-	{
-		color = texture(Texture, vs_TexCoord);
-	}
-)" };
-
 int main()
 {
 	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Texturing"));
@@ -51,8 +21,8 @@ int main()
 	try {
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
-		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
 		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
 		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();

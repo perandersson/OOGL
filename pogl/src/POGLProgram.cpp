@@ -41,19 +41,28 @@ void POGLProgram::AddRef()
 void POGLProgram::Release()
 {
 	if (--mRefCount == 0) {
+		auto globalIt = mGlobalUniforms.begin();
+		auto globalEnd = mGlobalUniforms.end();
+		for (; globalIt != globalEnd; ++globalIt) {
+			delete globalIt->second;
+		}
+
 		auto it = mUniforms.begin();
 		auto end = mUniforms.end();
 		for (; it != end; ++it) {
 			delete it->second;
 		}
+
 		if (mProgramID != 0) {
 			glDeleteProgram(mProgramID);
 			mProgramID = 0;
 		}
+
 		if (mData != nullptr) {
 			delete mData;
 			mData = nullptr;
 		}
+
 		delete this;
 	}
 }

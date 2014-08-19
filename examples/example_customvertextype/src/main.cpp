@@ -5,38 +5,6 @@
 #include <cmath>
 #include "POGLExampleWindow.h"
 
-static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
-	#version 330
-
-	// The "position" value is located on location = "0", defined in CustomVertexLayout
-	layout(location = 0) in vec3 position;
-
-	// The "value" value is located on location = "2", defined in CustomVertexLayout
-	layout(location = 2) in float value;
-
-	// Send the value to the fragment shader
-	out float vs_Value;
-
-	void main()
-	{
-		vs_Value = value;
-		gl_Position = vec4(position, 1.0);
-	}
-)"};
-
-static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
-	#version 330
-
-	in float vs_Value;
-
-	layout(location = 0) out vec4 color;
-
-	void main()
-	{
-		color = vec4(vs_Value, vs_Value, vs_Value, 1);
-	}
-)" };
-
 //
 // Custom vertex structure
 // 
@@ -135,8 +103,8 @@ int main()
 	try {
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
-		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
 		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
 		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();

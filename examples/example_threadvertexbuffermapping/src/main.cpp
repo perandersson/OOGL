@@ -7,28 +7,6 @@
 #include <cmath>
 #include "POGLExampleWindow.h"
 
-static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
-	#version 330
-
-	layout(location = 0) in vec3 position;
-
-	void main()
-	{
-		gl_Position = vec4(position, 1.0);
-	}
-)"};
-
-static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
-	#version 330
-
-	layout(location = 0) out vec4 color;
-
-	void main()
-	{
-		color = vec4(1, 1, 1, 1);
-	}
-)" };
-
 static const POGL_UINT32 CIRCLE_PTS = 365;
 
 int main()
@@ -46,16 +24,15 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		// Create a device context for main thread
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		// Create an effect based on the supplied vertex- and fragment shader
-		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
-		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
 		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
 		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 		vertexShader->Release();
 		fragmentShader->Release();
+
 
 		//
 		// Create vertex buffer for circle geometry
