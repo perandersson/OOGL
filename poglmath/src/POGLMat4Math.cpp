@@ -34,14 +34,16 @@ void POGLMat4Ortho2D(POGL_FLOAT left, POGL_FLOAT right, POGL_FLOAT bottom, POGL_
 void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const POGL_VECTOR3& up, POGL_MAT4* _out_Mat4)
 {
 	POGL_FLOAT* m = _out_Mat4->vec;
-	POGL_VECTOR3 u = up;
-	POGLVec3Normalize(&u);
 
 	POGL_VECTOR3 forward(center.x - eye.x, center.y - eye.y, center.z - eye.z);
 	POGLVec3Normalize(&forward);
 
 	POGL_VECTOR3 side;
-	POGLVec3Cross(forward, u, &side);
+	POGLVec3Cross(forward, up, &side);
+	POGLVec3Normalize(&side);
+
+	POGL_VECTOR3 newUp;
+	POGLVec3Cross(side, forward, &newUp);
 
 #define M(row,col)  m[col*4+row]
 	M(0, 0) = side.x;
@@ -49,9 +51,9 @@ void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const P
 	M(0, 2) = side.z;
 	M(0, 3) = 0.0f;
 
-	M(1, 0) = u.x;
-	M(1, 1) = u.y;
-	M(1, 2) = u.z;
+	M(1, 0) = newUp.x;
+	M(1, 1) = newUp.y;
+	M(1, 2) = newUp.z;
 	M(1, 3) = 0.0f;
 
 	M(2, 0) = -forward.x;
@@ -97,7 +99,7 @@ void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL_FLOAT zNear, P
 	M(3, 0) = 0.0f;
 	M(3, 1) = 0.0f;
 	M(3, 2) = -1.0f;
-	M(3, 3) = 0.0f;
+	M(3, 3) = 1.0f;
 #undef M
 }
 

@@ -1,43 +1,11 @@
 #include <gl/pogl.h>
+#include <gl/poglmath.h>
 #include <thread>
 #include "POGLExampleWindow.h"
 
-static const POGL_CHAR SIMPLE_EFFECT_VS[] = { R"(
-	#version 330
-
-	layout(location = 0) in vec3 position;
-	layout(location = 1) in vec4 color;
-
-	out vec4 vs_Color;
-
-	void main()
-	{
-		vs_Color = color;
-		gl_Position = vec4(position, 1.0);
-	}
-)"};
-
-static const POGL_CHAR SIMPLE_EFFECT_FS[] = { R"(
-	#version 330
-
-	in vec4 vs_Color;
-
-	layout(location = 0) out vec4 color;
-
-	void main()
-	{
-		color = vs_Color;
-	}
-)" };
-
 int main()
 {
-	//
-	// Create an example window. This function is NOT part of the main POGL library and is only usable for these examples.
-	// You are responsible for creating a valid window to be drawn to on your own. 
-	//
-
-	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Draw Triangle"));
+	POGL_HANDLE windowHandle = POGLCreateExampleWindow(POGL_SIZE(1024, 768), POGL_TOCHAR("Example: Draw Cube"));
 
 	POGL_DEVICE_INFO deviceInfo = { 0 };
 #ifdef _DEBUG
@@ -52,116 +20,113 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		//
-		// Retrieves the immediately device context.
-		//
-
 		IPOGLDeviceContext* context = device->GetDeviceContext();
 
-		//
-		// Load a very simple vertex- and fragment shader and link them into a a GPU program
-		// usable when drawing the geometry onto the screen. 
-		//
-		// The array of IPOGLShader's must end with a nullptr (or 0).
-		//
-
-		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
-		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
+		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
+		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
 		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
 		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
-
-		//
-		// We release the shader resources, since they are not needed anymore. You are allowed to reuse the shader resources 
-		// for other programs if you want to.
-		// 
-
 		vertexShader->Release();
 		fragmentShader->Release();
 
 		//
-		// Create data for a triangle.
+		// Create vertex data for a cube.
 		//
 
 		const POGL_POSITION_COLOR_VERTEX VERTICES[] = {
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-0.5f, -0.5f, 0.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(0.0f, 0.5f, 0.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(0.5f, -0.5f, 0.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f))
+			// Front vertices
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, 1.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, -1.0f, 1.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, 1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, 1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f)),
+
+			// Back vertices
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, -1.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, -1.0f, -1.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, -1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
+			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, -1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f))
 		};
-
-		// 
-		// Create a vertex buffer based on the above vertices. This example makes use of one of the built-in vertex types.
-		// See the later examples on how you can create your own vertex structures if you want.
-		// 
-		// The layout locations when using the built-in vertex types are:
-		//
-		// Position = 0
-		// Color    = 1
-		// TexCoord = 2
-		// Normal   = 3
-		// Tangent  = 4
-		//
-		// You are free to use any layout locations that you want if you create your own vertex types.
-		//
-
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+
+		//
+		// Create the index buffer for the cube
+		//
+
+		const POGL_UINT32 INDICES[] = {
+			// front
+			0, 1, 2,
+			2, 3, 0,
+			// top
+			3, 2, 6,
+			6, 7, 3,
+			// back
+			7, 6, 5,
+			5, 4, 7,
+			// bottom
+			4, 5, 1,
+			1, 0, 4,
+			// left
+			4, 0, 3,
+			3, 7, 4,
+			// right
+			1, 5, 6,
+			6, 2, 1
+		};
+		IPOGLIndexBuffer* indexBuffer = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::STATIC);
+
+		//
+		// Set viewport
+		//
+
+		context->SetViewport(POGL_RECT(0, 0, 1024, 768));
+
+		//
+		// Generate a perspective- and lookat matrix
+		//
+
+		POGL_MAT4 perspective;
+		POGLMat4Perspective(45.0f, 1.2f, 0.1f, 100.0f, &perspective);
+	
+		POGL_MAT4 lookAt;
+		POGLMat4LookAt(POGL_VECTOR3(-20.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
+
+		//
+		// Set default uniforms for this program
+		//
+
+		program->FindUniformByName("ProjectionMatrix")->SetMatrix(perspective);
+		program->FindUniformByName("ViewMatrix")->SetMatrix(lookAt);
+
+		//
+		// Set default properties for this program
+		//
+
+		program->SetDepthTest(true);
+		program->SetDepthFunc(POGLDepthFunc::LESS);
 		
 		//
 		// Poll the opened window's events. This is NOT part of the POGL library
 		//
 
 		while (POGLProcessEvents()) {
-			
-			//
-			// Prepare the program. The result is a state which is responsible for preventing unneccessary OpenGL state changes.
-			//
-
 			IPOGLRenderState* state = context->Apply(program);
-
-			//
-			// Clear the color and depth buffer on the screen
-			// 
-
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-
-			//
-			// Draw the triangle vertex buffer. This will automatically bind the vertex buffer if it's not already bound
-			//
-
-			state->Draw(vertexBuffer);
-
-			//
-			// Nofiy the rendering engine that we are finished using the bound program this frame.
-			//
-
+			state->Draw(vertexBuffer, indexBuffer);
 			state->Release();
-
-			//
-			// End the frame and swap the back buffer with the front buffer so that we can see the result onto the screen
-			//
-
 			device->EndFrame();
 		}
 
-		//
-		// Release resources
-		//
-
+		indexBuffer->Release();
 		vertexBuffer->Release();
 		program->Release();
 		context->Release();
+		device->Release();
 	}
 	catch (POGLException e) {
 		POGLAlert(e);
 	}
 
-	device->Release();
-
-	//
-	// Destroy the example window. This is NOT part of the POGL library
-	//
-
+	
 	POGLDestroyExampleWindow(windowHandle);
-
-	// Quit application
 	return 0;
 }
