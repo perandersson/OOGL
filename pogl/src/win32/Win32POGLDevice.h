@@ -5,7 +5,7 @@
 #include <vector>
 #include <mutex>
 
-class Win32POGLDevice : public POGLDevice
+class POGLAPI Win32POGLDevice : public POGLDevice
 {
 public:
 	Win32POGLDevice(const POGL_DEVICE_INFO* info);

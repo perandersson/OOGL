@@ -4,7 +4,7 @@
 class POGLRenderState;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
-class POGLDeviceContext : public IPOGLDeviceContext
+class POGLAPI POGLDeviceContext : public IPOGLDeviceContext
 {
 public:
 	POGLDeviceContext(IPOGLDevice* device);

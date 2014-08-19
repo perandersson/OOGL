@@ -1,7 +1,7 @@
 #pragma once
 #include "POGLDeviceContext.h"
 
-class Win32POGLDeviceContext : public POGLDeviceContext
+class POGLAPI Win32POGLDeviceContext : public POGLDeviceContext
 {
 public:
 	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);

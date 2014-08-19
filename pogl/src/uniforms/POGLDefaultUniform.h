@@ -2,7 +2,7 @@
 #include "config.h"
 
 class POGLRenderState;
-class POGLDefaultUniform : public IPOGLUniform, public IPOGLSamplerState
+class POGLAPI POGLDefaultUniform : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
 	POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);

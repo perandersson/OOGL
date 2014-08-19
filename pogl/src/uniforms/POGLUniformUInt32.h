@@ -2,7 +2,7 @@
 #include "POGLDefaultUniform.h"
 #include <mutex>
 
-class POGLUniformUInt32 : public POGLDefaultUniform
+class POGLAPI POGLUniformUInt32 : public POGLDefaultUniform
 {
 public:
 	POGLUniformUInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);

@@ -2,7 +2,7 @@
 #include "config.h"
 #include <gl/pogl.h>
 
-class POGLEnum
+class POGLAPI POGLEnum
 {
 public:
 	//static GLenum Convert(Access::Enum e);

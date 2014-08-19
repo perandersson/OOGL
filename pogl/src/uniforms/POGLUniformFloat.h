@@ -2,7 +2,7 @@
 #include "POGLDefaultUniform.h"
 #include <mutex>
 
-class POGLUniformFloat : public POGLDefaultUniform
+class POGLAPI POGLUniformFloat : public POGLDefaultUniform
 {
 public:
 	POGLUniformFloat(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);

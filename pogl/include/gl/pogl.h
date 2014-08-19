@@ -10,6 +10,24 @@
 #endif
 #include <cinttypes>
 
+#ifdef POGL_STATIC
+#	define POGLAPI 
+#else
+#	if defined(WIN32)
+#		if defined(POGL_BUILD)
+#			define POGLAPI __declspec(dllexport)
+#		else
+#			define POGLAPI __declspec(dllimport)
+#		endif
+#	else
+#		if defined(__GNUC__) && __GNUC__>=4
+#			define POGLAPI __attribute__ ((visibility("default")))
+#		else
+#			error Unknown compiler!
+#		endif
+#	endif
+#endif
+
 #ifndef OFFSET
 #define OFFSET(x) ((char *)0 + x)
 #endif
@@ -50,27 +68,27 @@
 // Classes
 //
 
-class IPOGLInterface;
-class IPOGLResource;
+class POGLAPI IPOGLInterface;
+class POGLAPI IPOGLResource;
 
-class IPOGLDevice;
-class IPOGLDeviceContext;
-class IPOGLRenderState;
+class POGLAPI IPOGLDevice;
+class POGLAPI IPOGLDeviceContext;
+class POGLAPI IPOGLRenderState;
 
-class IPOGLDeferredDeviceContext;
+class POGLAPI IPOGLDeferredDeviceContext;
 
-class IPOGLVertexBuffer;
-class IPOGLIndexBuffer;
+class POGLAPI IPOGLVertexBuffer;
+class POGLAPI IPOGLIndexBuffer;
 
-class IPOGLTexture;
-class IPOGLTexture1D;
-class IPOGLTexture2D;
-class IPOGLTexture3D;
-class IPOGLFramebuffer;
+class POGLAPI IPOGLTexture;
+class POGLAPI IPOGLTexture1D;
+class POGLAPI IPOGLTexture2D;
+class POGLAPI IPOGLTexture3D;
+class POGLAPI IPOGLFramebuffer;
 
-class IPOGLShader;
-class IPOGLProgram;
-class IPOGLUniform;
+class POGLAPI IPOGLShader;
+class POGLAPI IPOGLProgram;
+class POGLAPI IPOGLUniform;
 
 //
 // typedefs
@@ -100,7 +118,7 @@ typedef char POGL_CHAR;
 // Enums
 //
 
-struct POGLDeviceInfoFlags
+struct POGLAPI POGLDeviceInfoFlags
 {
 	enum Enum {
 		//
@@ -111,7 +129,7 @@ struct POGLDeviceInfoFlags
 	};
 };
 
-struct POGLVendor
+struct POGLAPI POGLVendor
 {
 	enum Enum {
 		AMD = 0,
@@ -122,7 +140,7 @@ struct POGLVendor
 	};
 };
 
-struct POGLTextureFormat
+struct POGLAPI POGLTextureFormat
 {
 	enum Enum {
 		R = 0,
@@ -152,7 +170,7 @@ struct POGLTextureFormat
 	};
 };
 
-struct POGLPixelFormat
+struct POGLAPI POGLPixelFormat
 {
 	enum Enum {
 		R8G8B8A8 = 0,
@@ -162,7 +180,7 @@ struct POGLPixelFormat
 	};
 };
 
-struct POGLClearType
+struct POGLAPI POGLClearType
 {
 	enum Enum {
 		COLOR = BIT(1),
@@ -180,7 +198,7 @@ struct POGLClearType
 	static const POGL_UINT32 ALL = COLOR | DEPTH | STENCIL;
 };
 
-struct POGLShaderType
+struct POGLAPI POGLShaderType
 {
 	enum Enum {
 		GEOMETRY_SHADER = 0,
@@ -192,7 +210,7 @@ struct POGLShaderType
 	};
 };
 
-struct POGLVertexType
+struct POGLAPI POGLVertexType
 {
 	enum Enum {
 		BYTE = 0,
@@ -209,7 +227,7 @@ struct POGLVertexType
 	};
 };
 
-struct POGLPrimitiveType
+struct POGLAPI POGLPrimitiveType
 {
 	enum Enum {
 		POINT = 0,
@@ -224,7 +242,7 @@ struct POGLPrimitiveType
 	};
 };
 
-struct POGLBufferUsage
+struct POGLAPI POGLBufferUsage
 {
 	enum Enum {
 		STATIC = 0,
@@ -235,7 +253,7 @@ struct POGLBufferUsage
 	};
 };
 
-struct POGLDepthFunc
+struct POGLAPI POGLDepthFunc
 {
 	enum Enum {
 		NEVER = 0,
@@ -255,7 +273,7 @@ struct POGLDepthFunc
 	static const Enum DEFAULT = LEQUAL;
 };
 
-struct POGLTextureWrap
+struct POGLAPI POGLTextureWrap
 {
 	enum Enum {
 		CLAMP_TO_EDGE = 0,
@@ -271,7 +289,7 @@ struct POGLTextureWrap
 	static const Enum DEFAULT = REPEAT;
 };
 
-struct POGLMinFilter
+struct POGLAPI POGLMinFilter
 {
 	enum Enum {
 		NEAREST = 0,
@@ -289,7 +307,7 @@ struct POGLMinFilter
 	static const Enum DEFAULT = LINEAR;
 };
 
-struct POGLMagFilter
+struct POGLAPI POGLMagFilter
 {
 	enum Enum {
 		NEAREST = 0,
@@ -306,7 +324,7 @@ struct POGLMagFilter
 /*!
 	\brief
 */
-struct POGLCompareFunc
+struct POGLAPI POGLCompareFunc
 {
 	enum Enum {
 		NEVER = 0,
@@ -329,7 +347,7 @@ struct POGLCompareFunc
 /*!
 	\brief
 */
-struct POGLCompareMode
+struct POGLAPI POGLCompareMode
 {
 	enum Enum {
 		COMPARE_R_TO_TEXTURE,
@@ -346,7 +364,7 @@ struct POGLCompareMode
 /*!
 
 */
-struct POGLPolygonMode
+struct POGLAPI POGLPolygonMode
 {
 	enum Enum {
 		POINT = 0,
@@ -360,7 +378,7 @@ struct POGLPolygonMode
 	static const Enum DEFAULT = FILL;
 };
 
-struct POGLColorMask
+struct POGLAPI POGLColorMask
 {
 	enum Enum {
 		RED = BIT(1),
@@ -376,7 +394,7 @@ struct POGLColorMask
 	static const POGL_UINT8 NONE = 0;
 };
 
-struct POGLSrcFactor
+struct POGLAPI POGLSrcFactor
 {
 	enum Enum {
 		ZERO = 0,
@@ -401,7 +419,7 @@ struct POGLSrcFactor
 	static const Enum DEFAULT = ONE;
 };
 
-struct POGLDstFactor
+struct POGLAPI POGLDstFactor
 {
 	enum Enum {
 		ZERO = 0,
@@ -426,7 +444,7 @@ struct POGLDstFactor
 	static const Enum DEFAULT = ZERO;
 };
 
-struct POGLFrontFace
+struct POGLAPI POGLFrontFace
 {
 	enum Enum {
 		CW = 0,
@@ -442,7 +460,7 @@ struct POGLFrontFace
 /*!
 	\brief
 */
-struct POGLCullFace
+struct POGLAPI POGLCullFace
 {
 	enum Enum {
 		DISABLED = 0,
@@ -460,7 +478,7 @@ struct POGLCullFace
 /*!
 	\brief Describes our intentions with the resource mapping
 */
-struct POGLResourceMapType
+struct POGLAPI POGLResourceMapType
 {
 	enum Enum {
 		/* Open a reading stream */
@@ -478,7 +496,7 @@ struct POGLResourceMapType
 /*!
 	\brief Resource type enum
 */
-struct POGLResourceType
+struct POGLAPI POGLResourceType
 {
 	enum Enum {
 		VERTEXBUFFER = 0,
@@ -516,7 +534,7 @@ typedef __m128 __POGL_VECTOR128;
 typedef __m64 __POGL_VECTOR64;
 #endif
 
-typedef struct POGL_SIZE
+typedef struct POGLAPI POGL_SIZE
 {
 	union {
 		struct {
@@ -537,7 +555,7 @@ typedef struct POGL_SIZE
 	POGL_SIZE& operator=(const POGL_SIZE& rhs);
 } POGL_POINTI;
 
-struct POGL_VECTOR2
+struct POGLAPI POGL_VECTOR2
 {
 	union {
 		struct {
@@ -557,7 +575,7 @@ struct POGL_VECTOR2
 	POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs);
 };
 
-typedef struct POGL_VECTOR3
+typedef struct POGLAPI POGL_VECTOR3
 {
 	union {
 		struct {
@@ -585,7 +603,7 @@ typedef struct POGL_VECTOR3
 	POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs);
 } POGL_COLOR3;
 
-typedef struct POGL_VECTOR4
+typedef struct POGLAPI POGL_VECTOR4
 {
 	union {
 		struct {
@@ -616,7 +634,7 @@ typedef struct POGL_VECTOR4
 	POGL_VECTOR4& operator=(const POGL_VECTOR4& rhs);
 } POGL_COLOR4;
 
-struct POGL_RECT
+struct POGLAPI POGL_RECT
 {
 	union {
 		struct {
@@ -635,7 +653,7 @@ struct POGL_RECT
 	POGL_RECT& operator=(const POGL_RECT& rhs);
 };
 
-struct POGL_MAT4
+struct POGLAPI POGL_MAT4
 {
 	union {
 		struct {
@@ -655,7 +673,7 @@ struct POGL_MAT4
 /*!
 	\brief
 */
-struct POGL_DEVICE_INFO
+struct POGLAPI POGL_DEVICE_INFO
 {
 	/* The window the IPOGLDeviceContext should be associated with. If nullptr then the context will "draw" to the console instead */
 	POGL_HANDLE windowHandle;
@@ -676,7 +694,7 @@ struct POGL_DEVICE_INFO
 /*!
 	\brief
 */
-struct POGL_VERTEX_LAYOUT_FIELD
+struct POGLAPI POGL_VERTEX_LAYOUT_FIELD
 {
 	/*!
 		The size of the current buffer field type. Use {@code sizeof(Type)}, for example: {@code sizeof(POGL_VEC3F)}
@@ -701,7 +719,7 @@ static const POGL_UINT32 MAX_VERTEX_LAYOUT_FIELD_SIZE = 8;
 /*!
 	\brief
 */
-struct POGL_VERTEX_LAYOUT
+struct POGLAPI POGL_VERTEX_LAYOUT
 {
 	/* The vertex fields */
 	POGL_VERTEX_LAYOUT_FIELD fields[MAX_VERTEX_LAYOUT_FIELD_SIZE];
@@ -714,7 +732,7 @@ struct POGL_VERTEX_LAYOUT
 /*!
 	\brief Vertex containing a position
 */
-struct POGL_POSITION_VERTEX
+struct POGLAPI POGL_POSITION_VERTEX
 {
 	POGL_VECTOR3 position;
 
@@ -737,7 +755,7 @@ static const POGL_VERTEX_LAYOUT POGL_POSITION_VERTEX_LAYOUT = {
 /*!
 	\brief Vertex containing a position and color
 */
-struct POGL_POSITION_COLOR_VERTEX
+struct POGLAPI POGL_POSITION_COLOR_VERTEX
 {
 	POGL_VECTOR3 position;
 	POGL_COLOR4 color;
@@ -762,7 +780,7 @@ static const POGL_VERTEX_LAYOUT POGL_POSITION_COLOR_VERTEX_LAYOUT = {
 /*!
 	\brief Vertex containing a position and a texture coordinate
 */
-struct POGL_POSITION_TEXCOORD_VERTEX
+struct POGLAPI POGL_POSITION_TEXCOORD_VERTEX
 {
 	POGL_VECTOR3 position;
 	POGL_VECTOR2 texCoord;
@@ -789,7 +807,7 @@ static const POGL_VERTEX_LAYOUT POGL_POSITION_TEXCOORD_VERTEX_LAYOUT = {
 // Class Definitions
 //
 
-class IPOGLInterface
+class POGLAPI IPOGLInterface
 {
 public:
 	virtual ~IPOGLInterface() {}
@@ -812,7 +830,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLResource : public IPOGLInterface
+class POGLAPI IPOGLResource : public IPOGLInterface
 {
 public:
 	/*!
@@ -824,7 +842,7 @@ public:
 /*!
 	\brief 
 */
-class IPOGLDevice : public IPOGLInterface
+class POGLAPI IPOGLDevice : public IPOGLInterface
 {
 public:
 	/*!
@@ -865,7 +883,7 @@ public:
 /*!
 	\brief 
 */
-class IPOGLDeviceContext : public IPOGLInterface
+class POGLAPI IPOGLDeviceContext : public IPOGLInterface
 {
 public:
 	/*!
@@ -1113,7 +1131,7 @@ public:
 /*!
 
 */
-class IPOGLDeferredDeviceContext : public IPOGLDeviceContext
+class POGLAPI IPOGLDeferredDeviceContext : public IPOGLDeviceContext
 {
 public:
 	/*!
@@ -1146,7 +1164,7 @@ public:
 /*!
 	\brief The sampler state
 */
-class IPOGLSamplerState
+class POGLAPI IPOGLSamplerState
 {
 public:
 	virtual ~IPOGLSamplerState() {}
@@ -1189,7 +1207,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLUniform
+class POGLAPI IPOGLUniform
 {
 public:
 	virtual ~IPOGLUniform() {}
@@ -1235,7 +1253,7 @@ public:
 	A shader resource is a part of a GPU program. By linking one or many shaders using the 
 	IPOGLDeviceContext you get a GPU program
 */
-class IPOGLShader : public IPOGLResource
+class POGLAPI IPOGLShader : public IPOGLResource
 {
 public:
 };
@@ -1246,7 +1264,7 @@ public:
 	A GPU program is required if you want to draw geometry onto the screen. You link one or many shader resources
 	using the IPOGLDeviceContext to get a GPU program
 */
-class IPOGLProgram : public IPOGLResource
+class POGLAPI IPOGLProgram : public IPOGLResource
 {
 public:	
 	/*!
@@ -1380,7 +1398,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLRenderState : public IPOGLInterface
+class POGLAPI IPOGLRenderState : public IPOGLInterface
 {
 public:
 	/*!
@@ -1504,7 +1522,7 @@ public:
 /*!
 	\brief The default texture interface
 */
-class IPOGLTexture : public IPOGLResource
+class POGLAPI IPOGLTexture : public IPOGLResource
 {
 public:
 	/*!
@@ -1516,7 +1534,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLTexture1D : public IPOGLTexture
+class POGLAPI IPOGLTexture1D : public IPOGLTexture
 {
 public:
 	/*!
@@ -1528,7 +1546,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLTexture2D : public IPOGLTexture
+class POGLAPI IPOGLTexture2D : public IPOGLTexture
 {
 public:
 	/*!
@@ -1540,7 +1558,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLTexture3D : public IPOGLTexture
+class POGLAPI IPOGLTexture3D : public IPOGLTexture
 {
 public:
 	virtual POGL_UINT32 GetDepth() const = 0;
@@ -1554,7 +1572,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLFramebuffer : public IPOGLInterface
+class POGLAPI IPOGLFramebuffer : public IPOGLInterface
 {
 public:
 	/*!
@@ -1576,7 +1594,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLVertexBuffer : public IPOGLResource
+class POGLAPI IPOGLVertexBuffer : public IPOGLResource
 {
 public:
 	/*!
@@ -1595,7 +1613,7 @@ public:
 /*!
 	\brief
 */
-class IPOGLIndexBuffer : public IPOGLResource
+class POGLAPI IPOGLIndexBuffer : public IPOGLResource
 {
 public:
 	/*!
@@ -1610,13 +1628,13 @@ public:
 	\param deviceInfo
 	\return
 */
-extern IPOGLDevice* POGLCreateDevice(const POGL_DEVICE_INFO* info);
+extern POGLAPI IPOGLDevice* POGLCreateDevice(const POGL_DEVICE_INFO* info);
 
 //
 // Exceptions
 //
 
-class POGLException {
+class POGLAPI POGLException {
 public:
 	POGLException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file);
 	POGLException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
@@ -1637,43 +1655,43 @@ protected:
 /*!
 	\brief Exception thrown if you are trying to use a feature that's not implemented yet
 */
-class POGLNotImplementedException : public POGLException {
+class POGLAPI POGLNotImplementedException : public POGLException {
 public:
 	POGLNotImplementedException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLNotImplementedException();
+	virtual ~POGLNotImplementedException();
 };
 
 /*!
 	\brief Exception thrown if a resource generation has failed
 */
-class POGLInitializationException : public POGLException {
+class POGLAPI POGLInitializationException : public POGLException {
 public:
 	POGLInitializationException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLInitializationException();
+	virtual ~POGLInitializationException();
 };
 
 /*!
 	\brief Exception thrown if a resource generation has failed
 */
-class POGLResourceException : public POGLException {
+class POGLAPI POGLResourceException : public POGLException {
 public:
 	POGLResourceException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLResourceException();
+	virtual ~POGLResourceException();
 };
 
 /*!
 	\brief Exception thrown if a fatal fault happened when initializing or using a program
 */
-class POGLProgramException : public POGLException {
+class POGLAPI POGLProgramException : public POGLException {
 public:
 	POGLProgramException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
-	~POGLProgramException();
+	virtual ~POGLProgramException();
 };
 
 /*!
 	\brief Exception thrown if a fatal fault happened when using a state in a way that's not solvable by the rendering engine
 */
-class POGLStateException : public POGLException {
+class POGLAPI POGLStateException : public POGLException {
 public:
 	POGLStateException(const POGL_CHAR* function, const POGL_UINT64 line, const POGL_CHAR* file, const POGL_CHAR* message, ...);
 	~POGLStateException();

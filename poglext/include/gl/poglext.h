@@ -13,7 +13,7 @@
 	\param fileName
 	\return
 */
-extern IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
+extern POGLAPI IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
 
 /*!
 	\brief Load the supplied BMP fileName into a 2D texture and returns it
@@ -22,7 +22,7 @@ extern IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLDeviceContext* context, co
 	\param fileName
 	\return
 */
-extern IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
+extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
 
 /*!
 	\brief Load the supplied BMP data into a 2D texture and returns it
@@ -32,6 +32,6 @@ extern IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, co
 	\param size
 	\return
 */
-extern IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const POGL_CHAR* bytes, POGL_UINT32 size);
+extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const POGL_CHAR* bytes, POGL_UINT32 size);
 
 #endif

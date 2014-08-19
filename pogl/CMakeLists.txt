@@ -24,4 +24,11 @@ include_directories(${OPENGL_INCLUDE_DIRS})
 include_directories (${ROOT_DIR}/pogl/src)
 
 # Create Library
-add_library(pogl STATIC ${pogl_SOURCES})
+if(POGL_BUILD_STATIC)
+	add_library(pogl STATIC ${pogl_SOURCES})
+else()
+	add_library(pogl SHARED ${pogl_SOURCES})
+	
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(pogl ${OPENGL_LIBRARIES})
+endif()

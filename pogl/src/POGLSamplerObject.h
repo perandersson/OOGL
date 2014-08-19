@@ -3,7 +3,7 @@
 #include <gl/pogl.h>
 
 class POGLRenderState;
-class POGLSamplerObject
+class POGLAPI POGLSamplerObject
 {
 public:
 	POGLSamplerObject(GLuint samplerID, POGLRenderState* renderState);

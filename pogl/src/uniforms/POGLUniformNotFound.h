@@ -2,7 +2,7 @@
 #include "config.h"
 #include <gl/pogl.h>
 
-class POGLUniformNotFound : public IPOGLUniform, public IPOGLSamplerState
+class POGLAPI POGLUniformNotFound : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
 	POGLUniformNotFound();

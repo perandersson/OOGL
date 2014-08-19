@@ -1,7 +1,7 @@
 #pragma once
 #include "config.h"
 
-class POGLFactory
+class POGLAPI POGLFactory
 {
 public:
 	/*!

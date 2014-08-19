@@ -5,4 +5,9 @@ include_directories (${ROOT_DIR}/pogl/include)
 include_directories (${ROOT_DIR}/poglext/include)
 
 # Create Library
-add_library(poglext STATIC ${pogl_SOURCES})
+if(POGL_BUILD_STATIC)
+	add_library(poglext STATIC ${pogl_SOURCES})
+else()
+	add_library(poglext SHARED ${pogl_SOURCES})
+	target_link_libraries(poglext pogl)
+endif()
