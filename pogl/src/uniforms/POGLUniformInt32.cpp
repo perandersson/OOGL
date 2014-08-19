@@ -2,8 +2,8 @@
 #include "POGLUniformInt32.h"
 #include "POGLDeviceContext.h"
 
-POGLUniformInt32::POGLUniformInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID)
-: POGLDefaultUniform(programUID, state, componentID), mCount(0)
+POGLUniformInt32::POGLUniformInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType)
+: POGLDefaultUniform(programUID, state, componentID, uniformType), mCount(0)
 {
 	mValues[0] = 0;
 	mValues[1] = 0;

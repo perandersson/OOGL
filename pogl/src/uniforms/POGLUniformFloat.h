@@ -5,7 +5,7 @@
 class POGLAPI POGLUniformFloat : public POGLDefaultUniform
 {
 public:
-	POGLUniformFloat(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);
+	POGLUniformFloat(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType);
 	~POGLUniformFloat();
 
 	void Apply();

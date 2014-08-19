@@ -23,6 +23,8 @@ namespace {
 	}
 }
 
+static POGLUniformNotFound POGL_UNIFORM_NOT_FOUND;
+
 POGLProgram::POGLProgram()
 : mRefCount(1), mProgramID(0), mUID(0), mData(new POGLProgramData)
 {
@@ -106,31 +108,31 @@ void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
 		case GL_FLOAT_VEC2:
 		case GL_FLOAT_VEC3:
 		case GL_FLOAT_VEC4:
-			uniform = new POGLUniformFloat(programUID, renderState, componentID);
+			uniform = new POGLUniformFloat(programUID, renderState, componentID, uniformType);
 			break;
 		case GL_DOUBLE:
 		case GL_DOUBLE_VEC2:
 		case GL_DOUBLE_VEC3:
 		case GL_DOUBLE_VEC4:
-			uniform = new POGLUniformDouble(programUID, renderState, componentID);
+			uniform = new POGLUniformDouble(programUID, renderState, componentID, uniformType);
 			break;
 		case GL_INT:
 		case GL_INT_VEC2:
 		case GL_INT_VEC3:
 		case GL_INT_VEC4:
-			uniform = new POGLUniformInt32(programUID, renderState, componentID);
+			uniform = new POGLUniformInt32(programUID, renderState, componentID, uniformType);
 			break;
 		case GL_UNSIGNED_INT:
 		case GL_UNSIGNED_INT_VEC2:
 		case GL_UNSIGNED_INT_VEC3:
 		case GL_UNSIGNED_INT_VEC4:
-			uniform = new POGLUniformUInt32(programUID, renderState, componentID);
+			uniform = new POGLUniformUInt32(programUID, renderState, componentID, uniformType);
 			break;
 		case GL_FLOAT_MAT4:
-			uniform = new POGLUniformMat4(programUID, renderState, componentID);
+			uniform = new POGLUniformMat4(programUID, renderState, componentID, uniformType);
 			break;
 		case GL_SAMPLER_2D:
-			uniform = new POGLUniformSampler2D(programUID, renderState, componentID, renderState->NextActiveTexture(), GenSamplerObject(renderState));
+			uniform = new POGLUniformSampler2D(programUID, renderState, componentID, renderState->NextActiveTexture(), GenSamplerObject(renderState), uniformType);
 			break;
 		case GL_SAMPLER_CUBE:
 			break;
@@ -142,9 +144,6 @@ void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
 		}
 
 		mUniforms.insert(std::make_pair(name, uniform));
-
-		POGLGlobalUniform* globalUniform = new POGLGlobalUniform(uniform, uniformType);
-		mGlobalUniforms.insert(std::make_pair(name, globalUniform));
 	}
 
 	mUID = programUID;
@@ -198,8 +197,7 @@ IPOGLUniform* POGLProgram::FindStateUniformByName(const POGL_CHAR* name)
 
 	auto it = mUniforms.find(POGL_STRING(name));
 	if (it == mUniforms.end()) {
-		static POGLUniformNotFound uniformNotFound;
-		return &uniformNotFound;
+		return &POGL_UNIFORM_NOT_FOUND;
 	}
 	return it->second;
 }
@@ -210,8 +208,14 @@ IPOGLUniform* POGLProgram::FindUniformByName(const POGL_CHAR* name)
 
 	auto it = mGlobalUniforms.find(POGL_STRING(name));
 	if (it == mGlobalUniforms.end()) {
-		static POGLUniformNotFound uniformNotFound;
-		return &uniformNotFound;
+		auto uniform = FindStateUniformByName(name);
+		if (uniform != &POGL_UNIFORM_NOT_FOUND) {
+			POGLDefaultUniform* defaultUniform = static_cast<POGLDefaultUniform*>(uniform);
+			POGLGlobalUniform* globalUniform = new POGLGlobalUniform(defaultUniform, defaultUniform->GetUniformType());
+			mGlobalUniforms.insert(std::make_pair(POGL_STRING(name), globalUniform));
+			uniform = globalUniform;
+		}
+		return uniform;
 	}
 	return it->second;
 }

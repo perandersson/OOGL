@@ -6,8 +6,8 @@
 #include "POGLTexture2D.h"
 #include "POGLEnum.h"
 
-POGLUniformSampler2D::POGLUniformSampler2D(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject)
-: POGLDefaultUniform(programUID, state, componentID),
+POGLUniformSampler2D::POGLUniformSampler2D(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject, GLenum uniformType)
+: POGLDefaultUniform(programUID, state, componentID, uniformType),
 mTextureResource(nullptr), mTextureUID(0), mActiveTexture(activeTexture), 
 mSamplerObject(samplerObject), mMinFilter(POGLMinFilter::DEFAULT), mMagFilter(POGLMagFilter::DEFAULT), mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 {

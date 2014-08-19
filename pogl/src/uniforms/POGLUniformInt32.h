@@ -5,7 +5,7 @@
 class POGLAPI POGLUniformInt32 : public POGLDefaultUniform
 {
 public:
-	POGLUniformInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);
+	POGLUniformInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType);
 	~POGLUniformInt32();
 
 	void Apply();

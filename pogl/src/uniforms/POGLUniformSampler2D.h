@@ -7,7 +7,7 @@ class POGLTextureResource;
 class POGLAPI POGLUniformSampler2D : public POGLDefaultUniform
 {
 public:
-	POGLUniformSampler2D(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject);
+	POGLUniformSampler2D(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLuint activeTexture, POGLSamplerObject* samplerObject, GLenum uniformType);
 	~POGLUniformSampler2D();
 
 	void Apply();

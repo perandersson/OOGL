@@ -3,8 +3,8 @@
 #include "POGLProgram.h"
 #include "POGLRenderState.h"
 
-POGLDefaultUniform::POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID)
-: mProgramUID(programUID), mRenderState(state), mComponentID(componentID)
+POGLDefaultUniform::POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType)
+: mProgramUID(programUID), mRenderState(state), mComponentID(componentID), mUniformType(uniformType)
 {
 }
 

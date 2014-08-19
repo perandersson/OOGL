@@ -6,13 +6,11 @@
 #error "You must include pogl.h before poglmath.h"
 #endif
 
-/*
-	Parts of the mathematical algorithms used have been influenced by Mesa3D (http://www.mesa3d.org)
-	License: LICENSE_mesa3d.txt
-*/
-
 /*!
-	\brief
+	\brief Calculate the length of the supplied vector
+
+	\param v
+	\return
 */
 extern POGLAPI POGL_FLOAT POGLVec3Length(const POGL_VECTOR3& v);
 
@@ -24,7 +22,9 @@ extern POGLAPI POGL_FLOAT POGLVec3Length(const POGL_VECTOR3& v);
 extern POGLAPI void POGLVec3Normalize(POGL_VECTOR3* v);
 
 /*!
+	\brief Calculate the cross product between the first- and second vector.
 
+	result = v1 x v2
 */
 extern POGLAPI void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3* result);
 

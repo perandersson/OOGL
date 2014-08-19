@@ -5,7 +5,7 @@ class POGLRenderState;
 class POGLAPI POGLDefaultUniform : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
-	POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID);
+	POGLDefaultUniform(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType);
 	~POGLDefaultUniform();
 
 	/*!
@@ -19,6 +19,13 @@ public:
 		\return
 	*/
 	bool IsProgramActive() const;
+
+	/*!
+	
+	*/
+	inline GLenum GetUniformType() const {
+		return mUniformType;
+	}
 
 	void SetInt32(POGL_INT32 a);
 	void SetInt32(POGL_INT32 a, POGL_INT32 b);
@@ -67,4 +74,5 @@ private:
 protected:
 	POGLRenderState* mRenderState;
 	GLint mComponentID;
+	GLenum mUniformType;
 };
