@@ -34,4 +34,20 @@ extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* con
 */
 extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const POGL_CHAR* bytes, POGL_UINT32 size);
 
+/*!
+	\brief Create a IPOGLVertexBuffer instance containing the vertices needed to draw a sphere
+
+	\param context
+	\param R
+			The radius of the sphere
+	\param Q
+			The quality of the sphere
+	\param H
+	\param K
+	\param Z
+	\param usage
+	\return
+*/
+extern POGLAPI IPOGLVertexBuffer* POGLXCreateSphere(IPOGLDeviceContext* context, POGL_FLOAT R, POGL_UINT32 Q, POGL_UINT32 H, POGL_FLOAT K, POGL_UINT32 Z, POGLBufferUsage::Enum usage);
+
 #endif
