@@ -36,6 +36,7 @@ ENDIF()
 # Directories
 add_subdirectory (pogl)
 add_subdirectory (poglext)
+add_subdirectory (poglmath)
 
 # If GUI option is set then build examples projects
 IF(POGL_BUILD_EXAMPLES)

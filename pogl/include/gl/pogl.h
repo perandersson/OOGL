@@ -653,6 +653,31 @@ struct POGLAPI POGL_RECT
 	POGL_RECT& operator=(const POGL_RECT& rhs);
 };
 
+/*!
+	\brief A 4x4 matrix
+
+	Accessing the individual matrix values directly using the "m"- or "vec" field is column-major. If you 
+	want to access the fields as if they are row-major then you can do:
+
+	{@code
+		POGL_MAT4 mat;
+		POGL_FLOAT value = mat(row, column);
+	}
+
+	You can also do:
+
+	{@code
+		POGL_MAT4 mat;
+		POGL_FLOAT value = math.vec[column * 4 + row];
+	}
+
+	You can also do:
+
+	{@code
+		POGL_MAT4 mat;
+		POGL_FLOAT value = math.m[column][row];
+	}
+*/
 struct POGLAPI POGL_MAT4
 {
 	union {
@@ -668,6 +693,9 @@ struct POGLAPI POGL_MAT4
 		};
 		POGL_FLOAT vec[16];
 	};
+
+	POGL_FLOAT operator() (POGL_UINT32 row, POGL_UINT32 column) const { return m[column][row]; }
+	POGL_FLOAT& operator() (POGL_UINT32 row, POGL_UINT32 column) { return m[column][row]; }
 };
 
 /*!
