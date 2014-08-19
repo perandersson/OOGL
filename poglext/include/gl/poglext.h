@@ -6,8 +6,6 @@
 #error "You must include pogl.h before poglext.h"
 #endif
 
-#include "pogl.h"
-
 /*!
 	\brief Load the supplied TGA fileName into a 2D texture and returns it
 

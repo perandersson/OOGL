@@ -23,6 +23,7 @@ ENDIF()
 
 # Directories
 add_subdirectory (pogl)
+add_subdirectory (poglext)
 
 # If GUI option is set then build examples projects
 IF(POGL_BUILD_EXAMPLES)

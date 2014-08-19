@@ -1,6 +1,7 @@
 # Create a variable containing all .cpp files:
 file(GLOB example_loadtexturesfromthread_SOURCES ${EXAMPLES_DIR}/example_loadtexturesfromthread/src/*.cpp)
 include_directories (${ROOT_DIR}/pogl/include)
+include_directories (${ROOT_DIR}/poglext/include)
 include_directories (${EXAMPLES_DIR}/examples_window/include)
 
 # Add OpenGL package
@@ -13,3 +14,4 @@ add_executable(example_loadtexturesfromthread ${example_loadtexturesfromthread_S
 target_link_libraries(example_loadtexturesfromthread ${OPENGL_LIBRARIES})
 target_link_libraries(example_loadtexturesfromthread examples_window)
 target_link_libraries(example_loadtexturesfromthread pogl)
+target_link_libraries(example_loadtexturesfromthread poglext)
