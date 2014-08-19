@@ -9,6 +9,7 @@ mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 	mFloats[0] = mFloats[1] = mFloats[2] = mFloats[3] = 0.0f;
 	mDoubles[0] = mDoubles[1] = mDoubles[2] = mDoubles[3] = 0.0;
 	mInts[0] = mInts[1] = mInts[2] = mInts[3] = 0;
+	mWraps[0] = mWraps[1] = mWraps[2] = POGLTextureWrap::DEFAULT;
 
 	memset(&mValue, 0, sizeof(mValue));
 	mValue._11 = 1.0;
@@ -79,12 +80,14 @@ void POGLGlobalUniform::Apply()
 		mAssociatedUniform->SetMatrix(mValue);
 		break;
 	case GL_SAMPLER_2D:
-		mAssociatedUniform->SetTexture(mTexture);
-		mAssociatedUniform->SetMinFilter(mMinFilter);
-		mAssociatedUniform->SetMagFilter(mMagFilter);
-		mAssociatedUniform->SetTextureWrap(mWraps[0], mWraps[1]);
-		mAssociatedUniform->SetCompareFunc(mCompareFunc);
-		mAssociatedUniform->SetCompareMode(mCompareMode);
+		if (mTexture != nullptr) {
+			mAssociatedUniform->SetTexture(mTexture);
+			mAssociatedUniform->SetMinFilter(mMinFilter);
+			mAssociatedUniform->SetMagFilter(mMagFilter);
+			mAssociatedUniform->SetTextureWrap(mWraps[0], mWraps[1]);
+			mAssociatedUniform->SetCompareFunc(mCompareFunc);
+			mAssociatedUniform->SetCompareMode(mCompareMode);
+		}
 		break;
 	};
 }

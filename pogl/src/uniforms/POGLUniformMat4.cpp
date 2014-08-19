@@ -25,8 +25,6 @@ void POGLUniformMat4::Apply()
 
 void POGLUniformMat4::SetMatrix(const POGL_MAT4& mat4)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mValue._11 = mat4._11;
 	mValue._12 = mat4._12;
 	mValue._13 = mat4._13;

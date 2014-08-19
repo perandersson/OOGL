@@ -30,5 +30,4 @@ private:
 	POGL_INT32 mCount;
 	POGL_FLOAT mValues[4];
 	POGL_FLOAT mValuesSet[4];
-	std::mutex mMutex;
 };

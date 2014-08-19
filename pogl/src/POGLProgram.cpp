@@ -141,29 +141,26 @@ void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
 	mUID = programUID;
 }
 
-void POGLProgram::ApplyUniforms()
+void POGLProgram::ApplyStateUniforms()
 {
-	std::lock_guard<std::recursive_mutex> lock(mMutex);
-
-	//
-	// Apply global uniforms
-	//
-
-	auto globalIt = mGlobalUniforms.begin();
-	auto globalEnd = mGlobalUniforms.end();
-	for (; globalIt != globalEnd; ++globalIt) {
-		auto global = globalIt->second;
-		global->Apply();
-	}
-
-	//
-	// Apply the other uniforms
-	//
-
 	auto it = mUniforms.begin();
 	auto end = mUniforms.end();
 	for (; it != end; ++it) {
 		it->second->Apply();
+	}
+
+	CHECK_GL("Could not apply uniforms");
+}
+
+void POGLProgram::ApplyGlobalUniforms()
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+	auto it = mGlobalUniforms.begin();
+	auto end = mGlobalUniforms.end();
+	for (; it != end; ++it) {
+		auto global = it->second;
+		global->Apply();
 	}
 
 	CHECK_GL("Could not apply default uniforms");

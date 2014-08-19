@@ -356,6 +356,7 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 	mProgram->AddRef();
 	mProgramUID = uid;
 	glUseProgram(mProgram->GetProgramID());
+	mProgram->ApplyGlobalUniforms();
 	mApplyCurrentProgramState = true;
 
 	CHECK_GL("Could not bind the supplied program");
@@ -364,7 +365,7 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer)
 {
 	if (mApplyCurrentProgramState) {
-		mProgram->ApplyUniforms();
+		mProgram->ApplyStateUniforms();
 		mApplyCurrentProgramState = false;
 	}
 

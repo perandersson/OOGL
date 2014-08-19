@@ -14,5 +14,4 @@ public:
 
 private:
 	POGL_MAT4 mValue;
-	std::mutex mMutex;
 };

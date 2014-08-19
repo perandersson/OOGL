@@ -58,8 +58,6 @@ void POGLUniformInt32::Apply()
 
 void POGLUniformInt32::SetInt32(POGL_INT32 a)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 1;
 	mValues[0] = a;
 	mValues[1] = INT_MAX;
@@ -72,8 +70,6 @@ void POGLUniformInt32::SetInt32(POGL_INT32 a)
 
 void POGLUniformInt32::SetInt32(POGL_INT32 a, POGL_INT32 b)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 2;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -86,8 +82,6 @@ void POGLUniformInt32::SetInt32(POGL_INT32 a, POGL_INT32 b)
 
 void POGLUniformInt32::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 3;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -100,8 +94,6 @@ void POGLUniformInt32::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 
 void POGLUniformInt32::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POGL_INT32 d)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 4;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -114,8 +106,6 @@ void POGLUniformInt32::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POGL_I
 
 void POGLUniformInt32::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = ptr[i];
@@ -146,8 +136,6 @@ void POGLUniformInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, PO
 
 void POGLUniformInt32::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = (POGL_INT32)ptr[i];

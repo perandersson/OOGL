@@ -78,8 +78,6 @@ void POGLUniformDouble::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_
 
 void POGLUniformDouble::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = (POGL_DOUBLE)ptr[i];
@@ -90,8 +88,6 @@ void POGLUniformDouble::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 
 void POGLUniformDouble::SetDouble(POGL_DOUBLE a)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 1;
 	mValues[0] = a;
 	mValues[1] = DBL_MAX;
@@ -104,8 +100,6 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a)
 
 void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 2;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -118,8 +112,6 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 
 void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 3;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -132,8 +124,6 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 
 void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	mCount = 4;
 	mValues[0] = a;
 	mValues[1] = b;
@@ -146,8 +136,6 @@ void POGLUniformDouble::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, P
 
 void POGLUniformDouble::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 {
-	std::lock_guard<std::mutex> lock(mMutex);
-
 	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		mValues[i] = ptr[i];

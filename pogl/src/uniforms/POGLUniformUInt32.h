@@ -26,5 +26,4 @@ private:
 	POGL_UINT32 mCount;
 	POGL_UINT32 mValues[4];
 	POGL_UINT32 mValuesSet[4];
-	std::mutex mMutex;
 };

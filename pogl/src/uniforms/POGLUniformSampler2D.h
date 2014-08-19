@@ -29,6 +29,11 @@ private:
 	POGLTextureResource* mTextureResource;
 	POGL_UINT32 mTextureUID;
 	GLuint mActiveTexture;
+
 	POGLSamplerObject* mSamplerObject;
-	std::mutex mMutex;
+	POGLMinFilter::Enum mMinFilter;
+	POGLMagFilter::Enum mMagFilter;
+	POGLTextureWrap::Enum mWrap[2];
+	POGLCompareFunc::Enum mCompareFunc;
+	POGLCompareMode::Enum mCompareMode;
 };
