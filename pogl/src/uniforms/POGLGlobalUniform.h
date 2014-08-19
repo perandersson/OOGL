@@ -62,4 +62,14 @@ private:
 	POGL_FLOAT mFloats[4];
 	POGL_DOUBLE mDoubles[4];
 	POGL_UINT32 mInts[4];
+	POGL_MAT4 mValue;
+	IPOGLTexture* mTexture;
+
+	POGLMinFilter::Enum mMinFilter;
+	POGLMagFilter::Enum mMagFilter;
+	POGLTextureWrap::Enum mWraps[3];
+	POGLCompareFunc::Enum mCompareFunc;
+	POGLCompareMode::Enum mCompareMode;
+
+	std::mutex mMutex;
 };
