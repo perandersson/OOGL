@@ -309,6 +309,9 @@ void POGLRenderState::Apply(IPOGLProgram* program)
 	// Bind the program if neccessary
 	BindProgram(static_cast<POGLProgram*>(program));
 
+	// Apply the global uniform values
+	mProgram->ApplyGlobalUniforms();
+
 	// Retrieve the program data
 	POGLProgramData data;
 	mProgram->CopyProgramData(&data);
@@ -356,7 +359,6 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 	mProgram->AddRef();
 	mProgramUID = uid;
 	glUseProgram(mProgram->GetProgramID());
-	mProgram->ApplyGlobalUniforms();
 	mApplyCurrentProgramState = true;
 
 	CHECK_GL("Could not bind the supplied program");
