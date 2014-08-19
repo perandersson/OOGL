@@ -7,6 +7,9 @@ uniform mat4 ProjectionMatrix;
 // Uniform containing the view matrix
 uniform mat4 ViewMatrix;
 
+// Uniform containing the model matrix (rotation in this case)
+uniform mat4 ModelMatrix;
+
 // Vertex attributes
 layout(location = 0) in vec3 position;
 layout(location = 1) in vec4 color;

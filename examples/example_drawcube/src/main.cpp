@@ -108,8 +108,21 @@ int main()
 		// Poll the opened window's events. This is NOT part of the POGL library
 		//
 
+		//
+		// Rotate the cube based on the total application time
+		//
+
+		POGL_MAT4 modelMatrix;
+		POGL_FLOAT angle = 0.0f;
+
 		while (POGLProcessEvents()) {
+			angle += POGLGetTimeSinceLastTick() * 90.0f;
+			POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+
 			IPOGLRenderState* state = context->Apply(program);
+
+			state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
+
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			state->Draw(vertexBuffer, indexBuffer);
 			state->Release();

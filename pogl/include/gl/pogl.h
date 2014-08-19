@@ -694,6 +694,20 @@ struct POGLAPI POGL_MAT4
 		POGL_FLOAT vec[16];
 	};
 
+	POGL_MAT4() : 
+		_11(1.0f), _21(0.0f), _31(0.0f), _41(0.0f),
+		_12(0.0f), _22(1.0f), _32(0.0f), _42(0.0f),
+		_13(0.0f), _23(0.0f), _33(1.0f), _43(0.0f),
+		_14(0.0f), _24(0.0f), _34(0.0f), _44(1.0f) 
+	{}
+
+	POGL_MAT4(const POGL_MAT4& rhs) :
+		_11(rhs._11), _21(rhs._21), _31(rhs._31), _41(rhs._41),
+		_12(rhs._12), _22(rhs._22), _32(rhs._32), _42(rhs._42),
+		_13(rhs._13), _23(rhs._23), _33(rhs._33), _43(rhs._43),
+		_14(rhs._14), _24(rhs._24), _34(rhs._34), _44(rhs._44)
+	{}
+
 	POGL_FLOAT operator() (POGL_UINT32 row, POGL_UINT32 column) const { return m[column][row]; }
 	POGL_FLOAT& operator() (POGL_UINT32 row, POGL_UINT32 column) { return m[column][row]; }
 };

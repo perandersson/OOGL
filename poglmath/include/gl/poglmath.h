@@ -6,6 +6,11 @@
 #error "You must include pogl.h before poglmath.h"
 #endif
 
+/*
+	Parts of the mathematical algorithms used have been influenced by Mesa3D (http://www.mesa3d.org)
+	License: LICENSE_mesa3d.txt
+*/
+
 /*!
 	\brief
 */
@@ -68,6 +73,39 @@ extern POGLAPI void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& 
 */
 extern POGLAPI void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL_FLOAT zNear, POGL_FLOAT zFar, POGL_MAT4* _out_Mat4);
 
+/*!
+	\brief Multiply
+
+	\param lhs
+	\param rhs
+	\param _out_Mat4
+*/
+extern POGLAPI void POGLMat4Multiply(const POGL_MAT4& lhs, const POGL_MAT4& rhs, POGL_MAT4* _out_Mat4);
+
+/*!
+	\brief Translate the supplied output matrix with the supplied vector
+
+	\param v
+	\param _out_Mat4
+*/
 extern POGLAPI void POGLMat4Translate(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4);
+
+/*!
+	\brief Rotate the supplied output matrix with the supplied vector
+
+	\param angle
+			The angle in degrees
+	\param v
+	\param _out_Mat4
+*/
+extern POGLAPI void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4);
+
+/*!
+	\brief Rotate the supplied output matrix with the supplied vector
+
+	\param v
+	\param _out_Mat4
+*/
+extern POGLAPI void POGLMat4Scale(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4);
 
 #endif
