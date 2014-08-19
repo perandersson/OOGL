@@ -114,9 +114,12 @@ int main()
 
 		POGL_MAT4 modelMatrix;
 		POGL_FLOAT angle = 0.0f;
+		const POGL_FLOAT ROTATION_SPEED = 90.0f; 
 
 		while (POGLProcessEvents()) {
-			angle += POGLGetTimeSinceLastTick() * 90.0f;
+			angle += POGLGetTimeSinceLastTick() * ROTATION_SPEED;
+			if (angle > 360.0f)
+				angle = 360.0f - angle;
 			POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 
 			IPOGLRenderState* state = context->Apply(program);

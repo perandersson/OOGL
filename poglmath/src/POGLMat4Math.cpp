@@ -1,9 +1,15 @@
 #include "config.h"
 
+#ifndef M
+#define M(row, col) m[col * 4 + row]
+#endif
+
+static const POGL_MAT4 POGL_MAT4_IDENTITY;
+
 void POGLMat4Ortho(POGL_FLOAT left, POGL_FLOAT right, POGL_FLOAT bottom, POGL_FLOAT top, POGL_FLOAT zNear, POGL_FLOAT zFar, POGL_MAT4* _out_Mat4)
 {
 	POGL_FLOAT* m = _out_Mat4->vec;
-#define M(row,col)  m[col*4+row]
+
 	M(0, 0) = 2.0f / (right - left);
 	M(0, 1) = 0.0f;
 	M(0, 2) = 0.0f;
@@ -23,7 +29,6 @@ void POGLMat4Ortho(POGL_FLOAT left, POGL_FLOAT right, POGL_FLOAT bottom, POGL_FL
 	M(3, 1) = 0.0f;
 	M(3, 2) = 0.0f;
 	M(3, 3) = 1.0f;
-#undef M
 }
 
 void POGLMat4Ortho2D(POGL_FLOAT left, POGL_FLOAT right, POGL_FLOAT bottom, POGL_FLOAT top, POGL_MAT4* _out_Mat4)
@@ -45,7 +50,6 @@ void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const P
 	POGL_VECTOR3 newUp;
 	POGLVec3Cross(side, forward, &newUp);
 
-#define M(row,col)  m[col*4+row]
 	M(0, 0) = side.x;
 	M(0, 1) = side.y;
 	M(0, 2) = side.z;
@@ -65,7 +69,6 @@ void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const P
 	M(3, 1) = 0.0f;
 	M(3, 2) = 0.0f;
 	M(3, 3) = 1.0f;
-#undef M
 
 	POGL_VECTOR3 negativeEye(-eye.x, -eye.y, -eye.z);
 	POGLMat4Translate(negativeEye, _out_Mat4);
@@ -74,7 +77,6 @@ void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const P
 void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL_FLOAT zNear, POGL_FLOAT zFar, POGL_MAT4* _out_Mat4)
 {
 	POGL_FLOAT* m = _out_Mat4->vec;
-#define M(row,col)  m[col*4+row]
 
 	const POGL_FLOAT top = zNear * tanf(fovy * (POGL_FLOAT)(POGL_M_PI / 360.0));
 	const POGL_FLOAT bottom = -top;
@@ -100,15 +102,14 @@ void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL_FLOAT zNear, P
 	M(3, 1) = 0.0f;
 	M(3, 2) = -1.0f;
 	M(3, 3) = 1.0f;
-#undef M
 }
 
 void POGLMat4Translate(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
 {
 	POGL_FLOAT* m = _out_Mat4->vec;
 	const POGL_FLOAT x = v.x;
-	const POGL_FLOAT y = v.x;
-	const POGL_FLOAT z = v.x;
+	const POGL_FLOAT y = v.y;
+	const POGL_FLOAT z = v.z;
 
 	m[12] = m[0] * x + m[4] * y + m[8] * z + m[12];
 	m[13] = m[1] * x + m[5] * y + m[9] * z + m[13];
@@ -118,8 +119,8 @@ void POGLMat4Translate(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
 
 void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
 {
-	const POGL_FLOAT s = (POGL_FLOAT)sinf(angle * POGL_ANG2RAD_F);
-	const POGL_FLOAT c = (POGL_FLOAT)cosf(angle * POGL_ANG2RAD_F);
+	const POGL_FLOAT s = (POGL_FLOAT)sin(angle * POGL_ANG2RAD_F);
+	const POGL_FLOAT c = (POGL_FLOAT)cos(angle * POGL_ANG2RAD_F);
 
 	POGL_FLOAT x = v.x;
 	POGL_FLOAT y = v.y;
@@ -130,10 +131,9 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 
 	bool optimized = false;
 
-#define M(row, col)  m[col * 4 + row]
-	if (x == 0.0F) {
-		if (y == 0.0F) {
-			if (z != 0.0F) {
+	if (x == 0.0f) {
+		if (y == 0.0f) {
+			if (z != 0.0f) {
 				optimized = true;
 				/* rotate only around z-axis */
 				M(0, 0) = c;
@@ -148,12 +148,12 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 				}
 			}
 		}
-		else if (z == 0.0F) {
+		else if (z == 0.0f) {
 			optimized = true;
 			/* rotate only around y-axis */
 			M(0, 0) = c;
 			M(2, 2) = c;
-			if (y < 0.0F) {
+			if (y < 0.0f) {
 				M(0, 2) = -s;
 				M(2, 0) = s;
 			}
@@ -163,13 +163,13 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 			}
 		}
 	}
-	else if (y == 0.0F) {
-		if (z == 0.0F) {
+	else if (y == 0.0f) {
+		if (z == 0.0f) {
 			optimized = true;
 			/* rotate only around x-axis */
 			M(1, 1) = c;
 			M(2, 2) = c;
-			if (x < 0.0F) {
+			if (x < 0.0f) {
 				M(1, 2) = s;
 				M(2, 1) = -s;
 			}
@@ -216,8 +216,8 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 		M(2, 1) = (one_c * yz) + xs;
 		M(2, 2) = (one_c * zz) + c;
 	}
-#undef M
-	POGLMat4Multiply(*_out_Mat4, tmp, _out_Mat4);
+
+	POGLMat4Multiply(POGL_MAT4_IDENTITY, tmp, _out_Mat4);
 }
 
 void POGLMat4Scale(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
@@ -241,24 +241,24 @@ void POGLMat4Multiply(const POGL_MAT4& lhs, const POGL_MAT4& rhs, POGL_MAT4* _ou
 	POGL_FLOAT* tmp_M = tmp.vec;
 
 	tmp_M[0] = (a[0] * b[0] + a[4] * b[1] + a[8] * b[2] + a[12] * b[3]);
-	tmp_M[0] = (a[1] * b[0] + a[5] * b[1] + a[9] * b[2] + a[13] * b[3]);
-	tmp_M[0] = (a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14] * b[3]);
-	tmp_M[0] = (a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3]);
+	tmp_M[1] = (a[1] * b[0] + a[5] * b[1] + a[9] * b[2] + a[13] * b[3]);
+	tmp_M[2] = (a[2] * b[0] + a[6] * b[1] + a[10] * b[2] + a[14] * b[3]);
+	tmp_M[3] = (a[3] * b[0] + a[7] * b[1] + a[11] * b[2] + a[15] * b[3]);
 
-	tmp_M[0] = (a[0] * b[4] + a[4] * b[5] + a[8] * b[6] + a[12] * b[7]);
-	tmp_M[0] = (a[1] * b[4] + a[5] * b[5] + a[9] * b[6] + a[13] * b[7]);
-	tmp_M[0] = (a[2] * b[4] + a[6] * b[5] + a[10] * b[6] + a[14] * b[7]);
-	tmp_M[0] = (a[3] * b[4] + a[7] * b[5] + a[11] * b[6] + a[15] * b[7]);
+	tmp_M[4] = (a[0] * b[4] + a[4] * b[5] + a[8] * b[6] + a[12] * b[7]);
+	tmp_M[5] = (a[1] * b[4] + a[5] * b[5] + a[9] * b[6] + a[13] * b[7]);
+	tmp_M[6] = (a[2] * b[4] + a[6] * b[5] + a[10] * b[6] + a[14] * b[7]);
+	tmp_M[7] = (a[3] * b[4] + a[7] * b[5] + a[11] * b[6] + a[15] * b[7]);
 
-	tmp_M[0] = (a[0] * b[8] + a[4] * b[9] + a[8] * b[10] + a[12] * b[11]);
-	tmp_M[0] = (a[1] * b[8] + a[5] * b[9] + a[9] * b[10] + a[13] * b[11]);
-	tmp_M[0] = (a[2] * b[8] + a[6] * b[9] + a[10] * b[10] + a[14] * b[11]);
-	tmp_M[0] = (a[3] * b[8] + a[7] * b[9] + a[11] * b[10] + a[15] * b[11]);
+	tmp_M[8] = (a[0] * b[8] + a[4] * b[9] + a[8] * b[10] + a[12] * b[11]);
+	tmp_M[9] = (a[1] * b[8] + a[5] * b[9] + a[9] * b[10] + a[13] * b[11]);
+	tmp_M[10] = (a[2] * b[8] + a[6] * b[9] + a[10] * b[10] + a[14] * b[11]);
+	tmp_M[11] = (a[3] * b[8] + a[7] * b[9] + a[11] * b[10] + a[15] * b[11]);
 
-	tmp_M[0] = (a[0] * b[12] + a[4] * b[13] + a[8] * b[14] + a[12] * b[15]);
-	tmp_M[0] = (a[1] * b[12] + a[5] * b[13] + a[9] * b[14] + a[13] * b[15]);
-	tmp_M[0] = (a[2] * b[12] + a[6] * b[13] + a[10] * b[14] + a[14] * b[15]);
-	tmp_M[0] = (a[3] * b[12] + a[7] * b[13] + a[11] * b[14] + a[15] * b[15]);
+	tmp_M[12] = (a[0] * b[12] + a[4] * b[13] + a[8] * b[14] + a[12] * b[15]);
+	tmp_M[13] = (a[1] * b[12] + a[5] * b[13] + a[9] * b[14] + a[13] * b[15]);
+	tmp_M[14] = (a[2] * b[12] + a[6] * b[13] + a[10] * b[14] + a[14] * b[15]);
+	tmp_M[15] = (a[3] * b[12] + a[7] * b[13] + a[11] * b[14] + a[15] * b[15]);
 
 	*_out_Mat4 = tmp;
 }
