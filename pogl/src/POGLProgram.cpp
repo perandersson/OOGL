@@ -1,6 +1,7 @@
 #include "MemCheck.h"
 #include "POGLProgram.h"
 #include "uniforms/POGLDefaultUniform.h"
+#include "uniforms/POGLGlobalUniform.h"
 #include "uniforms/POGLUniformNotFound.h"
 #include "uniforms/POGLUniformInt32.h"
 #include "uniforms/POGLUniformUInt32.h"
@@ -59,6 +60,8 @@ void POGLProgram::Release()
 
 void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
 {
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+
 	mProgramID = programID;
 	const POGL_UINT32 programUID = GenProgramUID();
 
@@ -130,6 +133,9 @@ void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
 		}
 
 		mUniforms.insert(std::make_pair(name, uniform));
+
+		POGLGlobalUniform* globalUniform = new POGLGlobalUniform(uniform, uniformType);
+		mGlobalUniforms.insert(std::make_pair(name, globalUniform));
 	}
 
 	mUID = programUID;
@@ -137,6 +143,23 @@ void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
 
 void POGLProgram::ApplyUniforms()
 {
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+	//
+	// Apply global uniforms
+	//
+
+	auto globalIt = mGlobalUniforms.begin();
+	auto globalEnd = mGlobalUniforms.end();
+	for (; globalIt != globalEnd; ++globalIt) {
+		auto global = globalIt->second;
+		global->Apply();
+	}
+
+	//
+	// Apply the other uniforms
+	//
+
 	auto it = mUniforms.begin();
 	auto end = mUniforms.end();
 	for (; it != end; ++it) {
@@ -163,12 +186,24 @@ POGLSamplerObject* POGLProgram::GenSamplerObject(POGLRenderState* renderState)
 	return samplerObject;
 }
 
+IPOGLUniform* POGLProgram::FindStateUniformByName(const POGL_CHAR* name)
+{
+	std::lock_guard<std::recursive_mutex> lock(mMutex);
+
+	auto it = mUniforms.find(POGL_STRING(name));
+	if (it == mUniforms.end()) {
+		static POGLUniformNotFound uniformNotFound;
+		return &uniformNotFound;
+	}
+	return it->second;
+}
+
 IPOGLUniform* POGLProgram::FindUniformByName(const POGL_CHAR* name)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	IPOGLUniform* uniform = nullptr;
-	auto it = mUniforms.find(POGL_STRING(name));
-	if (it == mUniforms.end()) {
+
+	auto it = mGlobalUniforms.find(POGL_STRING(name));
+	if (it == mGlobalUniforms.end()) {
 		static POGLUniformNotFound uniformNotFound;
 		return &uniformNotFound;
 	}

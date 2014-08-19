@@ -73,7 +73,7 @@ void POGLRenderState::Clear(POGL_UINT32 clearBits)
 
 IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_CHAR* name)
 {
-	return mProgram->FindUniformByName(name);
+	return mProgram->FindStateUniformByName(name);
 }
 
 void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)

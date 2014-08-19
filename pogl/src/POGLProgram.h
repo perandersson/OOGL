@@ -8,9 +8,11 @@ class POGLDefaultUniform;
 class POGLDeviceContext;
 class POGLRenderState;
 class POGLSamplerObject;
+class POGLGlobalUniform;
 class POGLProgram : public IPOGLProgram
 {
 	typedef std::hash_map<POGL_STRING, POGLDefaultUniform*> Uniforms;
+	typedef std::hash_map<POGL_STRING, POGLGlobalUniform*> GlobalUniforms;
 
 public:
 	POGLProgram();
@@ -66,6 +68,11 @@ public:
 	*/
 	POGLSamplerObject* GenSamplerObject(POGLRenderState* renderState);
 
+	/*!
+		\brief Retrieves a uniform based on the given name
+	*/
+	IPOGLUniform* FindStateUniformByName(const POGL_CHAR* name);
+
 // IPOGLProgram
 public:
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
@@ -105,4 +112,5 @@ private:
 	POGLProgramData* mData;
 
 	Uniforms mUniforms;
+	GlobalUniforms mGlobalUniforms;
 };
