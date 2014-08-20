@@ -2,6 +2,7 @@
 #include "POGLDeferredRenderState.h"
 #include "POGLDeferredRenderContext.h"
 #include "POGLFramebuffer.h"
+#include "uniforms/POGLDeferredUniform.h"
 
 POGLDeferredRenderState::POGLDeferredRenderState(POGLDeferredRenderContext* context)
 : mRefCount(1), mRenderContext(context)
@@ -19,8 +20,15 @@ void POGLDeferredRenderState::AddRef()
 
 void POGLDeferredRenderState::Release()
 {
-	if (--mRefCount == 0)
+	if (--mRefCount == 0) {
+		auto it = mUniforms.begin();
+		auto end = mUniforms.end();
+		for (; it != end; ++it) {
+			delete it->second;
+		}
+
 		delete this;
+	}
 }
 
 void POGLDeferredRenderState::Clear(POGL_UINT32 clearBits)
@@ -32,7 +40,15 @@ void POGLDeferredRenderState::Clear(POGL_UINT32 clearBits)
 
 IPOGLUniform* POGLDeferredRenderState::FindUniformByName(const POGL_CHAR* name)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	const POGL_STRING sname(name);
+	auto it = mUniforms.find(sname);
+	if (it == mUniforms.end()) {
+		POGLDeferredUniform* uniform = new POGLDeferredUniform(sname, mRenderContext);
+		mUniforms.insert(std::make_pair(sname, uniform));
+		return uniform;
+	}
+
+	return it->second;
 }
 
 void POGLDeferredRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)

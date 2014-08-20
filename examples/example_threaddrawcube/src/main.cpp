@@ -1,6 +1,7 @@
 #include <gl/pogl.h>
 #include <gl/poglmath.h>
 #include <thread>
+#include <atomic>
 #include "POGLExampleWindow.h"
 
 int main()
@@ -103,35 +104,87 @@ int main()
 
 		program->SetDepthTest(true);
 		program->SetDepthFunc(POGLDepthFunc::LESS);
+
+		std::atomic<bool> running(true);
+		std::atomic<POGL_FLOAT> angle(0.0f);
+
+		IPOGLDeferredRenderContext* deferredContext = device->CreateDeferredRenderContext();
+		std::condition_variable condition;
+		std::thread t([deferredContext, program, vertexBuffer, indexBuffer, &angle, &condition, &running] {
+			//
+			// Rotate the cube based on the total application time
+			//
+
+			try {
+				std::mutex m;
+				std::unique_lock<std::mutex> lock(m);
+				while (running) {
+					POGL_MAT4 modelMatrix;
+					POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+					// 
+					// Draw the cube
+					//
+					IPOGLRenderState* state = deferredContext->Apply(program);
+
+					state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
+
+					state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
+					state->Draw(vertexBuffer, indexBuffer);
+					state->Release();
+
+					//
+					// Flush the commands 
+					//
+
+					deferredContext->Flush();
+
+					//
+					// Wait until the commands have been executed. Otherwise the deferred context will start allocating memory faster then it will be released.
+					// The reason for this happening is because this thread will be executed much much faster than the main thread because of all
+					// OpenGL commands. We allocate variables faster than we can release them.
+					//
+
+					if (running)
+						condition.wait(lock);
+				}
+			}
+			catch (POGLException e) {
+				POGLAlert(e);
+			}
+		});
 		
 		//
 		// Poll the opened window's events. This is NOT part of the POGL library
 		//
 
-		//
-		// Rotate the cube based on the total application time
-		//
-
-		POGL_FLOAT angle = 0.0f;
-		const POGL_FLOAT ROTATION_SPEED = 90.0f; 
+		POGL_FLOAT angleFlt = 0.0f;
+		const POGL_FLOAT ROTATION_SPEED = 90.0f;
 
 		while (POGLProcessEvents()) {
-			angle += POGLGetTimeSinceLastTick() * ROTATION_SPEED;
-			if (angle > 360.0f)
-				angle = 360.0f - angle;
-			POGL_MAT4 modelMatrix;
-			POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+			angleFlt += POGLGetTimeSinceLastTick() * ROTATION_SPEED;
+			if (angleFlt > 360.0f)
+				angleFlt = 360.0f - angle;
+			angle = angleFlt;
 
-			IPOGLRenderState* state = context->Apply(program);
+			//
+			// Execute the deferred context commands and notify the thread so that it generates the commands once again
+			//
+			
+			deferredContext->ExecuteCommands(context);
+			condition.notify_one();
 
-			state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
-
-			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-			state->Draw(vertexBuffer, indexBuffer);
-			state->Release();
 			device->EndFrame();
 		}
 
+		//
+		// Stop running and wait for the thread to stop running
+		//
+
+		running = false;
+		condition.notify_one();
+		t.join();
+
+		deferredContext->Release();
 		indexBuffer->Release();
 		vertexBuffer->Release();
 		program->Release();

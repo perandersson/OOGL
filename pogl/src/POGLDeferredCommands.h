@@ -208,3 +208,26 @@ struct POGL_RESIZETEXTURE2D_COMMAND_DATA
 };
 extern void POGLResizeTexture2D_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLResizeTexture2D_Release(POGL_HANDLE command);
+
+struct POGL_UNIFORM_SET_INT_COMMAND_DATA
+{
+	// The name of the uniform
+	POGL_CHAR name[32];
+	
+	// The uniform value
+	POGL_INT32 values[4];
+
+	// The number of values
+	POGL_UINT32 count;
+};
+extern void POGLUniformSetInt_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+struct POGL_UNIFORM_SET_MAT4_COMMAND_DATA
+{
+	// The name of the uniform
+	POGL_CHAR name[32];
+
+	// The uniform value
+	POGL_MAT4 matrix;
+};
+extern void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);

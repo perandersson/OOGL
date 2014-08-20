@@ -3,8 +3,11 @@
 #include <memory>
 
 class POGLDeferredRenderContext;
+class POGLDeferredUniform;
 class POGLDeferredRenderState : public IPOGLRenderState
 {
+	typedef std::hash_map<POGL_STRING, POGLDeferredUniform*> Uniforms;
+
 public:
 	POGLDeferredRenderState(POGLDeferredRenderContext* context);
 	~POGLDeferredRenderState();
@@ -38,4 +41,6 @@ public:
 private:
 	REF_COUNTER mRefCount;
 	POGLDeferredRenderContext* mRenderContext;
+
+	Uniforms mUniforms;
 };

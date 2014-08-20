@@ -242,7 +242,7 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 		M(2, 2) = (one_c * zz) + c;
 	}
 
-	POGLMat4Multiply(POGL_MAT4_IDENTITY, tmp, _out_Mat4);
+	POGLMat4Multiply(*_out_Mat4, tmp, _out_Mat4);
 }
 
 void POGLMat4Scale(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
