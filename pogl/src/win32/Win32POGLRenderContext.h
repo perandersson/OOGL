@@ -1,11 +1,11 @@
 #pragma once
-#include "POGLDeviceContext.h"
+#include "POGLRenderContext.h"
 
-class POGLAPI Win32POGLDeviceContext : public POGLDeviceContext
+class POGLAPI Win32POGLRenderContext : public POGLRenderContext
 {
 public:
-	Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);
-	~Win32POGLDeviceContext();
+	Win32POGLRenderContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);
+	~Win32POGLRenderContext();
 
 	/*!
 		\brief Retrieves the windows specific render context

@@ -20,7 +20,7 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		IPOGLDeviceContext* context = device->GetDeviceContext();
+		IPOGLRenderContext* context = device->GetRenderContext();
 		
 		//
 		// Load the vertex- and fragment shader used to render to the framebuffer render targets
@@ -77,7 +77,7 @@ int main()
 		// Create a deferred device context and use that to create the textures and framebuffers
 		//
 
-		IPOGLDeferredDeviceContext* deferredContext = device->CreateDeferredDeviceContext();
+		IPOGLDeferredRenderContext* deferredContext = device->CreateDeferredRenderContext();
 
 		//
 		// Prepare and create a framebuffer to render to

@@ -1,6 +1,5 @@
 #include "MemCheck.h"
 #include "POGLUniformUInt32.h"
-#include "POGLDeviceContext.h"
 
 POGLUniformUInt32::POGLUniformUInt32(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType)
 : POGLDefaultUniform(programUID, state, componentID, uniformType), mCount(0)

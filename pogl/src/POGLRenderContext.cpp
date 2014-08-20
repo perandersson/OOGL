@@ -1,5 +1,5 @@
 #include "MemCheck.h"
-#include "POGLDeviceContext.h"
+#include "POGLRenderContext.h"
 #include "POGLRenderState.h"
 #include "POGLDevice.h"
 #include "POGLEnum.h"
@@ -13,27 +13,27 @@
 #include "POGLProgram.h"
 #include <algorithm>
 
-POGLDeviceContext::POGLDeviceContext(IPOGLDevice* device)
+POGLRenderContext::POGLRenderContext(IPOGLDevice* device)
 : mRenderState(nullptr), mDevice(device)
 {
 }
 
-POGLDeviceContext::~POGLDeviceContext()
+POGLRenderContext::~POGLRenderContext()
 {
 }
 
-void POGLDeviceContext::Destroy()
+void POGLRenderContext::Destroy()
 {
 	POGL_SAFE_RELEASE(mRenderState);
 }
 
-IPOGLDevice* POGLDeviceContext::GetDevice()
+IPOGLDevice* POGLRenderContext::GetDevice()
 {
 	mDevice->AddRef();
 	return mDevice;
 }
 
-IPOGLShader* POGLDeviceContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
+IPOGLShader* POGLRenderContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
 {
 	POGL_ISTREAM stream(path);
 	if (!stream.is_open())
@@ -44,7 +44,7 @@ IPOGLShader* POGLDeviceContext::CreateShaderFromFile(const POGL_CHAR* path, POGL
 	return CreateShaderFromMemory(str.c_str(), str.length(), type);
 }
 
-IPOGLShader* POGLDeviceContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
+IPOGLShader* POGLRenderContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
 {
 	if (size == 0 || memory == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You cannot generate a non-existing shader");
@@ -74,7 +74,7 @@ IPOGLShader* POGLDeviceContext::CreateShaderFromMemory(const POGL_CHAR* memory, 
 	return new POGLShader(shaderID, type);
 }
 
-IPOGLProgram* POGLDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
+IPOGLProgram* POGLRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)
 {
 	if (shaders == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You must supply at least one shader to be able to create a program");
@@ -111,12 +111,12 @@ IPOGLProgram* POGLDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
 	return program;
 }
 
-IPOGLTexture1D* POGLDeviceContext::CreateTexture1D()
+IPOGLTexture1D* POGLRenderContext::CreateTexture1D()
 {
 	return nullptr;
 }
 
-IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes)
+IPOGLTexture2D* POGLRenderContext::CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes)
 {
 	if (size.width <= 0)
 		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with width: %d", size.width);
@@ -150,12 +150,12 @@ IPOGLTexture2D* POGLDeviceContext::CreateTexture2D(const POGL_SIZE& size, POGLTe
 	return texture;
 }
 
-IPOGLTexture3D* POGLDeviceContext::CreateTexture3D()
+IPOGLTexture3D* POGLRenderContext::CreateTexture3D()
 {
 	return nullptr;
 }
 
-void POGLDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size)
+void POGLRenderContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size)
 {
 	if (texture == nullptr)
 		THROW_EXCEPTION(POGLStateException, "You cannot resize a non-existing texture");
@@ -179,12 +179,12 @@ void POGLDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE
 	CHECK_GL("Could not set new texture size");
 }
 
-IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures)
+IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures)
 {
 	return CreateFramebuffer(textures, nullptr);
 }
 
-IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture)
+IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture)
 {
 	//
 	// Generate a framebuffer ID
@@ -214,7 +214,7 @@ IPOGLFramebuffer* POGLDeviceContext::CreateFramebuffer(IPOGLTexture** textures, 
 	return framebuffer;
 }
 
-IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	assert_not_null(memory);
 	assert_with_message(memorySize > 0, "You cannot create a vertex buffer of no size");
@@ -249,22 +249,22 @@ IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const void* memory, POG
 	return vb;
 }
 
-IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
-IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_COLOR_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
-IPOGLVertexBuffer* POGLDeviceContext::CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_TEXCOORD_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
-IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
+IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
 {
 	assert_not_null(memory);
 	assert_with_message(memorySize > 0, "You cannot create a index buffer of no size");
@@ -292,29 +292,29 @@ IPOGLIndexBuffer* POGLDeviceContext::CreateIndexBuffer(const void* memory, POGL_
 	return ib;
 }
 
-IPOGLResource* POGLDeviceContext::CloneResource(IPOGLResource* resource)
+IPOGLResource* POGLRenderContext::CloneResource(IPOGLResource* resource)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination)
+void POGLRenderContext::CopyResource(IPOGLResource* source, IPOGLResource* destination)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size)
+void POGLRenderContext::CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLRenderState* POGLDeviceContext::Apply(IPOGLProgram* program)
+IPOGLRenderState* POGLRenderContext::Apply(IPOGLProgram* program)
 {
 	mRenderState->Apply(program);
 	mRenderState->AddRef();
 	return mRenderState;
 }
 
-void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
+void* POGLRenderContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
@@ -326,7 +326,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
+void* POGLRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
@@ -342,7 +342,7 @@ void* POGLDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeviceContext::Unmap(IPOGLResource* resource)
+void POGLRenderContext::Unmap(IPOGLResource* resource)
 {
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
@@ -353,12 +353,12 @@ void POGLDeviceContext::Unmap(IPOGLResource* resource)
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeviceContext::SetViewport(const POGL_RECT& viewport)
+void POGLRenderContext::SetViewport(const POGL_RECT& viewport)
 {
 	mRenderState->SetViewport(viewport);
 }
 
-void POGLDeviceContext::InitializeRenderState()
+void POGLRenderContext::InitializeRenderState()
 {
 	if (mRenderState == nullptr) {
 		mRenderState = new POGLRenderState(this);

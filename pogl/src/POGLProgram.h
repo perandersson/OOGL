@@ -5,7 +5,7 @@
 
 struct POGLUniformProperty;
 class POGLDefaultUniform;
-class POGLDeviceContext;
+class POGLRenderContext;
 class POGLRenderState;
 class POGLSamplerObject;
 class POGLGlobalUniform;
@@ -28,7 +28,7 @@ public:
 		\param context
 				The immediately POGLDeviceContext
 	*/
-	void PostConstruct(GLuint programID, POGLDeviceContext* context);
+	void PostConstruct(GLuint programID, POGLRenderContext* context);
 	
 	/*!
 		\brief Retrieves a unique ID for this effect

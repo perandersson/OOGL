@@ -1,15 +1,15 @@
 #include "MemCheck.h"
-#include "POGLDeferredDeviceContext.h"
+#include "POGLDeferredRenderContext.h"
 #include "POGLVertexBuffer.h"
 #include "POGLEnum.h"
 #include "POGLFactory.h"
 #include "POGLRenderState.h"
-#include "POGLDeviceContext.h"
+#include "POGLRenderContext.h"
 #include "POGLTexture2D.h"
 #include "POGLDeferredRenderState.h"
 #include "POGLFramebuffer.h"
 
-POGLDeferredDeviceContext::POGLDeferredDeviceContext(IPOGLDevice* device)
+POGLDeferredRenderContext::POGLDeferredRenderContext(IPOGLDevice* device)
 : mRefCount(1), mDevice(device), mRenderState(nullptr),
 mCommands(nullptr), mCommandsSize(0), mCommandsOffset(0),
 mFlushedCommands(nullptr), mFlushedCommandsSize(0), 
@@ -18,16 +18,16 @@ mMapMemoryPool(nullptr), mMapMemoryPoolSize(0), mMapMemoryPoolOffset(0)
 {
 }
 
-POGLDeferredDeviceContext::~POGLDeferredDeviceContext()
+POGLDeferredRenderContext::~POGLDeferredRenderContext()
 {
 }
 
-void POGLDeferredDeviceContext::AddRef()
+void POGLDeferredRenderContext::AddRef()
 {
 	mRefCount++;
 }
 
-void POGLDeferredDeviceContext::Release()
+void POGLDeferredRenderContext::Release()
 {
 	if (--mRefCount == 0) {
 		
@@ -77,33 +77,33 @@ void POGLDeferredDeviceContext::Release()
 	}
 }
 
-IPOGLDevice* POGLDeferredDeviceContext::GetDevice()
+IPOGLDevice* POGLDeferredRenderContext::GetDevice()
 {
 	mDevice->AddRef();
 	return mDevice;
 }
 
-IPOGLShader* POGLDeferredDeviceContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
+IPOGLShader* POGLDeferredRenderContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLShader* POGLDeferredDeviceContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
+IPOGLShader* POGLDeferredRenderContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLProgram* POGLDeferredDeviceContext::CreateProgramFromShaders(IPOGLShader** shaders)
+IPOGLProgram* POGLDeferredRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLTexture1D* POGLDeferredDeviceContext::CreateTexture1D()
+IPOGLTexture1D* POGLDeferredRenderContext::CreateTexture1D()
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes)
+IPOGLTexture2D* POGLDeferredRenderContext::CreateTexture2D(const POGL_SIZE& size, POGLTextureFormat::Enum format, const void* bytes)
 {
 	if (size.width <= 0)
 		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with width: %d", size.width);
@@ -135,12 +135,12 @@ IPOGLTexture2D* POGLDeferredDeviceContext::CreateTexture2D(const POGL_SIZE& size
 	return texture;
 }
 
-IPOGLTexture3D* POGLDeferredDeviceContext::CreateTexture3D()
+IPOGLTexture3D* POGLDeferredRenderContext::CreateTexture3D()
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeferredDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size)
+void POGLDeferredRenderContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size)
 {
 	if (texture == nullptr)
 		THROW_EXCEPTION(POGLStateException, "You cannot resize a non-existing texture");
@@ -157,12 +157,12 @@ void POGLDeferredDeviceContext::ResizeTexture2D(IPOGLTexture2D* texture, const P
 	cmd->newSize = size;
 }
 
-IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures)
+IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** textures)
 {
 	return CreateFramebuffer(textures, nullptr);
 }
 
-IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture)
+IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture)
 {
 	std::vector<IPOGLTexture*> texturesVector;
 	if (textures != nullptr) {
@@ -180,7 +180,7 @@ IPOGLFramebuffer* POGLDeferredDeviceContext::CreateFramebuffer(IPOGLTexture** te
 	return framebuffer;
 }
 
-IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
@@ -196,42 +196,42 @@ IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const void* mem
 	return vb;
 }
 
-IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
-IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_COLOR_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
-IPOGLVertexBuffer* POGLDeferredDeviceContext::CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
+IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const POGL_POSITION_TEXCOORD_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
 	return CreateVertexBuffer(memory, memorySize, &POGL_POSITION_TEXCOORD_VERTEX_LAYOUT, primitiveType, bufferUsage);
 }
 
-IPOGLIndexBuffer* POGLDeferredDeviceContext::CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
+IPOGLIndexBuffer* POGLDeferredRenderContext::CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLResource* POGLDeferredDeviceContext::CloneResource(IPOGLResource* resource)
+IPOGLResource* POGLDeferredRenderContext::CloneResource(IPOGLResource* resource)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeferredDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination)
+void POGLDeferredRenderContext::CopyResource(IPOGLResource* source, IPOGLResource* destination)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeferredDeviceContext::CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size)
+void POGLDeferredRenderContext::CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size)
 {
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLProgram* program)
+IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 {
 	if (program == nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to apply a non-existing program");
@@ -247,7 +247,7 @@ IPOGLRenderState* POGLDeferredDeviceContext::Apply(IPOGLProgram* program)
 	return mRenderState;
 }
 
-void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
+void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
 	if (mMap != nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
@@ -267,7 +267,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
+void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
 	if (mMap != nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
@@ -292,7 +292,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
+void POGLDeferredRenderContext::Unmap(IPOGLResource* resource)
 {
 	if (mMap == nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to unmap a non-mapped resource");
@@ -306,17 +306,17 @@ void POGLDeferredDeviceContext::Unmap(IPOGLResource* resource)
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLDeferredDeviceContext::SetViewport(const POGL_RECT& viewport)
+void POGLDeferredRenderContext::SetViewport(const POGL_RECT& viewport)
 {
 	mRenderState->SetViewport(viewport);
 }
 
-void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context)
+void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context)
 {
 	ExecuteCommands(context, true);
 }
 
-POGL_UINT32 POGLDeferredDeviceContext::GetMapOffset(POGL_UINT32 size)
+POGL_UINT32 POGLDeferredRenderContext::GetMapOffset(POGL_UINT32 size)
 {
 	POGL_UINT32 memoryLeft = mMapMemoryPoolSize - mMapMemoryPoolOffset;
 	if (memoryLeft < size) {
@@ -330,15 +330,15 @@ POGL_UINT32 POGLDeferredDeviceContext::GetMapOffset(POGL_UINT32 size)
 
 }
 
-POGL_HANDLE POGLDeferredDeviceContext::GetMapPointer(POGL_UINT32 offset)
+POGL_HANDLE POGLDeferredRenderContext::GetMapPointer(POGL_UINT32 offset)
 {
 	return (char*)mMapMemoryPool + offset;
 }
 
-void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, bool clearCommands)
+void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context, bool clearCommands)
 {
 	// Execute the deferred render commands and then return the allocated command-pointers to the memory pool
-	auto renderState = static_cast<POGLDeviceContext*>(context)->GetRenderState();
+	auto renderState = static_cast<POGLRenderContext*>(context)->GetRenderState();
 
 	//
 	// Retrieve the flushed commands if they exists and execute them
@@ -364,7 +364,7 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	}
 }
 
-void POGLDeferredDeviceContext::Flush()
+void POGLDeferredRenderContext::Flush()
 {
 	mFlushedCommandsMutex.lock();
 	mFlushedCommands = mCommands;
@@ -374,7 +374,7 @@ void POGLDeferredDeviceContext::Flush()
 	mFlushedCommandsMutex.unlock();
 }
 
-POGL_DEFERRED_COMMAND* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
+POGL_DEFERRED_COMMAND* POGLDeferredRenderContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
 {
 	if (mCommandsOffset >= mCommandsSize) {
 		static const POGL_UINT32 INCREASE_SIZE = 100;

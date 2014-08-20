@@ -1,15 +1,15 @@
 #include "MemCheck.h"
-#include "Win32POGLDeviceContext.h"
+#include "Win32POGLRenderContext.h"
 #include "Win32POGLDevice.h"
 #include <vector>
 
-Win32POGLDeviceContext::Win32POGLDeviceContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext)
-: POGLDeviceContext(device), mRefCount(0), mDeviceContext(deviceContext), mRenderContext(renderContext)
+Win32POGLRenderContext::Win32POGLRenderContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext)
+: POGLRenderContext(device), mRefCount(0), mDeviceContext(deviceContext), mRenderContext(renderContext)
 {
 
 }
 
-Win32POGLDeviceContext::~Win32POGLDeviceContext()
+Win32POGLRenderContext::~Win32POGLRenderContext()
 {
 	if (mRenderContext != nullptr) {
 		wglDeleteContext(mRenderContext);
@@ -17,7 +17,7 @@ Win32POGLDeviceContext::~Win32POGLDeviceContext()
 	}
 }
 
-void Win32POGLDeviceContext::AddRef()
+void Win32POGLRenderContext::AddRef()
 {
 	if (++mRefCount == 1) {
 		const BOOL current = wglMakeCurrent(mDeviceContext, mRenderContext);
@@ -28,7 +28,7 @@ void Win32POGLDeviceContext::AddRef()
 	}
 }
 
-void Win32POGLDeviceContext::Release()
+void Win32POGLRenderContext::Release()
 {
 	assert_with_message(mRefCount > 0, "You are calling Release more often than to AddRef");
 

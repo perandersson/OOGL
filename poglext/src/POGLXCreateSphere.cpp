@@ -1,7 +1,7 @@
 #include "config.h"
 #include <vector>
 
-IPOGLVertexBuffer* POGLXCreateSphere(IPOGLDeviceContext* context, POGL_FLOAT R, POGL_UINT32 Q, POGL_UINT32 H, POGL_FLOAT K, POGL_UINT32 Z, POGLBufferUsage::Enum usage)
+IPOGLVertexBuffer* POGLXCreateSphere(IPOGLRenderContext* context, POGL_FLOAT R, POGL_UINT32 Q, POGL_UINT32 H, POGL_FLOAT K, POGL_UINT32 Z, POGLBufferUsage::Enum usage)
 {
 	const POGL_UINT32 SPACE = Q;
 	const POGL_UINT32 VERTEX_COUNT = (180 / SPACE) * (360 / SPACE) * 4;

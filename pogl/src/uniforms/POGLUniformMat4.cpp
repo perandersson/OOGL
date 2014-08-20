@@ -1,6 +1,5 @@
 #include "MemCheck.h"
 #include "POGLUniformMat4.h"
-#include "POGLDeviceContext.h"
 
 POGLUniformMat4::POGLUniformMat4(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType)
 : POGLDefaultUniform(programUID, state, componentID, uniformType)

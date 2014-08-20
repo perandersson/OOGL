@@ -19,7 +19,7 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		IPOGLDeviceContext* context = device->GetDeviceContext();
+		IPOGLRenderContext* context = device->GetRenderContext();
 
 		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
 		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
@@ -67,7 +67,7 @@ int main()
 			//
 			// If the texture is already bound then the only thing the "SetTexture" method does is a couple of simple integer
 			// comparisons. The IPOGLUniform instance returned by the render state is RenderState specific, which means that you
-			// are not allowed to use it on anything other than when rendering on the state returned by the IPOGLDeviceContext::Apply(IPOGLProgram*)
+			// are not allowed to use it on anything other than when rendering on the state returned by the IPOGLRenderContext::Apply(IPOGLProgram*)
 			// method above. 
 
 			state->FindUniformByName("Texture")->SetTexture(texture);

@@ -1,27 +1,48 @@
 #pragma once
-#include "config.h"
+#include "POGLDeferredCommands.h"
+#include <mutex>
+#include <condition_variable>
 
-class POGLRenderState;
-class POGLVertexBuffer;
-class POGLIndexBuffer;
-class POGLAPI POGLDeviceContext : public IPOGLDeviceContext
+class POGLDeferredRenderState;
+class POGLDeferredRenderContext : public IPOGLDeferredRenderContext
 {
 public:
-	POGLDeviceContext(IPOGLDevice* device);
-	~POGLDeviceContext();
-
+	POGLDeferredRenderContext(IPOGLDevice* device);
+	~POGLDeferredRenderContext();
+	
 	/*!
-		\brief Destroys this instance and removes the internal release the associated memory with it
-	*/
-	void Destroy();
+		\brief Retrieves the memory location based on the supplied offset
 
+		\param offset
+		\return
+	*/
+	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
+	
 	/*!
-		\brief Retrieves the render state
-	*/
-	inline POGLRenderState* GetRenderState() {
-		return mRenderState;
-	}
+		\brief Add a new command to be executed and put it onto the queue
 
+		If no commands are available on the memory pool then create a new one
+
+		\param function
+		\param releaseFunction
+	*/
+	POGL_DEFERRED_COMMAND* AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction);
+	
+	/*!
+		\brief Retrieves the next offset position for the supplied vertex buffer size
+
+		\param size
+		\return
+	*/
+	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
+
+// IPOGLInterface
+public:
+	virtual void AddRef();
+	virtual void Release();
+
+// IPOGLRenderContext
+public:
 	virtual IPOGLDevice* GetDevice();
 	virtual IPOGLShader* CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type);
 	virtual IPOGLShader* CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type);
@@ -31,7 +52,7 @@ public:
 	virtual IPOGLTexture3D* CreateTexture3D();
 	virtual void ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size);
 	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures);
-	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture);
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture);
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage);
@@ -46,12 +67,38 @@ public:
 	virtual void Unmap(IPOGLResource* resource);
 	virtual void SetViewport(const POGL_RECT& viewport);
 
-	/*!
-		\brief 
-	*/
-	void InitializeRenderState();
+// IPOGLDeferredRenderContext
+public:
+	virtual void ExecuteCommands(IPOGLRenderContext* context);
+	virtual void ExecuteCommands(IPOGLRenderContext* context, bool clearCommands);
+	virtual void Flush();
 
 protected:
+	REF_COUNTER mRefCount;
 	IPOGLDevice* mDevice;
-	POGLRenderState* mRenderState;
+	POGLDeferredRenderState* mRenderState;
+
+	//
+	// Commands to be flushed
+	//
+
+	POGL_DEFERRED_COMMAND* mCommands;
+	POGL_UINT32 mCommandsSize;
+	POGL_UINT32 mCommandsOffset;
+
+	//
+	// Flushed commands
+	//
+
+	std::mutex mFlushedCommandsMutex;
+	POGL_DEFERRED_COMMAND* mFlushedCommands;
+	POGL_UINT32 mFlushedCommandsSize;
+
+	/* Keep track of the vertex mapping */
+	POGL_DEFERRED_COMMAND* mMap;
+
+	/* Memory used when mapping */
+	void* mMapMemoryPool;
+	POGL_UINT32 mMapMemoryPoolSize;
+	POGL_UINT32 mMapMemoryPoolOffset;
 };

@@ -1,7 +1,6 @@
 #include "MemCheck.h"
 #include "Win32POGLDevice.h"
-#include "Win32POGLDeviceContext.h"
-#include "POGLDeferredDeviceContext.h"
+#include "POGLDeferredRenderContext.h"
 #include <algorithm>
 
 /* Memory Leak Detection */
@@ -19,7 +18,7 @@ void POGLEnableMemoryLeakDetection()
 
 Win32POGLDevice::Win32POGLDevice(const POGL_DEVICE_INFO* info)
 : POGLDevice(info), mRefCount(1), mReleasing(false),
-mHWND(nullptr), mDC(nullptr), mDeviceContext(nullptr)
+mHWND(nullptr), mDC(nullptr), mRenderContext(nullptr)
 {
 
 }
@@ -38,10 +37,10 @@ void Win32POGLDevice::Release()
 	if (--mRefCount == 0 && !mReleasing) {
 		mReleasing = true;
 				
-		if (mDeviceContext != nullptr) {
-			mDeviceContext->Destroy();
-			mDeviceContext->Release();
-			mDeviceContext = nullptr;
+		if (mRenderContext != nullptr) {
+			mRenderContext->Destroy();
+			mRenderContext->Release();
+			mRenderContext = nullptr;
 		}
 		
 		if (mDC != nullptr && mHWND != nullptr) {
@@ -54,15 +53,15 @@ void Win32POGLDevice::Release()
 	}
 }
 
-IPOGLDeviceContext* Win32POGLDevice::GetDeviceContext()
+IPOGLRenderContext* Win32POGLDevice::GetRenderContext()
 {
-	mDeviceContext->AddRef();
-	return mDeviceContext;
+	mRenderContext->AddRef();
+	return mRenderContext;
 }
 
-IPOGLDeferredDeviceContext* Win32POGLDevice::CreateDeferredDeviceContext()
+IPOGLDeferredRenderContext* Win32POGLDevice::CreateDeferredRenderContext()
 {
-	POGLDeferredDeviceContext* context = new POGLDeferredDeviceContext(this);
+	POGLDeferredRenderContext* context = new POGLDeferredRenderContext(this);
 	return context;
 }
 
@@ -141,25 +140,25 @@ void Win32POGLDevice::Initialize()
 	}
 
 	// Create the OpenGL 3.3 render context
-	mDeviceContext = CreateRenderContext();
+	mRenderContext = CreateRenderContext();
 
 	// Legacy Render context is no longer needed
 	wglDeleteContext(legacyRenderContext);
 
 	// Ensure that we have the reference for it
-	mDeviceContext->AddRef();
+	mRenderContext->AddRef();
 
 	// Load extensions for the OpenGL 3.3 RenderContext
 	if (!POGLLoadExtensions()) {
-		mDeviceContext->Release();
+		mRenderContext->Release();
 		ReleaseDC(mHWND, mDC); mDC = nullptr; mHWND = nullptr;
 		THROW_EXCEPTION(POGLInitializationException, "Could not load OpenGL extensions");
 	}
 
-	mDeviceContext->InitializeRenderState();
+	mRenderContext->InitializeRenderState();
 }
 
-Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext()
+Win32POGLRenderContext* Win32POGLDevice::CreateRenderContext()
 {
 	//
 	// Set neccessary attributes so that we get an OpenGL 3.3 render context
@@ -184,7 +183,7 @@ Win32POGLDeviceContext* Win32POGLDevice::CreateRenderContext()
 		THROW_EXCEPTION(POGLException, "Failed to create an OpenGL 3.3 render context. Reason: 0x%x", error);
 	}
 
-	return new Win32POGLDeviceContext(this, mDC, renderContext);
+	return new Win32POGLRenderContext(this, mDC, renderContext);
 }
 
 //

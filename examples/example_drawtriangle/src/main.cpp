@@ -56,7 +56,7 @@ int main()
 		// Retrieves the immediately device context.
 		//
 
-		IPOGLDeviceContext* context = device->GetDeviceContext();
+		IPOGLRenderContext* context = device->GetRenderContext();
 
 		//
 		// Load a very simple vertex- and fragment shader and link them into a a GPU program

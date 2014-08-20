@@ -19,7 +19,7 @@ struct TDeleteArray
 	}
 };
 
-IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName)
+IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLRenderContext* context, const POGL_CHAR* fileName)
 {
 	assert_not_null(context);
 	assert_not_null(fileName);
@@ -39,7 +39,7 @@ IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POG
 	return POGLXLoadBMPImageFromMemory(context, bytes.get(), sz);
 }
 
-IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const POGL_CHAR* bytes, POGL_UINT32 size)
+IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* context, const POGL_CHAR* bytes, POGL_UINT32 size)
 {
 	assert_not_null(context);
 	assert_not_null(bytes);

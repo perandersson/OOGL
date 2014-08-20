@@ -24,7 +24,7 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		IPOGLDeviceContext* context = device->GetDeviceContext();
+		IPOGLRenderContext* context = device->GetRenderContext();
 
 		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
 		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
@@ -57,7 +57,7 @@ int main()
 		// The second thread is responsible for increasing and decreasing the radius of the bottom-part of the circle over time.
 		//
 
-		IPOGLDeferredDeviceContext* t1context = device->CreateDeferredDeviceContext();
+		IPOGLDeferredRenderContext* t1context = device->CreateDeferredRenderContext();
 		std::condition_variable t1cond;
 		std::thread t1([t1context, vertexBuffer, &running, &totalTime, &t1cond] {
 			try {
@@ -117,7 +117,7 @@ int main()
 			} 
 		});
 
-		IPOGLDeferredDeviceContext* t2context = device->CreateDeferredDeviceContext();
+		IPOGLDeferredRenderContext* t2context = device->CreateDeferredRenderContext();
 		std::condition_variable t2cond;
 		std::thread t2([t2context, vertexBuffer, &running, &totalTime, &t2cond] {
 			try {

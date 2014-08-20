@@ -9,7 +9,7 @@
 #include "uniforms/POGLUniformDouble.h"
 #include "uniforms/POGLUniformMat4.h"
 #include "uniforms/POGLUniformSampler2D.h"
-#include "POGLDeviceContext.h"
+#include "POGLRenderContext.h"
 #include "POGLRenderState.h"
 #include "POGLFactory.h"
 #include "POGLEnum.h"
@@ -69,7 +69,7 @@ void POGLProgram::Release()
 	}
 }
 
-void POGLProgram::PostConstruct(GLuint programID, POGLDeviceContext* context)
+void POGLProgram::PostConstruct(GLuint programID, POGLRenderContext* context)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 

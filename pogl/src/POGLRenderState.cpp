@@ -1,6 +1,6 @@
 #include "MemCheck.h"
 #include "POGLRenderState.h"
-#include "POGLDeviceContext.h"
+#include "POGLRenderContext.h"
 #include "POGLProgramData.h"
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
@@ -10,8 +10,8 @@
 #include "POGLFramebuffer.h"
 #include "POGLProgram.h"
 
-POGLRenderState::POGLRenderState(POGLDeviceContext* context)
-: mRefCount(1), mDeviceContext(context), mProgram(nullptr), mProgramUID(0), mApplyCurrentProgramState(false),
+POGLRenderState::POGLRenderState(POGLRenderContext* context)
+: mRefCount(1), mRenderContext(context), mProgram(nullptr), mProgramUID(0), mApplyCurrentProgramState(false),
 mVertexBuffer(nullptr), mVertexBufferUID(0), mIndexBuffer(nullptr), mIndexBufferUID(0),
 mDepthTest(false), mDepthFunc(POGLDepthFunc::DEFAULT), mDepthMask(true),
 mColorMask(POGLColorMask::ALL), mStencilTest(false), mStencilMask(BIT_ALL), mSrcFactor(POGLSrcFactor::DEFAULT), mDstFactor(POGLDstFactor::DEFAULT), mBlending(false), 

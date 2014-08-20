@@ -2,7 +2,7 @@
 #include "config.h"
 #include <memory>
 
-class POGLDeviceContext;
+class POGLRenderContext;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
 class POGLTextureResource;
@@ -12,7 +12,7 @@ class POGLProgram;
 class POGLRenderState : public IPOGLRenderState
 {
 public:
-	POGLRenderState(POGLDeviceContext* context);
+	POGLRenderState(POGLRenderContext* context);
 	virtual ~POGLRenderState();
 	
 	/*!
@@ -130,7 +130,7 @@ private:
 	
 private:
 	REF_COUNTER mRefCount;
-	POGLDeviceContext* mDeviceContext;
+	POGLRenderContext* mRenderContext;
 
 	POGLProgram* mProgram;
 	POGL_UINT32 mProgramUID;

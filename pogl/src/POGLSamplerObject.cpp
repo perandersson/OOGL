@@ -1,8 +1,5 @@
 #include "MemCheck.h"
 #include "POGLSamplerObject.h"
-#include "POGLDeviceContext.h"
-#include "POGLRenderState.h"
-#include "POGLEnum.h"
 #include <atomic>
 
 namespace {

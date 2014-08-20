@@ -13,7 +13,7 @@
 	\param fileName
 	\return
 */
-extern POGLAPI IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
+extern POGLAPI IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLRenderContext* context, const POGL_CHAR* fileName);
 
 /*!
 	\brief Load the supplied BMP fileName into a 2D texture and returns it
@@ -22,7 +22,7 @@ extern POGLAPI IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLDeviceContext* con
 	\param fileName
 	\return
 */
-extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* context, const POGL_CHAR* fileName);
+extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLRenderContext* context, const POGL_CHAR* fileName);
 
 /*!
 	\brief Load the supplied BMP data into a 2D texture and returns it
@@ -32,7 +32,7 @@ extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLDeviceContext* con
 	\param size
 	\return
 */
-extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* context, const POGL_CHAR* bytes, POGL_UINT32 size);
+extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* context, const POGL_CHAR* bytes, POGL_UINT32 size);
 
 /*!
 	\brief Create a IPOGLVertexBuffer instance containing the vertices needed to draw a sphere
@@ -48,6 +48,6 @@ extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLDeviceContext* c
 	\param usage
 	\return
 */
-extern POGLAPI IPOGLVertexBuffer* POGLXCreateSphere(IPOGLDeviceContext* context, POGL_FLOAT R, POGL_UINT32 Q, POGL_UINT32 H, POGL_FLOAT K, POGL_UINT32 Z, POGLBufferUsage::Enum usage);
+extern POGLAPI IPOGLVertexBuffer* POGLXCreateSphere(IPOGLRenderContext* context, POGL_FLOAT R, POGL_UINT32 Q, POGL_UINT32 H, POGL_FLOAT K, POGL_UINT32 Z, POGLBufferUsage::Enum usage);
 
 #endif

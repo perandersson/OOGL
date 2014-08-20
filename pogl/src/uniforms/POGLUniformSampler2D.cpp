@@ -1,6 +1,5 @@
 #include "MemCheck.h"
 #include "POGLUniformSampler2D.h"
-#include "POGLDeviceContext.h"
 #include "POGLRenderState.h"
 #include "POGLSamplerObject.h"
 #include "POGLTexture2D.h"

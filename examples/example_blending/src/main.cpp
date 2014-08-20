@@ -18,7 +18,7 @@ int main()
 	IPOGLDevice* device = POGLCreateDevice(&deviceInfo);
 
 	try {
-		IPOGLDeviceContext* context = device->GetDeviceContext();
+		IPOGLRenderContext* context = device->GetRenderContext();
 
 		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
 		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
@@ -49,7 +49,7 @@ int main()
 		// Setup program properties. This can be done on the associated RenderState as well, but we do it on the program since 
 		// we want this to be applied globally for this program.
 		//
-		// Changes made on the program will NOT be applied until the next time we call IPOGLDeviceContext::Apply(IPOGLProgram*)
+		// Changes made on the program will NOT be applied until the next time we call IPOGLRenderContext::Apply(IPOGLProgram*)
 		//
 
 		program->SetBlend(true);

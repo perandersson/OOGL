@@ -2,11 +2,11 @@
 #include "config.h"
 #include <memory>
 
-class POGLDeferredDeviceContext;
+class POGLDeferredRenderContext;
 class POGLDeferredRenderState : public IPOGLRenderState
 {
 public:
-	POGLDeferredRenderState(POGLDeferredDeviceContext* context);
+	POGLDeferredRenderState(POGLDeferredRenderContext* context);
 	~POGLDeferredRenderState();
 
 // IPOGLInterface
@@ -37,5 +37,5 @@ public:
 
 private:
 	REF_COUNTER mRefCount;
-	POGLDeferredDeviceContext* mDeviceContext;
+	POGLDeferredRenderContext* mRenderContext;
 };

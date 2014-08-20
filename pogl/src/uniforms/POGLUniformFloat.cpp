@@ -1,6 +1,5 @@
 #include "MemCheck.h"
 #include "POGLUniformFloat.h"
-#include "POGLDeviceContext.h"
 
 POGLUniformFloat::POGLUniformFloat(POGL_UINT32 programUID, POGLRenderState* state, GLint componentID, GLenum uniformType)
 : POGLDefaultUniform(programUID, state, componentID, uniformType), mCount(0)

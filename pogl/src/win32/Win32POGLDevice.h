@@ -1,6 +1,6 @@
 #pragma once
 #include "POGLDevice.h"
-#include "Win32POGLDeviceContext.h"
+#include "Win32POGLRenderContext.h"
 #include <list>
 #include <vector>
 #include <mutex>
@@ -23,15 +23,15 @@ public:
 
 // IPOGLDevice
 public:
-	virtual IPOGLDeviceContext* GetDeviceContext();
-	virtual IPOGLDeferredDeviceContext* CreateDeferredDeviceContext();
+	virtual IPOGLRenderContext* GetRenderContext();
+	virtual IPOGLDeferredRenderContext* CreateDeferredRenderContext();
 	virtual void EndFrame();
 	
 private:
 	/*!
 		\brief Creates a new render OpenGL 3.3 RenderContext
 	*/
-	Win32POGLDeviceContext* CreateRenderContext();
+	Win32POGLRenderContext* CreateRenderContext();
 
 private:
 	REF_COUNTER mRefCount;
@@ -39,5 +39,5 @@ private:
 	HWND mHWND;
 	HDC mDC;
 	
-	Win32POGLDeviceContext* mDeviceContext;
+	Win32POGLRenderContext* mRenderContext;
 };

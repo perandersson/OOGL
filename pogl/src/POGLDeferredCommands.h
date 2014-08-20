@@ -3,7 +3,7 @@
 
 struct POGL_DEFERRED_COMMAND;
 
-typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, POGL_DEFERRED_COMMAND*);
+typedef void(*POGLCommandFuncPtr)(class POGLDeferredRenderContext*, class POGLRenderState*, POGL_DEFERRED_COMMAND*);
 typedef void(*POGLCommandReleaseFuncPtr)(POGL_DEFERRED_COMMAND*);
 
 struct POGL_DEFERRED_COMMAND
@@ -15,7 +15,7 @@ struct POGL_DEFERRED_COMMAND
 	POGL_HANDLE extra[4];
 };
 extern void POGLNothing_Release(POGL_DEFERRED_COMMAND* command);
-extern void POGLNothing_Command(class POGLDeferredDeviceContext*, class POGLRenderState*, POGL_DEFERRED_COMMAND*);
+extern void POGLNothing_Command(class POGLDeferredRenderContext*, class POGLRenderState*, POGL_DEFERRED_COMMAND*);
 
 struct POGLCreateVertexBufferCommand
 {
@@ -31,7 +31,7 @@ struct POGLCreateVertexBufferCommand
 		};
 	};
 };
-extern void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLCreateVertexBuffer_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLCreateVertexBuffer_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateVertexBufferCommand));
 
@@ -49,7 +49,7 @@ struct POGLCreateTexture2DCommand
 		};
 	};
 };
-extern void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLCreateTexture2D_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLCreateTexture2D_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateVertexBufferCommand));
 
@@ -67,7 +67,7 @@ struct POGLMapVertexBufferCommand
 		};
 	};
 };
-extern void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLMapVertexBuffer_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLMapVertexBuffer_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLMapVertexBufferCommand));
 
@@ -86,7 +86,7 @@ struct POGLMapRangeVertexBufferCommand
 		};
 	};
 };
-extern void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLMapRangeVertexBuffer_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLMapRangeVertexBuffer_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLMapRangeVertexBufferCommand));
 
@@ -102,7 +102,7 @@ struct POGLClearCommand
 		};
 	};
 };
-extern void POGLClear_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLClear_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLClearCommand));
 
 struct POGLSetFramebufferCommand
@@ -117,7 +117,7 @@ struct POGLSetFramebufferCommand
 		};
 	};
 };
-extern void POGLSetFramebuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetFramebuffer_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLSetFramebuffer_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetFramebufferCommand));
 
@@ -136,8 +136,8 @@ struct POGLDeferredDrawCommand
 		};
 	};
 };
-extern void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
-extern void POGLDrawCount_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLDraw_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLDrawCount_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLDraw_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLDeferredDrawCommand));
 
@@ -153,10 +153,10 @@ struct POGLBooleanCommand
 		};
 	};
 };
-extern void POGLSetDepthTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
-extern void POGLSetDepthMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
-extern void POGLSetStencilTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
-extern void POGLSetBlend_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetDepthTest_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetDepthMask_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetStencilTest_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetBlend_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLBooleanCommand));
 
 struct POGLColorMaskCommand
@@ -171,7 +171,7 @@ struct POGLColorMaskCommand
 		};
 	};
 };
-extern void POGLColorMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLColorMask_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLColorMaskCommand));
 
 struct POGLStencilMaskCommand
@@ -186,7 +186,7 @@ struct POGLStencilMaskCommand
 		};
 	};
 };
-extern void POGLStencilMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLStencilMask_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLStencilMaskCommand));
 
 struct POGLSetDepthFuncCommand
@@ -201,7 +201,7 @@ struct POGLSetDepthFuncCommand
 		};
 	};
 };
-extern void POGLSetDepthFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetDepthFunc_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetDepthFuncCommand));
 
 struct POGLSetBlendFuncCommand
@@ -217,7 +217,7 @@ struct POGLSetBlendFuncCommand
 		};
 	};
 };
-extern void POGLSetBlendFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetBlendFunc_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetBlendFuncCommand));
 
 struct POGLSetFrontFaceCommand
@@ -232,7 +232,7 @@ struct POGLSetFrontFaceCommand
 		};
 	};
 };
-extern void POGLSetFrontFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetFrontFace_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetFrontFaceCommand));
 
 struct POGLSetCullFaceCommand
@@ -247,7 +247,7 @@ struct POGLSetCullFaceCommand
 		};
 	};
 };
-extern void POGLSetCullFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetCullFace_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetCullFaceCommand));
 
 struct POGLSetViewportCommand
@@ -262,7 +262,7 @@ struct POGLSetViewportCommand
 		};
 	};
 };
-extern void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetViewport_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetViewportCommand));
 
 struct POGLApplyProgramCommand
@@ -277,7 +277,7 @@ struct POGLApplyProgramCommand
 		};
 	};
 };
-extern void POGLApplyProgram_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLApplyProgram_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLApplyProgram_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLApplyProgramCommand));
 
@@ -293,7 +293,7 @@ struct POGLCreateFrameBufferCommand
 		};
 	};
 };
-extern void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLCreateFrameBuffer_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLCreateFrameBuffer_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateFrameBufferCommand));
 
@@ -310,6 +310,6 @@ struct POGLResizeTexture2DCommand
 		};
 	};
 };
-extern void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLResizeTexture2D_Command(class POGLDeferredRenderContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
 extern void POGLResizeTexture2D_Release(POGL_DEFERRED_COMMAND* command);
 _STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateFrameBufferCommand));
