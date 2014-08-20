@@ -41,7 +41,7 @@ extern void POGLNothing_Release(POGL_HANDLE command);
 #endif
 
 static const POGL_UINT32 POGL_DEFERRED_COMMAND_SIZE = sizeof(POGL_DEFERRED_COMMAND);
-static const POGL_UINT32 POGL_DEFERRED_COMMAND_RESIZE_SIZE = 50;
+static const POGL_UINT32 POGL_DEFERRED_COMMAND_RESIZE_SIZE = 100;
 
 struct POGL_CREATEVERTEXBUFFER_COMMAND_DATA
 {
@@ -119,9 +119,16 @@ extern void POGLSetFramebuffer_Release(POGL_HANDLE command);
 
 struct POGL_DRAW_COMMAND_DATA
 {
+	/* The vertex buffer we want to draw */
 	IPOGLVertexBuffer* vertexBuffer;
+
+	/* The index buffer we want to draw */
 	IPOGLIndexBuffer* indexBuffer;
+
+	/* Where we want to start render the vertex buffer */
 	POGL_UINT32 startIndex;
+
+	/* How many vertices we want to draw */
 	POGL_UINT32 count;
 };
 extern void POGLDraw_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
