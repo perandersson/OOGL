@@ -103,6 +103,7 @@ typedef uint32_t POGL_UINT32;
 typedef int64_t POGL_INT64;
 typedef uint64_t POGL_UINT64;
 typedef void* POGL_HANDLE;
+typedef char POGL_BYTE;
 typedef float POGL_FLOAT;
 typedef double POGL_DOUBLE;
 

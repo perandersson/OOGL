@@ -11,10 +11,10 @@
 
 POGLDeferredRenderContext::POGLDeferredRenderContext(IPOGLDevice* device)
 : mRefCount(1), mDevice(device), mRenderState(nullptr),
-mCommands(nullptr), mCommandsSize(0), mCommandsOffset(0),
-mFlushedCommands(nullptr), mFlushedCommandsSize(0), 
-mMap(nullptr),
-mMapMemoryPool(nullptr), mMapMemoryPoolSize(0), mMapMemoryPoolOffset(0)
+mMemoryPool(nullptr), mMemoryPoolOffset(0), mMemoryPoolSize(0),
+mFlushedCommands(nullptr), mFlushedCommandsSize(0),
+mMapMemoryPool(nullptr), mMapMemoryPoolSize(0), mMapMemoryPoolOffset(0),
+mMapping(false)
 {
 }
 
@@ -37,11 +37,10 @@ void POGLDeferredRenderContext::Release()
 		//
 
 		if (mFlushedCommands != nullptr) {
-			for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
-				POGL_DEFERRED_COMMAND* command = &mFlushedCommands[i];
-				(*command->releaseFunction)(command);
+			FOR_EACH_COMMAND(mFlushedCommands, mFlushedCommandsSize)
+				(*command->releaseFunction)(ptr);
 				command->releaseFunction = &POGLNothing_Release;
-			}
+			END_FOR_COMMANDS()
 			mFlushedCommands = nullptr;
 			mFlushedCommandsSize = 0;
 		}
@@ -50,15 +49,14 @@ void POGLDeferredRenderContext::Release()
 		// Free the memory pools memory
 		//
 
-		if (mCommands != nullptr) {
-			for (POGL_UINT32 i = 0; i < mCommandsOffset; ++i) {
-				POGL_DEFERRED_COMMAND* command = &mCommands[i];
-				(*command->releaseFunction)(command);
+		if (mMemoryPool != nullptr) {
+			FOR_EACH_COMMAND(mMemoryPool, mMemoryPoolOffset)
+				(*command->releaseFunction)(ptr);
 				command->releaseFunction = &POGLNothing_Release;
-			}
-			free(mCommands);
-			mCommands = nullptr;
-			mCommandsSize = mCommandsOffset = 0;
+			END_FOR_COMMANDS()
+			free(mMemoryPool);
+			mMemoryPool = nullptr;
+			mMemoryPoolOffset = mMemoryPoolSize = 0;
 		}
 
 		if (mMapMemoryPool != nullptr) {
@@ -110,28 +108,22 @@ IPOGLTexture2D* POGLDeferredRenderContext::CreateTexture2D(const POGL_SIZE& size
 
 	if (size.height <= 0)
 		THROW_EXCEPTION(POGLResourceException, "You cannot create a texture with height: %d", size.height);
-
-	//
-	// When the bytes container is null then it usually means that we want to create a texture used togehter
-	// with a framebuffer
-	//
+	
+	POGL_CREATETEXTURE2D_COMMAND_DATA* cmd = (POGL_CREATETEXTURE2D_COMMAND_DATA*)AddCommand(&POGLCreateTexture2D_Command, &POGLCreateTexture2D_Release, 
+		sizeof(POGL_CREATETEXTURE2D_COMMAND_DATA));
+	cmd->dataSize = 0;
+	cmd->memoryOffset = 0;
+	if (bytes != nullptr) {
+		const POGL_UINT32 dataSize = POGLEnum::TextureFormatToSize(format, size);
+		cmd->dataSize = dataSize;
+		cmd->memoryOffset = GetMapOffset(dataSize);
+		memcpy(GetMapPointer(cmd->memoryOffset), bytes, dataSize);
+	}
 
 	POGLTexture2D* texture = new POGLTexture2D(size, format);
-	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)AddCommand(&POGLCreateTexture2D_Command, &POGLCreateTexture2D_Release);
 	cmd->texture = texture;
 	cmd->texture->AddRef();
-
-	if (bytes == nullptr) {
-		cmd->memoryPoolOffset = 0;
-		cmd->size = 0;
-	}
-	else {
-		const POGL_UINT32 memorySize = POGLEnum::TextureFormatToSize(format, size);
-		cmd->memoryPoolOffset = GetMapOffset(memorySize);
-		memcpy(GetMapPointer(cmd->memoryPoolOffset), bytes, memorySize);
-		cmd->size = memorySize;
-	}
-
+	
 	return texture;
 }
 
@@ -151,7 +143,8 @@ void POGLDeferredRenderContext::ResizeTexture2D(IPOGLTexture2D* texture, const P
 	if (size.height <= 0)
 		THROW_EXCEPTION(POGLStateException, "You cannot resize a texture to 0 height");
 
-	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)AddCommand(&POGLResizeTexture2D_Command, &POGLResizeTexture2D_Release);
+	POGL_RESIZETEXTURE2D_COMMAND_DATA* cmd = (POGL_RESIZETEXTURE2D_COMMAND_DATA*)AddCommand(&POGLResizeTexture2D_Command, &POGLResizeTexture2D_Release, 
+		sizeof(POGL_RESIZETEXTURE2D_COMMAND_DATA));
 	cmd->texture = static_cast<POGLTexture2D*>(texture);
 	cmd->texture->AddRef();
 	cmd->newSize = size;
@@ -174,7 +167,8 @@ IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** te
 
 	POGLFramebuffer* framebuffer = new POGLFramebuffer(texturesVector, depthTexture);
 
-	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)AddCommand(&POGLCreateFrameBuffer_Command, &POGLCreateFrameBuffer_Release);
+	POGL_CREATEFRAMEBUFFER_COMMAND_DATA* cmd = (POGL_CREATEFRAMEBUFFER_COMMAND_DATA*)AddCommand(&POGLCreateFrameBuffer_Command, &POGLCreateFrameBuffer_Release, 
+		sizeof(POGL_CREATEFRAMEBUFFER_COMMAND_DATA));
 	cmd->framebuffer = framebuffer;
 	cmd->framebuffer->AddRef();
 	return framebuffer;
@@ -187,12 +181,13 @@ IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const void* mem
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
 	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage);
-	POGLCreateVertexBufferCommand* command = (POGLCreateVertexBufferCommand*)AddCommand(&POGLCreateVertexBuffer_Command, &POGLCreateVertexBuffer_Release);
-	command->vertexBuffer = vb;
-	command->vertexBuffer->AddRef();
-	command->memoryPoolOffset = GetMapOffset(memorySize);
-	memcpy(GetMapPointer(command->memoryPoolOffset), memory, memorySize);
-	command->size = memorySize;
+	POGL_CREATEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEVERTEXBUFFER_COMMAND_DATA*)AddCommand(&POGLCreateVertexBuffer_Command, &POGLCreateVertexBuffer_Release,
+		sizeof(POGL_CREATEVERTEXBUFFER_COMMAND_DATA));
+	cmd->vertexBuffer = vb;
+	cmd->vertexBuffer->AddRef();
+	cmd->memoryOffset = GetMapOffset(memorySize);
+	memcpy(GetMapPointer(cmd->memoryOffset), memory, memorySize);
+	cmd->dataSize = memorySize;
 	return vb;
 }
 
@@ -240,7 +235,8 @@ IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 		mRenderState = new POGLDeferredRenderState(this);
 	}
 
-	POGLApplyProgramCommand* cmd = (POGLApplyProgramCommand*)AddCommand(&POGLApplyProgram_Command, &POGLApplyProgram_Release);
+	POGL_APPLYPROGRAM_COMMAND* cmd = (POGL_APPLYPROGRAM_COMMAND*)AddCommand(&POGLApplyProgram_Command, &POGLApplyProgram_Release,
+		sizeof(POGL_APPLYPROGRAM_COMMAND));
 	cmd->program = program;
 	cmd->program->AddRef();
 	mRenderState->AddRef();
@@ -249,19 +245,20 @@ IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 
 void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum e)
 {
-	if (mMap != nullptr)
+	if (mMapping)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
 
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
-		POGLMapVertexBufferCommand* map = (POGLMapVertexBufferCommand*)AddCommand(&POGLMapVertexBuffer_Command, &POGLMapVertexBuffer_Release);
-		map->size = vb->GetCount() * vb->GetLayout()->vertexSize;
-		map->memoryPoolOffset = GetMapOffset(map->size);
-		map->vertexBuffer = vb;
-		map->vertexBuffer->AddRef();
-		mMap = (POGL_DEFERRED_COMMAND*)map;
-		return GetMapPointer(map->memoryPoolOffset);
+		POGL_MAPVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPVERTEXBUFFER_COMMAND_DATA*)AddCommand(&POGLMapVertexBuffer_Command, &POGLMapVertexBuffer_Release,
+			sizeof(POGL_MAPVERTEXBUFFER_COMMAND_DATA));
+		cmd->dataSize = vb->GetCount() * vb->GetLayout()->vertexSize;
+		cmd->memoryOffset = GetMapOffset(cmd->dataSize);
+		cmd->vertexBuffer = vb;
+		cmd->vertexBuffer->AddRef();
+		mMapping = true;
+		return GetMapPointer(cmd->memoryOffset);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
@@ -269,7 +266,7 @@ void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 
 void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	if (mMap != nullptr)
+	if (mMapping)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to map more than one resource at the same time");
 
 	auto type = resource->GetType();
@@ -279,14 +276,15 @@ void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		if (offset + length > memorySize)
 			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 		
-		POGLMapRangeVertexBufferCommand* map = (POGLMapRangeVertexBufferCommand*)AddCommand(&POGLMapRangeVertexBuffer_Command, &POGLMapRangeVertexBuffer_Release);
-		map->offset = offset;
-		map->length = length;
-		map->memoryPoolOffset = GetMapOffset(memorySize);
-		map->vertexBuffer = vb;
-		map->vertexBuffer->AddRef();
-		mMap = (POGL_DEFERRED_COMMAND*)map;
-		return GetMapPointer(map->memoryPoolOffset);
+		POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA*)AddCommand(&POGLMapRangeVertexBuffer_Command, &POGLMapRangeVertexBuffer_Release,
+			sizeof(POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA));
+		cmd->offset = offset;
+		cmd->length = length;
+		cmd->memoryOffset = GetMapOffset(memorySize);
+		cmd->vertexBuffer = vb;
+		cmd->vertexBuffer->AddRef();
+		mMapping = true;
+		return GetMapPointer(cmd->memoryOffset);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
@@ -294,12 +292,12 @@ void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 
 void POGLDeferredRenderContext::Unmap(IPOGLResource* resource)
 {
-	if (mMap == nullptr)
+	if (!mMapping)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to unmap a non-mapped resource");
 
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
-		mMap = nullptr;
+		mMapping = false;
 		return;
 	}
 
@@ -345,15 +343,13 @@ void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context, boo
 	//
 
 	std::lock_guard<std::mutex> lock(mFlushedCommandsMutex);
-	const POGL_UINT32 size = mFlushedCommandsSize;
-	for (POGL_UINT32 i = 0; i < size; ++i) {
-		POGL_DEFERRED_COMMAND* command = &mFlushedCommands[i];
-		(*command->function)(this, renderState, command);
-		(*command->releaseFunction)(command);
+	FOR_EACH_COMMAND(mFlushedCommands, mFlushedCommandsSize)
+		(*command->function)(this, renderState, ptr);
+		(*command->releaseFunction)(ptr);
 		command->function = &POGLNothing_Command;
 		command->releaseFunction = &POGLNothing_Release;
-	}
-	
+	END_FOR_COMMANDS()
+
 	//
 	// Free the commands
 	//
@@ -367,24 +363,35 @@ void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context, boo
 void POGLDeferredRenderContext::Flush()
 {
 	mFlushedCommandsMutex.lock();
-	mFlushedCommands = mCommands;
-	mFlushedCommandsSize = mCommandsOffset;
-	mCommandsOffset = 0;
+	mFlushedCommands = mMemoryPool;
+	mFlushedCommandsSize = mMemoryPoolOffset;
+	mMemoryPoolOffset = 0;
 	mMapMemoryPoolOffset = 0;
 	mFlushedCommandsMutex.unlock();
 }
 
-POGL_DEFERRED_COMMAND* POGLDeferredRenderContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
+POGL_HANDLE POGLDeferredRenderContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction, POGL_UINT32 size)
 {
-	if (mCommandsOffset >= mCommandsSize) {
-		static const POGL_UINT32 INCREASE_SIZE = 100;
-		mCommandsSize += INCREASE_SIZE;
-		mCommands = (POGL_DEFERRED_COMMAND*)realloc(mCommands, mCommandsSize * sizeof(POGL_DEFERRED_COMMAND));
+	// Calculate the total memory (bytes) required by the command
+	const POGL_UINT32 memoryRequired = mMemoryPoolOffset + POGL_DEFERRED_COMMAND_SIZE + size;
+
+	if (memoryRequired > mMemoryPoolSize) {
+		mMemoryPoolSize += POGL_DEFERRED_COMMAND_RESIZE_SIZE;
+		mMemoryPool = (POGL_BYTE*)realloc(mMemoryPool, mMemoryPoolSize);
 	}
 
-	POGL_DEFERRED_COMMAND* command = mCommands + mCommandsOffset;
-	mCommandsOffset++;
-	command->function = function;
-	command->releaseFunction = releaseFunction;
-	return command;
+	// Retrieve the command item
+	POGL_DEFERRED_COMMAND* item = (POGL_DEFERRED_COMMAND*)OFFSET_PTR(mMemoryPool, mMemoryPoolOffset);
+	item->function = function;
+	item->releaseFunction = releaseFunction;
+	item->size = size;
+
+	// Pointer where we can begin put the command data
+	POGL_HANDLE dataMemoryBlock = OFFSET_PTR(mMemoryPool, mMemoryPoolOffset + POGL_DEFERRED_COMMAND_SIZE);
+
+	// Move the offset pointer to the next free area in the memory block
+	mMemoryPoolOffset = memoryRequired;
+
+	// Return the memory block for the data
+	return dataMemoryBlock;
 }

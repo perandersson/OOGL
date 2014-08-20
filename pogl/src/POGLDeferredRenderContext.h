@@ -8,15 +8,7 @@ class POGLDeferredRenderContext : public IPOGLDeferredRenderContext
 {
 public:
 	POGLDeferredRenderContext(IPOGLDevice* device);
-	~POGLDeferredRenderContext();
-	
-	/*!
-		\brief Retrieves the memory location based on the supplied offset
-
-		\param offset
-		\return
-	*/
-	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
+	virtual ~POGLDeferredRenderContext();
 	
 	/*!
 		\brief Add a new command to be executed and put it onto the queue
@@ -24,15 +16,29 @@ public:
 		If no commands are available on the memory pool then create a new one
 
 		\param function
+				The function called when executing the command
 		\param releaseFunction
+				The function called when releasing the command
+		\param size
+				The memory size of the command
 	*/
-	POGL_DEFERRED_COMMAND* AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction);
+	POGL_HANDLE AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction, POGL_UINT32 size);
+	
+	/*!
+		\brief Retrieves a pointer to a memory location based on the supplied offset
+
+		\param offset
+				Memory offset
+		\return A pointer to a memory location
+	*/
+	POGL_HANDLE GetMapPointer(POGL_UINT32 offset);
 	
 	/*!
 		\brief Retrieves the next offset position for the supplied vertex buffer size
 
 		\param size
-		\return
+				The size that is required
+		\return A pointer to a memory location where we are allowed to write the amount of bytes supplied to this method
 	*/
 	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
 
@@ -78,27 +84,33 @@ protected:
 	IPOGLDevice* mDevice;
 	POGLDeferredRenderState* mRenderState;
 
-	//
-	// Commands to be flushed
+	// 
+	// Command memory pool
 	//
 
-	POGL_DEFERRED_COMMAND* mCommands;
-	POGL_UINT32 mCommandsSize;
-	POGL_UINT32 mCommandsOffset;
+	POGL_BYTE* mMemoryPool;
+	POGL_UINT32 mMemoryPoolOffset;
+	POGL_UINT32 mMemoryPoolSize;
 
 	//
 	// Flushed commands
 	//
 
 	std::mutex mFlushedCommandsMutex;
-	POGL_DEFERRED_COMMAND* mFlushedCommands;
+	POGL_BYTE* mFlushedCommands;
 	POGL_UINT32 mFlushedCommandsSize;
 
-	/* Keep track of the vertex mapping */
-	POGL_DEFERRED_COMMAND* mMap;
+	//
+	// Memory pool for data
+	//
 
-	/* Memory used when mapping */
 	void* mMapMemoryPool;
 	POGL_UINT32 mMapMemoryPoolSize;
 	POGL_UINT32 mMapMemoryPoolOffset;
+
+	//
+	// Currently mapping a vertex buffer
+	//
+
+	bool mMapping;
 };
