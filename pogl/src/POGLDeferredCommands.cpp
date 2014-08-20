@@ -8,15 +8,15 @@
 #include "POGLFramebuffer.h"
 #include "POGLEnum.h"
 
-void POGLNothing_Release(POGLDeferredCommand* command)
+void POGLNothing_Release(POGL_DEFERRED_COMMAND* command)
 {
 }
 
-void POGLNothing_Command(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*)
+void POGLNothing_Command(POGLDeferredDeviceContext*, POGLRenderState*, POGL_DEFERRED_COMMAND*)
 {
 }
 
-void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLCreateVertexBuffer_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
 
@@ -43,13 +43,13 @@ void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, PO
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command)
+void POGLCreateVertexBuffer_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLCreateVertexBufferCommand* cmd = (POGLCreateVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
 }
 
-void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLCreateTexture2D_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)command;
 
@@ -84,13 +84,13 @@ void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLR
 	state->SetTextureResource((POGLTextureResource*)cmd->texture->GetResourcePtr());
 }
 
-void POGLCreateTexture2D_Release(POGLDeferredCommand* command)
+void POGLCreateTexture2D_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLCreateTexture2DCommand* cmd = (POGLCreateTexture2DCommand*)command;
 	cmd->texture->Release();
 }
 
-void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLMapVertexBuffer_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLMapVertexBufferCommand* cmd = (POGLMapVertexBufferCommand*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
@@ -99,13 +99,13 @@ void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLR
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void POGLMapVertexBuffer_Release(POGLDeferredCommand* command)
+void POGLMapVertexBuffer_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLMapVertexBufferCommand* cmd = (POGLMapVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
 }
 
-void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLMapRangeVertexBuffer_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLMapRangeVertexBufferCommand* cmd = (POGLMapRangeVertexBufferCommand*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
@@ -114,44 +114,44 @@ void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, 
 	glUnmapBuffer(GL_ARRAY_BUFFER);
 }
 
-void POGLMapRangeVertexBuffer_Release(POGLDeferredCommand* command)
+void POGLMapRangeVertexBuffer_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLMapRangeVertexBufferCommand* cmd = (POGLMapRangeVertexBufferCommand*)command;
 	cmd->vertexBuffer->Release();
 }
 
-void POGLClear_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLClear_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLClearCommand* cmd = (POGLClearCommand*)command;
 	state->Clear(cmd->clearBits);
 }
 
-void POGLSetFramebuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetFramebuffer_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetFramebufferCommand* cmd = (POGLSetFramebufferCommand*)command;
 	state->SetFramebuffer(cmd->framebuffer);
 }
 
-void POGLSetFramebuffer_Release(POGLDeferredCommand* command)
+void POGLSetFramebuffer_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetFramebufferCommand* cmd = (POGLSetFramebufferCommand*)command;
 	if (cmd->framebuffer != nullptr)
 		cmd->framebuffer->Release();
 }
 
-void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLDraw_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLDeferredDrawCommand* cmd = (POGLDeferredDrawCommand*)command;
 	state->Draw(cmd->vertexBuffer, cmd->indexBuffer, cmd->startIndex);
 }
 
-void POGLDrawCount_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLDrawCount_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLDeferredDrawCommand* cmd = (POGLDeferredDrawCommand*)command;
 	state->Draw(cmd->vertexBuffer, cmd->indexBuffer, cmd->startIndex, cmd->count);
 }
 
-void POGLDraw_Release(POGLDeferredCommand* command)
+void POGLDraw_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLDeferredDrawCommand* cmd = (POGLDeferredDrawCommand*)command;
 	cmd->vertexBuffer->Release();
@@ -159,85 +159,85 @@ void POGLDraw_Release(POGLDeferredCommand* command)
 		cmd->indexBuffer->Release();
 }
 
-void POGLSetDepthTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetDepthTest_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLBooleanCommand* cmd = (POGLBooleanCommand*)command;
 	state->SetDepthTest(cmd->value);
 }
 
-void POGLSetDepthMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetDepthMask_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLBooleanCommand* cmd = (POGLBooleanCommand*)command;
 	state->SetDepthMask(cmd->value);
 }
 
-void POGLSetStencilTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetStencilTest_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLBooleanCommand* cmd = (POGLBooleanCommand*)command;
 	state->SetStencilTest(cmd->value);
 }
 
-void POGLSetBlend_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetBlend_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLBooleanCommand* cmd = (POGLBooleanCommand*)command;
 	state->SetBlend(cmd->value);
 }
 
-void POGLColorMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLColorMask_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLColorMaskCommand* cmd = (POGLColorMaskCommand*)command;
 	state->SetColorMask(cmd->mask);
 }
 
-void POGLStencilMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLStencilMask_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLStencilMaskCommand* cmd = (POGLStencilMaskCommand*)command;
 	state->SetStencilMask(cmd->mask);
 }
 
-void POGLSetDepthFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetDepthFunc_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetDepthFuncCommand* cmd = (POGLSetDepthFuncCommand*)command;
 	state->SetDepthFunc(cmd->depthFunc);
 }
 
-void POGLSetBlendFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetBlendFunc_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetBlendFuncCommand* cmd = (POGLSetBlendFuncCommand*)command;
 	state->SetBlendFunc(cmd->sfactor, cmd->dfactor);
 }
 
-void POGLSetFrontFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetFrontFace_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetFrontFaceCommand* cmd = (POGLSetFrontFaceCommand*)command;
 	state->SetFrontFace(cmd->frontFace);
 }
 
-void POGLSetCullFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetCullFace_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetCullFaceCommand* cmd = (POGLSetCullFaceCommand*)command;
 	state->SetCullFace(cmd->cullFace);
 }
 
-void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLSetViewport_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLSetViewportCommand* cmd = (POGLSetViewportCommand*)command;
 	state->SetViewport(cmd->viewport);
 }
 
-void POGLApplyProgram_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLApplyProgram_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLApplyProgramCommand* cmd = (POGLApplyProgramCommand*)command;
 	state->Apply(cmd->program);
 }
 
-void POGLApplyProgram_Release(POGLDeferredCommand* command)
+void POGLApplyProgram_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLApplyProgramCommand* cmd = (POGLApplyProgramCommand*)command;
 	cmd->program->Release();
 }
 
-void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLCreateFrameBuffer_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)command;
 
@@ -257,13 +257,13 @@ void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POG
 	state->SetFramebuffer(cmd->framebuffer);
 }
 
-void POGLCreateFrameBuffer_Release(POGLDeferredCommand* command)
+void POGLCreateFrameBuffer_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLCreateFrameBufferCommand* cmd = (POGLCreateFrameBufferCommand*)command;
 	cmd->framebuffer->Release();
 }
 
-void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command)
+void POGLResizeTexture2D_Command(POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command)
 {
 	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)command;
 
@@ -282,7 +282,7 @@ void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLR
 	cmd->texture->SetSize(cmd->newSize);
 }
 
-void POGLResizeTexture2D_Release(POGLDeferredCommand* command)
+void POGLResizeTexture2D_Release(POGL_DEFERRED_COMMAND* command)
 {
 	POGLResizeTexture2DCommand* cmd = (POGLResizeTexture2DCommand*)command;
 	cmd->texture->Release();

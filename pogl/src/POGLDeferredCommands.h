@@ -1,10 +1,12 @@
 #pragma once
 #include "config.h"
 
-typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
-typedef void(*POGLCommandReleaseFuncPtr)(struct POGLDeferredCommand*);
+struct POGL_DEFERRED_COMMAND;
 
-struct POGLDeferredCommand
+typedef void(*POGLCommandFuncPtr)(class POGLDeferredDeviceContext*, class POGLRenderState*, POGL_DEFERRED_COMMAND*);
+typedef void(*POGLCommandReleaseFuncPtr)(POGL_DEFERRED_COMMAND*);
+
+struct POGL_DEFERRED_COMMAND
 {
 	POGLCommandFuncPtr function;
 	POGLCommandReleaseFuncPtr releaseFunction;
@@ -12,13 +14,13 @@ struct POGLDeferredCommand
 	// Extra memory
 	POGL_HANDLE extra[4];
 };
-extern void POGLNothing_Release(POGLDeferredCommand* command);
-extern void POGLNothing_Command(class POGLDeferredDeviceContext*, class POGLRenderState*, struct POGLDeferredCommand*);
+extern void POGLNothing_Release(POGL_DEFERRED_COMMAND* command);
+extern void POGLNothing_Command(class POGLDeferredDeviceContext*, class POGLRenderState*, POGL_DEFERRED_COMMAND*);
 
 struct POGLCreateVertexBufferCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -29,14 +31,14 @@ struct POGLCreateVertexBufferCommand
 		};
 	};
 };
-extern void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLCreateVertexBuffer_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateVertexBufferCommand));
+extern void POGLCreateVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLCreateVertexBuffer_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateVertexBufferCommand));
 
 struct POGLCreateTexture2DCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -47,14 +49,14 @@ struct POGLCreateTexture2DCommand
 		};
 	};
 };
-extern void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLCreateTexture2D_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateVertexBufferCommand));
+extern void POGLCreateTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLCreateTexture2D_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateVertexBufferCommand));
 
 struct POGLMapVertexBufferCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -65,14 +67,14 @@ struct POGLMapVertexBufferCommand
 		};
 	};
 };
-extern void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLMapVertexBuffer_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLMapVertexBufferCommand));
+extern void POGLMapVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLMapVertexBuffer_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLMapVertexBufferCommand));
 
 struct POGLMapRangeVertexBufferCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -84,14 +86,14 @@ struct POGLMapRangeVertexBufferCommand
 		};
 	};
 };
-extern void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLMapRangeVertexBuffer_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLMapRangeVertexBufferCommand));
+extern void POGLMapRangeVertexBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLMapRangeVertexBuffer_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLMapRangeVertexBufferCommand));
 
 struct POGLClearCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -100,13 +102,13 @@ struct POGLClearCommand
 		};
 	};
 };
-extern void POGLClear_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLClearCommand));
+extern void POGLClear_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLClearCommand));
 
 struct POGLSetFramebufferCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -115,14 +117,14 @@ struct POGLSetFramebufferCommand
 		};
 	};
 };
-extern void POGLSetFramebuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLSetFramebuffer_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetFramebufferCommand));
+extern void POGLSetFramebuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetFramebuffer_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetFramebufferCommand));
 
 struct POGLDeferredDrawCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -134,15 +136,15 @@ struct POGLDeferredDrawCommand
 		};
 	};
 };
-extern void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLDrawCount_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLDraw_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLDeferredDrawCommand));
+extern void POGLDraw_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLDrawCount_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLDraw_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLDeferredDrawCommand));
 
 struct POGLBooleanCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -151,16 +153,16 @@ struct POGLBooleanCommand
 		};
 	};
 };
-extern void POGLSetDepthTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLSetDepthMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLSetStencilTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLSetBlend_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLBooleanCommand));
+extern void POGLSetDepthTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetDepthMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetStencilTest_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLSetBlend_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLBooleanCommand));
 
 struct POGLColorMaskCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -169,13 +171,13 @@ struct POGLColorMaskCommand
 		};
 	};
 };
-extern void POGLColorMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLColorMaskCommand));
+extern void POGLColorMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLColorMaskCommand));
 
 struct POGLStencilMaskCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -184,13 +186,13 @@ struct POGLStencilMaskCommand
 		};
 	};
 };
-extern void POGLStencilMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLStencilMaskCommand));
+extern void POGLStencilMask_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLStencilMaskCommand));
 
 struct POGLSetDepthFuncCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -199,13 +201,13 @@ struct POGLSetDepthFuncCommand
 		};
 	};
 };
-extern void POGLSetDepthFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetDepthFuncCommand));
+extern void POGLSetDepthFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetDepthFuncCommand));
 
 struct POGLSetBlendFuncCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -215,13 +217,13 @@ struct POGLSetBlendFuncCommand
 		};
 	};
 };
-extern void POGLSetBlendFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetBlendFuncCommand));
+extern void POGLSetBlendFunc_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetBlendFuncCommand));
 
 struct POGLSetFrontFaceCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -230,13 +232,13 @@ struct POGLSetFrontFaceCommand
 		};
 	};
 };
-extern void POGLSetFrontFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetFrontFaceCommand));
+extern void POGLSetFrontFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetFrontFaceCommand));
 
 struct POGLSetCullFaceCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -245,13 +247,13 @@ struct POGLSetCullFaceCommand
 		};
 	};
 };
-extern void POGLSetCullFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetCullFaceCommand));
+extern void POGLSetCullFace_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetCullFaceCommand));
 
 struct POGLSetViewportCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -260,13 +262,13 @@ struct POGLSetViewportCommand
 		};
 	};
 };
-extern void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLSetViewportCommand));
+extern void POGLSetViewport_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLSetViewportCommand));
 
 struct POGLApplyProgramCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -275,14 +277,14 @@ struct POGLApplyProgramCommand
 		};
 	};
 };
-extern void POGLApplyProgram_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLApplyProgram_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLApplyProgramCommand));
+extern void POGLApplyProgram_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLApplyProgram_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLApplyProgramCommand));
 
 struct POGLCreateFrameBufferCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -291,14 +293,14 @@ struct POGLCreateFrameBufferCommand
 		};
 	};
 };
-extern void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLCreateFrameBuffer_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateFrameBufferCommand));
+extern void POGLCreateFrameBuffer_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLCreateFrameBuffer_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateFrameBufferCommand));
 
 struct POGLResizeTexture2DCommand
 {
 	union {
-		POGLDeferredCommand _memory;
+		POGL_DEFERRED_COMMAND _memory;
 		struct {
 			POGLCommandFuncPtr function;
 			POGLCommandReleaseFuncPtr releaseFunction;
@@ -308,6 +310,6 @@ struct POGLResizeTexture2DCommand
 		};
 	};
 };
-extern void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGLDeferredCommand* command);
-extern void POGLResizeTexture2D_Release(POGLDeferredCommand* command);
-_STATIC_ASSERT(sizeof(POGLDeferredCommand) >= sizeof(POGLCreateFrameBufferCommand));
+extern void POGLResizeTexture2D_Command(class POGLDeferredDeviceContext* context, POGLRenderState* state, POGL_DEFERRED_COMMAND* command);
+extern void POGLResizeTexture2D_Release(POGL_DEFERRED_COMMAND* command);
+_STATIC_ASSERT(sizeof(POGL_DEFERRED_COMMAND) >= sizeof(POGLCreateFrameBufferCommand));

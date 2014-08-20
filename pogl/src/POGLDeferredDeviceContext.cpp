@@ -38,7 +38,7 @@ void POGLDeferredDeviceContext::Release()
 
 		if (mFlushedCommands != nullptr) {
 			for (POGL_UINT32 i = 0; i < mFlushedCommandsSize; ++i) {
-				POGLDeferredCommand* command = &mFlushedCommands[i];
+				POGL_DEFERRED_COMMAND* command = &mFlushedCommands[i];
 				(*command->releaseFunction)(command);
 				command->releaseFunction = &POGLNothing_Release;
 			}
@@ -52,7 +52,7 @@ void POGLDeferredDeviceContext::Release()
 
 		if (mCommands != nullptr) {
 			for (POGL_UINT32 i = 0; i < mCommandsOffset; ++i) {
-				POGLDeferredCommand* command = &mCommands[i];
+				POGL_DEFERRED_COMMAND* command = &mCommands[i];
 				(*command->releaseFunction)(command);
 				command->releaseFunction = &POGLNothing_Release;
 			}
@@ -260,7 +260,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 		map->memoryPoolOffset = GetMapOffset(map->size);
 		map->vertexBuffer = vb;
 		map->vertexBuffer->AddRef();
-		mMap = (POGLDeferredCommand*)map;
+		mMap = (POGL_DEFERRED_COMMAND*)map;
 		return GetMapPointer(map->memoryPoolOffset);
 	}
 
@@ -285,7 +285,7 @@ void* POGLDeferredDeviceContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 		map->memoryPoolOffset = GetMapOffset(memorySize);
 		map->vertexBuffer = vb;
 		map->vertexBuffer->AddRef();
-		mMap = (POGLDeferredCommand*)map;
+		mMap = (POGL_DEFERRED_COMMAND*)map;
 		return GetMapPointer(map->memoryPoolOffset);
 	}
 
@@ -347,7 +347,7 @@ void POGLDeferredDeviceContext::ExecuteCommands(IPOGLDeviceContext* context, boo
 	std::lock_guard<std::mutex> lock(mFlushedCommandsMutex);
 	const POGL_UINT32 size = mFlushedCommandsSize;
 	for (POGL_UINT32 i = 0; i < size; ++i) {
-		POGLDeferredCommand* command = &mFlushedCommands[i];
+		POGL_DEFERRED_COMMAND* command = &mFlushedCommands[i];
 		(*command->function)(this, renderState, command);
 		(*command->releaseFunction)(command);
 		command->function = &POGLNothing_Command;
@@ -374,15 +374,15 @@ void POGLDeferredDeviceContext::Flush()
 	mFlushedCommandsMutex.unlock();
 }
 
-POGLDeferredCommand* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
+POGL_DEFERRED_COMMAND* POGLDeferredDeviceContext::AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction)
 {
 	if (mCommandsOffset >= mCommandsSize) {
 		static const POGL_UINT32 INCREASE_SIZE = 100;
 		mCommandsSize += INCREASE_SIZE;
-		mCommands = (POGLDeferredCommand*)realloc(mCommands, mCommandsSize * sizeof(POGLDeferredCommand));
+		mCommands = (POGL_DEFERRED_COMMAND*)realloc(mCommands, mCommandsSize * sizeof(POGL_DEFERRED_COMMAND));
 	}
 
-	POGLDeferredCommand* command = mCommands + mCommandsOffset;
+	POGL_DEFERRED_COMMAND* command = mCommands + mCommandsOffset;
 	mCommandsOffset++;
 	command->function = function;
 	command->releaseFunction = releaseFunction;

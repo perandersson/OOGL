@@ -26,7 +26,7 @@ public:
 		\param function
 		\param releaseFunction
 	*/
-	POGLDeferredCommand* AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction);
+	POGL_DEFERRED_COMMAND* AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction);
 	
 	/*!
 		\brief Retrieves the next offset position for the supplied vertex buffer size
@@ -82,7 +82,7 @@ protected:
 	// Commands to be flushed
 	//
 
-	POGLDeferredCommand* mCommands;
+	POGL_DEFERRED_COMMAND* mCommands;
 	POGL_UINT32 mCommandsSize;
 	POGL_UINT32 mCommandsOffset;
 
@@ -91,11 +91,11 @@ protected:
 	//
 
 	std::mutex mFlushedCommandsMutex;
-	POGLDeferredCommand* mFlushedCommands;
+	POGL_DEFERRED_COMMAND* mFlushedCommands;
 	POGL_UINT32 mFlushedCommandsSize;
 
 	/* Keep track of the vertex mapping */
-	POGLDeferredCommand* mMap;
+	POGL_DEFERRED_COMMAND* mMap;
 
 	/* Memory used when mapping */
 	void* mMapMemoryPool;
