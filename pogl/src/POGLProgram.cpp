@@ -64,15 +64,13 @@ void POGLProgram::Release()
 	}
 }
 
-void POGLProgram::PostConstruct(GLuint programID, POGLRenderContext* context)
+void POGLProgram::PostConstruct(GLuint programID, POGLRenderState* renderState)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 
 	mProgramID = programID;
 	const POGL_UINT32 programUID = GenProgramUID();
-
-	POGLRenderState* renderState = context->GetRenderState();
-
+	
 	//
 	// Prepare uniforms
 	//
@@ -139,6 +137,11 @@ void POGLProgram::PostConstruct(GLuint programID, POGLRenderContext* context)
 		}
 
 		mUniforms.insert(std::make_pair(name, uniform));
+
+		// Associate any uniforms already created
+		auto staticUniform = mStaticUniforms.find(name);
+		if (staticUniform != mStaticUniforms.end())
+			staticUniform->second->SetAssociatedUniform(uniform);
 	}
 
 	mUID = programUID;
@@ -209,13 +212,11 @@ IPOGLUniform* POGLProgram::FindUniformByName(const POGL_CHAR* name)
 	auto it = mStaticUniforms.find(POGL_STRING(name));
 	if (it == mStaticUniforms.end()) {
 		auto uniform = FindStateUniformByName(name);
-		if (uniform != &POGL_UNIFORM_NOT_FOUND) {
-			POGLDefaultUniform* defaultUniform = static_cast<POGLDefaultUniform*>(uniform);
-			POGLStaticUniform* staticUniform = new POGLStaticUniform(defaultUniform, defaultUniform->GetUniformType());
-			mStaticUniforms.insert(std::make_pair(POGL_STRING(name), staticUniform));
-			uniform = staticUniform;
-		}
-		return uniform;
+		POGLDefaultUniform* defaultUniform = static_cast<POGLDefaultUniform*>(uniform);
+		POGLStaticUniform* staticUniform = new POGLStaticUniform();
+		staticUniform->SetAssociatedUniform(defaultUniform);
+		mStaticUniforms.insert(std::make_pair(POGL_STRING(name), staticUniform));
+		return staticUniform;
 	}
 	return it->second;
 }

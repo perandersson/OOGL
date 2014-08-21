@@ -25,10 +25,10 @@ public:
 
 		\param programID
 				The OpenGL program ID
-		\param context
-				The immediately POGLDeviceContext
+		\param renderState
+				The render state
 	*/
-	void PostConstruct(GLuint programID, POGLRenderContext* context);
+	void PostConstruct(GLuint programID, POGLRenderState* renderState);
 	
 	/*!
 		\brief Retrieves a unique ID for this effect

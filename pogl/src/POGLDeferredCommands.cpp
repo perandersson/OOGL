@@ -105,6 +105,24 @@ void POGLCreateShader_Release(POGL_HANDLE command)
 	cmd->shader->Release();
 }
 
+void POGLCreateProgram_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_CREATEPROGRAM_COMMAND_DATA* cmd = (POGL_CREATEPROGRAM_COMMAND_DATA*)command;
+
+	const GLuint programID = POGLFactory::CreateProgram(cmd->shaders);
+	cmd->program->PostConstruct(programID, state);
+}
+
+void POGLCreateProgram_Release(POGL_HANDLE command)
+{
+	POGL_CREATEPROGRAM_COMMAND_DATA* cmd = (POGL_CREATEPROGRAM_COMMAND_DATA*)command;
+	for (POGL_UINT32 i = 0; i < cmd->shaderCount; ++i) {
+		if (cmd->shaders[i] != nullptr)
+			cmd->shaders[i]->Release();
+	}
+	cmd->program->Release();
+}
+
 void POGLMapVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_MAPVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPVERTEXBUFFER_COMMAND_DATA*)command;

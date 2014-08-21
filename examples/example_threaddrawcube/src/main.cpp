@@ -23,13 +23,6 @@ int main()
 	try {
 		IPOGLRenderContext* context = device->GetRenderContext();
 
-		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
-		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
-		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
-		vertexShader->Release();
-		fragmentShader->Release();
-
 		//
 		// Create vertex data for a cube.
 		//
@@ -81,41 +74,53 @@ int main()
 
 		context->SetViewport(POGL_RECT(0, 0, 1024, 768));
 
-		//
-		// Generate a perspective- and lookat matrix
-		//
-
-		POGL_MAT4 perspective;
-		POGLMat4Perspective(45.0f, 1.2f, 0.1f, 100.0f, &perspective);
-	
-		POGL_MAT4 lookAt;
-		POGLMat4LookAt(POGL_VECTOR3(-20.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
-
-		//
-		// Set default uniforms for this program
-		//
-
-		program->FindUniformByName("ProjectionMatrix")->SetMatrix(perspective);
-		program->FindUniformByName("ViewMatrix")->SetMatrix(lookAt);
-
-		//
-		// Set default properties for this program
-		//
-
-		program->SetDepthTest(true);
-		program->SetDepthFunc(POGLDepthFunc::LESS);
-
 		std::atomic<bool> running(true);
 		std::atomic<POGL_FLOAT> angle(0.0f);
 
 		IPOGLDeferredRenderContext* deferredContext = device->CreateDeferredRenderContext();
 		std::condition_variable condition;
-		std::thread t([deferredContext, program, vertexBuffer, indexBuffer, &angle, &condition, &running] {
+		std::thread t([deferredContext, vertexBuffer, indexBuffer, &angle, &condition, &running] {
 			//
 			// Rotate the cube based on the total application time
 			//
 
 			try {
+
+				IPOGLShader* vertexShader = deferredContext->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
+				IPOGLShader* fragmentShader = deferredContext->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
+				IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
+				IPOGLProgram* program = deferredContext->CreateProgramFromShaders(shaders);
+				vertexShader->Release();
+				fragmentShader->Release();
+
+				//
+				// Generate a perspective- and lookat matrix
+				//
+
+				POGL_MAT4 perspective;
+				POGLMat4Perspective(45.0f, 1.2f, 0.1f, 100.0f, &perspective);
+
+				POGL_MAT4 lookAt;
+				POGLMat4LookAt(POGL_VECTOR3(-20.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
+
+				//
+				// Set default uniforms for this program
+				//
+
+				program->FindUniformByName("ProjectionMatrix")->SetMatrix(perspective);
+				program->FindUniformByName("ViewMatrix")->SetMatrix(lookAt);
+
+				//
+				// Set default properties for this program
+				//
+
+				program->SetDepthTest(true);
+				program->SetDepthFunc(POGLDepthFunc::LESS);
+
+				//
+				// Run while loop
+				//
+
 				std::mutex m;
 				std::unique_lock<std::mutex> lock(m);
 				while (running) {
@@ -147,6 +152,8 @@ int main()
 					if (running)
 						condition.wait(lock);
 				}
+
+				program->Release();
 			}
 			catch (POGLException e) {
 				POGLAlert(e);
@@ -187,7 +194,6 @@ int main()
 		deferredContext->Release();
 		indexBuffer->Release();
 		vertexBuffer->Release();
-		program->Release();
 		context->Release();
 		device->Release();
 	}

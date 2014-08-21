@@ -60,34 +60,9 @@ IPOGLProgram* POGLRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)
 		THROW_EXCEPTION(POGLResourceException, "You must supply at least one shader to be able to create a program");
 
 	// Attach all the shaders to the program
-	const GLuint programID = glCreateProgram();
-	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
-		POGLShader* shader = static_cast<POGLShader*>(*ptr);
-		glAttachShader(programID, shader->GetShaderID());
-
-	}
-
-	// Link program
-	glLinkProgram(programID);
-
-	// Detach the shaders when linking is complete: http://www.opengl.org/wiki/GLSL_Object
-	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
-		POGLShader* shader = static_cast<POGLShader*>(*ptr);
-		glDetachShader(programID, shader->GetShaderID());
-	}
-
-	// Verify program
-	GLint status = 0;
-	glGetProgramiv(programID, GL_LINK_STATUS, &status);
-	GLchar infoLogg[2048] = { 0 };
-	glGetProgramInfoLog(programID, sizeof(infoLogg)-1, NULL, infoLogg);
-	if (!status) {
-		glDeleteProgram(programID);
-		THROW_EXCEPTION(POGLResourceException, "Could not link the supplied shader programs. Reason: %s", infoLogg);
-	}
-
+	const GLuint programID = POGLFactory::CreateProgram(shaders);
 	POGLProgram* program = new POGLProgram();
-	program->PostConstruct(programID, this);
+	program->PostConstruct(programID, GetRenderState());
 	return program;
 }
 

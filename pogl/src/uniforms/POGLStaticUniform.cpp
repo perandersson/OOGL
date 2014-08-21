@@ -2,8 +2,8 @@
 #include "POGLStaticUniform.h"
 #include "POGLDefaultUniform.h"
 
-POGLStaticUniform::POGLStaticUniform(POGLDefaultUniform* uniform, GLenum type)
-: mAssociatedUniform(uniform), mType(type), mTexture(nullptr), mMinFilter(POGLMinFilter::DEFAULT), mMagFilter(POGLMagFilter::DEFAULT),
+POGLStaticUniform::POGLStaticUniform()
+: mAssociatedUniform(nullptr), mType(0), mTexture(nullptr), mMinFilter(POGLMinFilter::DEFAULT), mMagFilter(POGLMagFilter::DEFAULT),
 mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 {
 	mFloats[0] = mFloats[1] = mFloats[2] = mFloats[3] = 0.0f;
@@ -20,6 +20,12 @@ mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 
 POGLStaticUniform::~POGLStaticUniform()
 {
+}
+
+void POGLStaticUniform::SetAssociatedUniform(POGLDefaultUniform* uniform)
+{
+	mAssociatedUniform = uniform;
+	mType = uniform->GetUniformType();
 }
 
 void POGLStaticUniform::Apply()

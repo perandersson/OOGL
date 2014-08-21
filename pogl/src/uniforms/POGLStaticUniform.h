@@ -5,11 +5,20 @@ class POGLDefaultUniform;
 class POGLStaticUniform : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
-	POGLStaticUniform(POGLDefaultUniform* uniform, GLenum type);
+	POGLStaticUniform();
 	virtual ~POGLStaticUniform();
 
 	/*!
-	
+		\brief Associate this uniform with the supplied uniform
+
+		\param uniform
+	*/
+	void SetAssociatedUniform(POGLDefaultUniform* uniform);
+
+	/*!
+		\brief Apply this uniform.
+
+		This will set the associated uniform value with the ones specified in this uniform
 	*/
 	void Apply();
 

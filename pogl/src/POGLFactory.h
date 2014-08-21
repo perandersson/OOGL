@@ -42,4 +42,9 @@ public:
 		\brief Creates a shader OpenGL ID based on the supplied parameters
 	*/
 	static GLuint CreateShader(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type);
+
+	/*!
+		\brief Creates a program ID based on the supplied shaders
+	*/
+	static GLuint CreateProgram(IPOGLShader** shaders);
 };

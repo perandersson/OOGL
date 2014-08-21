@@ -113,7 +113,23 @@ IPOGLShader* POGLDeferredRenderContext::CreateShaderFromMemory(const POGL_CHAR* 
 
 IPOGLProgram* POGLDeferredRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	if (shaders == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You must supply at least one shader to be able to create a program");
+
+	POGL_CREATEPROGRAM_COMMAND_DATA* cmd = (POGL_CREATEPROGRAM_COMMAND_DATA*)AddCommand(&POGLCreateProgram_Command, &POGLCreateProgram_Release,
+		sizeof(POGL_CREATEPROGRAM_COMMAND_DATA));
+	POGL_UINT32 count = 0;
+	memset(cmd->shaders, 0, sizeof(cmd->shaders));
+	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
+		POGLShader* shader = static_cast<POGLShader*>(*ptr);
+		cmd->shaders[count++] = shader;
+		shader->AddRef();
+	}
+	cmd->shaderCount = count;
+	POGLProgram* program = new POGLProgram();
+	cmd->program = program;
+	cmd->program->AddRef();
+	return program;
 }
 
 IPOGLTexture1D* POGLDeferredRenderContext::CreateTexture1D()

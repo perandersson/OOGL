@@ -88,6 +88,20 @@ struct POGL_CREATESHADER_COMMAND_DATA
 extern void POGLCreateShader_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLCreateShader_Release(POGL_HANDLE command);
 
+struct POGL_CREATEPROGRAM_COMMAND_DATA
+{
+	// The program
+	POGLProgram* program;
+
+	// Shaders
+	IPOGLShader* shaders[6];
+
+	// The number of shaders
+	POGL_UINT32 shaderCount;
+};
+extern void POGLCreateProgram_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLCreateProgram_Release(POGL_HANDLE command);
+
 struct POGL_MAPVERTEXBUFFER_COMMAND_DATA
 {
 	// The vertex buffer we want to map
