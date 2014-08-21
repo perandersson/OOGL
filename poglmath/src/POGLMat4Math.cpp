@@ -144,6 +144,11 @@ void POGLMat4Translate(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
 
 void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
 {
+	POGLMat4Rotate(angle, POGL_MAT4_IDENTITY, v, _out_Mat4);
+}
+
+void POGLMat4Rotate(POGL_FLOAT angle, const POGL_MAT4& mat4, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)
+{
 	const POGL_FLOAT s = (POGL_FLOAT)sin(angle * POGL_ANG2RAD_F);
 	const POGL_FLOAT c = (POGL_FLOAT)cos(angle * POGL_ANG2RAD_F);
 
@@ -151,7 +156,7 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 	POGL_FLOAT y = v.y;
 	POGL_FLOAT z = v.z;
 
-	POGL_MAT4 tmp; 
+	POGL_MAT4 tmp;
 	POGL_FLOAT* m = tmp.vec;
 
 	bool optimized = false;
@@ -242,7 +247,7 @@ void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 		M(2, 2) = (one_c * zz) + c;
 	}
 
-	POGLMat4Multiply(*_out_Mat4, tmp, _out_Mat4);
+	POGLMat4Multiply(mat4, tmp, _out_Mat4);
 }
 
 void POGLMat4Scale(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4)

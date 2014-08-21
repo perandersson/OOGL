@@ -91,7 +91,7 @@ extern POGLAPI void POGLMat4Multiply(const POGL_MAT4& lhs, const POGL_MAT4& rhs,
 extern POGLAPI void POGLMat4Translate(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4);
 
 /*!
-	\brief Rotate the supplied output matrix with the supplied vector
+	\brief Retrieves a rotation matrix based on the angle and vector
 
 	\param angle
 			The angle in degrees
@@ -99,6 +99,16 @@ extern POGLAPI void POGLMat4Translate(const POGL_VECTOR3& v, POGL_MAT4* _out_Mat
 	\param _out_Mat4
 */
 extern POGLAPI void POGLMat4Rotate(POGL_FLOAT angle, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4);
+
+/*!
+	\brief Rotate the supplied output matrix with the supplied vector
+
+	\param angle
+			The angle in degrees
+	\param v
+	\param _out_Mat4
+*/
+extern POGLAPI void POGLMat4Rotate(POGL_FLOAT angle, const POGL_MAT4& mat4, const POGL_VECTOR3& v, POGL_MAT4* _out_Mat4);
 
 /*!
 	\brief Rotate the supplied output matrix with the supplied vector
