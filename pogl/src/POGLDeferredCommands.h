@@ -222,6 +222,19 @@ struct POGL_UNIFORM_SET_INT_COMMAND_DATA
 };
 extern void POGLUniformSetInt_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 
+struct POGL_UNIFORM_SET_UINT_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGL_UINT32 values[4];
+
+	// The number of values
+	POGL_UINT32 count;
+};
+extern void POGLUniformSetUInt_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
 struct POGL_UNIFORM_SET_MAT4_COMMAND_DATA
 {
 	// The name of the uniform
@@ -231,3 +244,5 @@ struct POGL_UNIFORM_SET_MAT4_COMMAND_DATA
 	POGL_MAT4 matrix;
 };
 extern void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+

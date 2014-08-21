@@ -70,27 +70,57 @@ void POGLDeferredUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->count = 1;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->count = 1;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->values[2] = c;
+	cmd->count = 1;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->values[2] = c;
+	cmd->values[3] = d;
+	cmd->count = 1;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
+
+	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
+	cmd->name = &mName;
+	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
+		cmd->values[i] = (POGL_UINT32)ptr[i];
+
+	cmd->count = clampedCount;
 }
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a)
