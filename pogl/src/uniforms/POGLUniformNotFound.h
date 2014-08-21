@@ -38,6 +38,9 @@ public:
 	void SetVector3(const POGL_VECTOR3& vec);
 	void SetVector4(const POGL_VECTOR4& vec);
 
+	void SetSize(const POGL_SIZE& size);
+	void SetRect(const POGL_RECT& rect);
+
 	IPOGLSamplerState* GetSamplerState();
 
 	void SetTexture(IPOGLTexture* texture);

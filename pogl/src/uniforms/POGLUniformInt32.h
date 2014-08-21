@@ -22,6 +22,9 @@ public:
 	void SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d);
 	void SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count);
 
+	void SetSize(const POGL_SIZE& size);
+	void SetRect(const POGL_RECT& rect);
+
 private:
 	POGL_INT32 mCount;
 	POGL_INT32 mValues[4];

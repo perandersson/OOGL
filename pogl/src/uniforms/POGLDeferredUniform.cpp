@@ -52,7 +52,6 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POG
 	cmd->values[2] = c;
 	cmd->values[2] = d;
 	cmd->count = 4;
-
 }
 
 void POGLDeferredUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
@@ -272,6 +271,22 @@ void POGLDeferredUniform::SetVector4(const POGL_VECTOR4& vec)
 	cmd->values[2] = vec.z;
 	cmd->values[3] = vec.w;
 	cmd->count = 4;
+}
+
+void POGLDeferredUniform::SetSize(const POGL_SIZE& size)
+{
+	POGL_UNIFORM_SET_SIZE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_SIZE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetSize_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_SIZE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->size = size;
+}
+
+void POGLDeferredUniform::SetRect(const POGL_RECT& rect)
+{
+	POGL_UNIFORM_SET_RECT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_RECT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetRect_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_RECT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->rect = rect;
 }
 
 IPOGLSamplerState* POGLDeferredUniform::GetSamplerState()

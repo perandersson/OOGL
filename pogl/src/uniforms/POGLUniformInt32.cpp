@@ -115,22 +115,22 @@ void POGLUniformInt32::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 
 void POGLUniformInt32::SetUInt32(POGL_UINT32 a)
 {
-	SetInt32((POGL_INT32)a);
+	POGLUniformInt32::SetInt32((POGL_INT32)a);
 }
 
 void POGLUniformInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 {
-	SetInt32((POGL_INT32)a, (POGL_INT32)b);
+	POGLUniformInt32::SetInt32((POGL_INT32)a, (POGL_INT32)b);
 }
 
 void POGLUniformInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 {
-	SetInt32((POGL_INT32)a, (POGL_INT32)b, (POGL_INT32)c);
+	POGLUniformInt32::SetInt32((POGL_INT32)a, (POGL_INT32)b, (POGL_INT32)c);
 }
 
 void POGLUniformInt32::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
 {
-	SetInt32((POGL_INT32)a, (POGL_INT32)b, (POGL_INT32)c, (POGL_INT32)d);
+	POGLUniformInt32::SetInt32((POGL_INT32)a, (POGL_INT32)b, (POGL_INT32)c, (POGL_INT32)d);
 }
 
 void POGLUniformInt32::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
@@ -141,4 +141,14 @@ void POGLUniformInt32::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 
 	if (IsProgramActive())
 		POGLUniformInt32::Apply();
+}
+
+void POGLUniformInt32::SetSize(const POGL_SIZE& size)
+{
+	POGLUniformInt32::SetInt32(size.x, size.y);
+}
+
+void POGLUniformInt32::SetRect(const POGL_RECT& rect)
+{
+	POGLUniformInt32::SetInt32(rect.x, rect.y, rect.width, rect.height);
 }

@@ -323,6 +323,24 @@ void POGLStaticUniform::SetVector4(const POGL_VECTOR4& vec)
 	mFloats[3] = vec.w;
 }
 
+void POGLStaticUniform::SetSize(const POGL_SIZE& size)
+{
+	std::lock_guard<std::mutex> lock(mMutex);
+
+	mInts[0] = (POGL_UINT32)size.x;
+	mInts[1] = (POGL_UINT32)size.y;
+}
+
+void POGLStaticUniform::SetRect(const POGL_RECT& rect)
+{
+	std::lock_guard<std::mutex> lock(mMutex);
+
+	mInts[0] = (POGL_UINT32)rect.x;
+	mInts[1] = (POGL_UINT32)rect.y;
+	mInts[2] = (POGL_UINT32)rect.width;
+	mInts[3] = (POGL_UINT32)rect.height;
+}
+
 IPOGLSamplerState* POGLStaticUniform::GetSamplerState()
 {
 	return this;

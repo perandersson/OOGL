@@ -137,6 +137,16 @@ void POGLDefaultUniform::SetVector4(const POGL_VECTOR4& vec)
 	assert_with_message(false, "Invalid uniform type");
 }
 
+void POGLDefaultUniform::SetSize(const POGL_SIZE& size)
+{
+	assert_with_message(false, "Invalid uniform type");
+}
+
+void POGLDefaultUniform::SetRect(const POGL_RECT& rect)
+{
+	assert_with_message(false, "Invalid uniform type");
+}
+
 IPOGLSamplerState* POGLDefaultUniform::GetSamplerState()
 {
 	return this;

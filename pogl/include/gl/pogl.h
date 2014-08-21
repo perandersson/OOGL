@@ -1274,6 +1274,9 @@ public:
 	virtual void SetVector3(const POGL_VECTOR3& vec) = 0;
 	virtual void SetVector4(const POGL_VECTOR4& vec) = 0;
 
+	virtual void SetSize(const POGL_SIZE& size) = 0;
+	virtual void SetRect(const POGL_RECT& rect) = 0;
+
 	virtual IPOGLSamplerState* GetSamplerState() = 0;
 
 	virtual void SetTexture(IPOGLTexture* texture) = 0;

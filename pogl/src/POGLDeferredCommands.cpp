@@ -369,6 +369,22 @@ void POGLUniformSetUInt_Command(POGLDeferredRenderContext* context, POGLRenderSt
 	}
 }
 
+void POGLUniformSetSize_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_SIZE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_SIZE_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->SetSize(cmd->size);
+}
+
+void POGLUniformSetRect_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_RECT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_RECT_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->SetRect(cmd->rect);
+}
+
 void POGLUniformSetFloat_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)command;

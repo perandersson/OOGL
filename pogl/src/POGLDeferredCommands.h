@@ -270,6 +270,26 @@ struct POGL_UNIFORM_SET_UINT_COMMAND_DATA
 };
 extern void POGLUniformSetUInt_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 
+struct POGL_UNIFORM_SET_SIZE_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGL_SIZE size;
+};
+extern void POGLUniformSetSize_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+struct POGL_UNIFORM_SET_RECT_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGL_RECT rect;
+};
+extern void POGLUniformSetRect_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
 struct POGL_UNIFORM_SET_FLOAT_COMMAND_DATA
 {
 	// The name of the uniform

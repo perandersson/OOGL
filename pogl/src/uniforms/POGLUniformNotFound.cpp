@@ -105,6 +105,14 @@ void POGLUniformNotFound::SetVector4(const POGL_VECTOR4& vec)
 {
 }
 
+void POGLUniformNotFound::SetSize(const POGL_SIZE& size)
+{
+}
+
+void POGLUniformNotFound::SetRect(const POGL_RECT& rect)
+{
+}
+
 IPOGLSamplerState* POGLUniformNotFound::GetSamplerState()
 {
 	return this;
