@@ -243,17 +243,35 @@ void POGLDeferredUniform::SetMatrix(const POGL_MAT4& mat4)
 
 void POGLDeferredUniform::SetVector2(const POGL_VECTOR2& vec)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = vec.x;
+	cmd->values[1] = vec.y;
+	cmd->count = 2;
 }
 
 void POGLDeferredUniform::SetVector3(const POGL_VECTOR3& vec)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = vec.x;
+	cmd->values[1] = vec.y;
+	cmd->values[2] = vec.z;
+	cmd->count = 3;
 }
 
 void POGLDeferredUniform::SetVector4(const POGL_VECTOR4& vec)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = vec.x;
+	cmd->values[1] = vec.y;
+	cmd->values[2] = vec.z;
+	cmd->values[3] = vec.w;
+	cmd->count = 4;
 }
 
 IPOGLSamplerState* POGLDeferredUniform::GetSamplerState()
