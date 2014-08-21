@@ -20,7 +20,7 @@ public:
 	GLuint GetSamplerID() const;
 
 private:
-	POGL_UINT32 mUID;
+	POGL_UID mUID;
 	GLuint mSamplerID;
 	POGLRenderState* mRenderState;
 };

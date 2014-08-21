@@ -21,9 +21,9 @@ mMaxActiveTextures(0), mNextActiveTexture(0), mActiveTextureIndex(0),
 mFramebuffer(nullptr), mFramebufferUID(0)
 {
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxActiveTextures);
-	mTextureUID.resize(mMaxActiveTextures, 0);
+	mTextureUID = new POGL_UID[mMaxActiveTextures];
 	mTextures.resize(mMaxActiveTextures, nullptr);
-	mSamplerObjectUID.resize(mMaxActiveTextures, 0);
+	mSamplerObjectUID = new POGL_UID[mMaxActiveTextures];
 }
 
 POGLRenderState::~POGLRenderState()
@@ -49,6 +49,9 @@ void POGLRenderState::Release()
 			POGL_SAFE_RELEASE(mTextures[i]);
 			mTextureUID[i] = 0;
 		}
+
+		delete[] mTextureUID;
+		delete[] mSamplerObjectUID;
 
 		delete this;
 	}

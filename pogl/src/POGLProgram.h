@@ -41,6 +41,8 @@ public:
 
 	/*!
 		\brief Retrieves the OpenGL program ID
+
+		\return The OpenGL program ID
 	*/
 	inline GLuint GetProgramID() const {
 		return mProgramID;
@@ -75,11 +77,19 @@ public:
 
 	/*!
 		\brief Retrieves a uniform based on the given name
+
+		\param name
+				The name of the uniform
+		\return A valid uniform object
 	*/
 	IPOGLUniform* FindStateUniformByName(const POGL_CHAR* name);
 
 	/*!
 		\brief Retrieves a uniform based on the given name
+		
+		\param name
+				The name of the uniform
+		\return A valid uniform object
 	*/
 	IPOGLUniform* FindStateUniformByName(const POGL_STRING& name);
 
@@ -117,7 +127,7 @@ public:
 private:
 	REF_COUNTER mRefCount;
 	GLuint mProgramID;
-	POGL_UINT32 mUID;
+	POGL_UID mUID;
 	std::recursive_mutex mMutex;
 	POGLProgramData* mData;
 

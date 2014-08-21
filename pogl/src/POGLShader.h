@@ -39,7 +39,7 @@ public:
 
 private:
 	REF_COUNTER mRefCount;
-	POGL_UINT32 mUID;
+	POGL_UID mUID;
 	GLuint mShaderID;
 	POGLShaderType::Enum mShaderType;
 };

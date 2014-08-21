@@ -46,7 +46,7 @@ public:
 
 private:
 	REF_COUNTER mRefCount;
-	POGL_UINT32 mUID;
+	POGL_UID mUID;
 	GLuint mFramebufferID;
 	std::vector<IPOGLTexture*> mTextures;
 	IPOGLTexture* mDepthStencilTexture;

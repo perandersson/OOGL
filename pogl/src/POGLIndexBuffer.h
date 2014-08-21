@@ -65,7 +65,7 @@ public:
 
 private:
 	REF_COUNTER mRefCount;
-	POGL_UINT32 mUID;
+	POGL_UID mUID;
 	GLuint mBufferID;
 	POGL_UINT32 mNumIndices;
 	POGL_UINT32 mTypeSize;

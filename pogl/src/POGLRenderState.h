@@ -144,13 +144,13 @@ private:
 	POGLRenderContext* mRenderContext;
 
 	POGLProgram* mProgram;
-	POGL_UINT32 mProgramUID;
+	POGL_UID mProgramUID;
 	bool mApplyCurrentProgramState;
 
 	POGLVertexBuffer *mVertexBuffer;
-	POGL_UINT32 mVertexBufferUID;
+	POGL_UID mVertexBufferUID;
 	POGLIndexBuffer* mIndexBuffer;
-	POGL_UINT32 mIndexBufferUID;
+	POGL_UID mIndexBufferUID;
 
 	//
 	// Properties
@@ -175,9 +175,9 @@ private:
 
 	POGL_UINT32 mMaxActiveTextures;
 	POGL_UINT32 mNextActiveTexture;
-	std::vector<POGL_UINT32> mTextureUID;
+	POGL_UID* mTextureUID;
 	std::vector<POGLTextureResource*> mTextures;
-	std::vector<POGL_UINT32> mSamplerObjectUID;
+	POGL_UID* mSamplerObjectUID;
 	POGL_UINT32 mActiveTextureIndex;
 
 	//
@@ -185,5 +185,5 @@ private:
 	//
 
 	POGLFramebuffer* mFramebuffer;
-	POGL_UINT32 mFramebufferUID;
+	POGL_UID mFramebufferUID;
 };

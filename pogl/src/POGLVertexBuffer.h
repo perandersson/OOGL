@@ -87,7 +87,7 @@ public:
 
 private:
 	REF_COUNTER mRefCount;
-	POGL_UINT32 mUID;
+	POGL_UID mUID;
 	GLuint mBufferID;
 	POGL_UINT32 mCount;
 	GLuint mVAOID;
