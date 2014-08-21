@@ -358,6 +358,31 @@ void POGLUniformSetFloat_Command(POGLDeferredRenderContext* context, POGLRenderS
 		break;
 	}
 }
+
+void POGLUniformSetDouble_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	switch (cmd->count) {
+	case 1:
+		uniform->SetDouble(cmd->values[0]);
+		break;
+	case 2:
+		uniform->SetDouble(cmd->values[0], cmd->values[1]);
+		break;
+	case 3:
+		uniform->SetDouble(cmd->values[0], cmd->values[1], cmd->values[2]);
+		break;
+	case 4:
+		uniform->SetDouble(cmd->values[0], cmd->values[1], cmd->values[2], cmd->values[3]);
+		break;
+	default:
+		uniform->SetDouble(cmd->values, cmd->count);
+		break;
+	}
+}
+
 void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_MAT4_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MAT4_COMMAND_DATA*)command;

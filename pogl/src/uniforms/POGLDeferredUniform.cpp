@@ -180,27 +180,57 @@ void POGLDeferredUniform::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->count = 1;
 }
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->count = 2;
 }
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->values[2] = c;
+	cmd->count = 3;
 }
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->values[2] = c;
+	cmd->values[3] = d;
+	cmd->count = 4;
 }
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
+
+	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
+	cmd->name = &mName;
+	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
+		cmd->values[i] = ptr[i];
+
+	cmd->count = clampedCount;
 }
 
 void POGLDeferredUniform::SetMatrix(const POGL_MAT4& mat4)

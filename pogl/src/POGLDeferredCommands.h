@@ -248,6 +248,19 @@ struct POGL_UNIFORM_SET_FLOAT_COMMAND_DATA
 };
 extern void POGLUniformSetFloat_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 
+struct POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGL_DOUBLE values[4];
+
+	// The number of values
+	POGL_UINT32 count;
+};
+extern void POGLUniformSetDouble_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
 struct POGL_UNIFORM_SET_MAT4_COMMAND_DATA
 {
 	// The name of the uniform
