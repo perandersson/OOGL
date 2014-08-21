@@ -271,4 +271,14 @@ struct POGL_UNIFORM_SET_MAT4_COMMAND_DATA
 };
 extern void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 
+struct POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	IPOGLTexture* texture;
+};
+extern void POGLUniformSetTexture_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLUniformSetTexture_Release(POGL_HANDLE command);
 

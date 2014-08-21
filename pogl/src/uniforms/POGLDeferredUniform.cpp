@@ -281,7 +281,12 @@ IPOGLSamplerState* POGLDeferredUniform::GetSamplerState()
 
 void POGLDeferredUniform::SetTexture(IPOGLTexture* texture)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetTexture_Command, &POGLUniformSetTexture_Release,
+		sizeof(POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->texture = texture;
+	if (texture != nullptr)
+		texture->AddRef();
 }
 
 void POGLDeferredUniform::SetMinFilter(POGLMinFilter::Enum minFilter)

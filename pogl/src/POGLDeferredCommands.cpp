@@ -389,3 +389,18 @@ void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderSt
 	const POGL_STRING& str = *cmd->name;
 	state->FindUniformByName(str)->SetMatrix(cmd->matrix);
 }
+
+void POGLUniformSetTexture_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->SetTexture(cmd->texture);
+}
+
+void POGLUniformSetTexture_Release(POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA*)command;
+	if (cmd->texture != nullptr)
+		cmd->texture->Release();
+}
