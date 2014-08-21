@@ -291,21 +291,72 @@ void POGLUniformSetInt_Command(POGLDeferredRenderContext* context, POGLRenderSta
 {
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)command;
 	const POGL_STRING& str = *cmd->name;
-	state->FindUniformByName(str)->SetInt32(cmd->values, cmd->count);
+	auto uniform = state->FindUniformByName(str);
+	switch (cmd->count) {
+	case 1:
+		uniform->SetInt32(cmd->values[0]);
+		break;
+	case 2:
+		uniform->SetInt32(cmd->values[0], cmd->values[1]);
+		break;
+	case 3:
+		uniform->SetInt32(cmd->values[0], cmd->values[1], cmd->values[2]);
+		break;
+	case 4:
+		uniform->SetInt32(cmd->values[0], cmd->values[1], cmd->values[2], cmd->values[3]);
+		break;
+	default:
+		uniform->SetInt32(cmd->values, cmd->count);
+		break;
+	}
 }
 
 void POGLUniformSetUInt_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)command;
 	const POGL_STRING& str = *cmd->name;
-	state->FindUniformByName(str)->SetUInt32(cmd->values, cmd->count);
+	auto uniform = state->FindUniformByName(str);
+	switch (cmd->count) {
+	case 1:
+		uniform->SetUInt32(cmd->values[0]);
+		break;
+	case 2:
+		uniform->SetUInt32(cmd->values[0], cmd->values[1]);
+		break;
+	case 3:
+		uniform->SetUInt32(cmd->values[0], cmd->values[1], cmd->values[2]);
+		break;
+	case 4:
+		uniform->SetUInt32(cmd->values[0], cmd->values[1], cmd->values[2], cmd->values[3]);
+		break;
+	default:
+		uniform->SetUInt32(cmd->values, cmd->count);
+		break;
+	}
 }
 
 void POGLUniformSetFloat_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)command;
 	const POGL_STRING& str = *cmd->name;
-	state->FindUniformByName(str)->SetFloat(cmd->values, cmd->count);
+	auto uniform = state->FindUniformByName(str);
+	switch (cmd->count) {
+	case 1:
+		uniform->SetFloat(cmd->values[0]);
+		break;
+	case 2:
+		uniform->SetFloat(cmd->values[0], cmd->values[1]);
+		break;
+	case 3:
+		uniform->SetFloat(cmd->values[0], cmd->values[1], cmd->values[2]);
+		break;
+	case 4:
+		uniform->SetFloat(cmd->values[0], cmd->values[1], cmd->values[2], cmd->values[3]);
+		break;
+	default:
+		uniform->SetFloat(cmd->values, cmd->count);
+		break;
+	}
 }
 void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
