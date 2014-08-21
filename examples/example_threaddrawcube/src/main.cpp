@@ -80,11 +80,14 @@ int main()
 		IPOGLDeferredRenderContext* deferredContext = device->CreateDeferredRenderContext();
 		std::condition_variable condition;
 		std::thread t([deferredContext, vertexBuffer, indexBuffer, &angle, &condition, &running] {
-			//
-			// Rotate the cube based on the total application time
-			//
-
 			try {
+
+				// 
+				// Create the shaders in this thread and use it as if it was created in the main thread
+				//
+				// Please note that the program isn't actually created until the deferred render context is
+				// executed in the main thread.
+				//
 
 				IPOGLShader* vertexShader = deferredContext->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
 				IPOGLShader* fragmentShader = deferredContext->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
@@ -104,7 +107,7 @@ int main()
 				POGLMat4LookAt(POGL_VECTOR3(-20.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
 
 				//
-				// Set default uniforms for this program
+				// Set static uniforms for this program
 				//
 
 				program->FindUniformByName("ProjectionMatrix")->SetMatrix(perspective);
@@ -126,19 +129,29 @@ int main()
 				while (running) {
 					POGL_MAT4 modelMatrix;
 					POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+
 					// 
-					// Draw the cube
+					// Apply the program (note that the program is actually loaded, but not initialized, in this thread)
 					//
+
 					IPOGLRenderState* state = deferredContext->Apply(program);
 
+					//
+					// Set the model matrix (rotation only in this case)
+					//
+
 					state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
+
+					//
+					// Draw the box
+					//
 
 					state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 					state->Draw(vertexBuffer, indexBuffer);
 					state->Release();
 
 					//
-					// Flush the commands 
+					// Flush the commands so that they can be executed in the main thread
 					//
 
 					deferredContext->Flush();
@@ -160,10 +173,6 @@ int main()
 			}
 		});
 		
-		//
-		// Poll the opened window's events. This is NOT part of the POGL library
-		//
-
 		POGL_FLOAT angleFlt = 0.0f;
 		const POGL_FLOAT ROTATION_SPEED = 90.0f;
 
@@ -180,6 +189,7 @@ int main()
 			deferredContext->ExecuteCommands(context);
 			condition.notify_one();
 
+			// Swap buffers
 			device->EndFrame();
 		}
 
