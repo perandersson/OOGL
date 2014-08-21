@@ -2,11 +2,11 @@
 #include "config.h"
 
 class POGLDefaultUniform;
-class POGLGlobalUniform : public IPOGLUniform, public IPOGLSamplerState
+class POGLStaticUniform : public IPOGLUniform, public IPOGLSamplerState
 {
 public:
-	POGLGlobalUniform(POGLDefaultUniform* uniform, GLenum type);
-	virtual ~POGLGlobalUniform();
+	POGLStaticUniform(POGLDefaultUniform* uniform, GLenum type);
+	virtual ~POGLStaticUniform();
 
 	/*!
 	

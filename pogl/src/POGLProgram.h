@@ -8,11 +8,11 @@ class POGLDefaultUniform;
 class POGLRenderContext;
 class POGLRenderState;
 class POGLSamplerObject;
-class POGLGlobalUniform;
+class POGLStaticUniform;
 class POGLProgram : public IPOGLProgram
 {
 	typedef std::hash_map<POGL_STRING, POGLDefaultUniform*> Uniforms;
-	typedef std::hash_map<POGL_STRING, POGLGlobalUniform*> GlobalUniforms;
+	typedef std::hash_map<POGL_STRING, POGLStaticUniform*> StaticUniforms;
 
 public:
 	POGLProgram();
@@ -122,5 +122,5 @@ private:
 	POGLProgramData* mData;
 
 	Uniforms mUniforms;
-	GlobalUniforms mGlobalUniforms;
+	StaticUniforms mStaticUniforms;
 };

@@ -1,7 +1,7 @@
 #include "MemCheck.h"
 #include "POGLProgram.h"
 #include "uniforms/POGLDefaultUniform.h"
-#include "uniforms/POGLGlobalUniform.h"
+#include "uniforms/POGLStaticUniform.h"
 #include "uniforms/POGLUniformNotFound.h"
 #include "uniforms/POGLUniformInt32.h"
 #include "uniforms/POGLUniformUInt32.h"
@@ -43,8 +43,8 @@ void POGLProgram::AddRef()
 void POGLProgram::Release()
 {
 	if (--mRefCount == 0) {
-		auto globalIt = mGlobalUniforms.begin();
-		auto globalEnd = mGlobalUniforms.end();
+		auto globalIt = mStaticUniforms.begin();
+		auto globalEnd = mStaticUniforms.end();
 		for (; globalIt != globalEnd; ++globalIt) {
 			delete globalIt->second;
 		}
@@ -164,8 +164,8 @@ void POGLProgram::ApplyGlobalUniforms()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-	auto it = mGlobalUniforms.begin();
-	auto end = mGlobalUniforms.end();
+	auto it = mStaticUniforms.begin();
+	auto end = mStaticUniforms.end();
 	for (; it != end; ++it) {
 		auto global = it->second;
 		global->Apply();
@@ -211,14 +211,14 @@ IPOGLUniform* POGLProgram::FindUniformByName(const POGL_CHAR* name)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-	auto it = mGlobalUniforms.find(POGL_STRING(name));
-	if (it == mGlobalUniforms.end()) {
+	auto it = mStaticUniforms.find(POGL_STRING(name));
+	if (it == mStaticUniforms.end()) {
 		auto uniform = FindStateUniformByName(name);
 		if (uniform != &POGL_UNIFORM_NOT_FOUND) {
 			POGLDefaultUniform* defaultUniform = static_cast<POGLDefaultUniform*>(uniform);
-			POGLGlobalUniform* globalUniform = new POGLGlobalUniform(defaultUniform, defaultUniform->GetUniformType());
-			mGlobalUniforms.insert(std::make_pair(POGL_STRING(name), globalUniform));
-			uniform = globalUniform;
+			POGLStaticUniform* staticUniform = new POGLStaticUniform(defaultUniform, defaultUniform->GetUniformType());
+			mStaticUniforms.insert(std::make_pair(POGL_STRING(name), staticUniform));
+			uniform = staticUniform;
 		}
 		return uniform;
 	}

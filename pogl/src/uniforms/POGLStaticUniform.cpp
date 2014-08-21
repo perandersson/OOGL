@@ -1,8 +1,8 @@
 #include "MemCheck.h"
-#include "POGLGlobalUniform.h"
+#include "POGLStaticUniform.h"
 #include "POGLDefaultUniform.h"
 
-POGLGlobalUniform::POGLGlobalUniform(POGLDefaultUniform* uniform, GLenum type)
+POGLStaticUniform::POGLStaticUniform(POGLDefaultUniform* uniform, GLenum type)
 : mAssociatedUniform(uniform), mType(type), mTexture(nullptr), mMinFilter(POGLMinFilter::DEFAULT), mMagFilter(POGLMagFilter::DEFAULT),
 mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 {
@@ -18,11 +18,11 @@ mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 	mValue._44 = 1.0;
 }
 
-POGLGlobalUniform::~POGLGlobalUniform()
+POGLStaticUniform::~POGLStaticUniform()
 {
 }
 
-void POGLGlobalUniform::Apply()
+void POGLStaticUniform::Apply()
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -92,14 +92,14 @@ void POGLGlobalUniform::Apply()
 	};
 }
 
-void POGLGlobalUniform::SetInt32(POGL_INT32 a)
+void POGLStaticUniform::SetInt32(POGL_INT32 a)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mInts[0] = a;
 }
 
-void POGLGlobalUniform::SetInt32(POGL_INT32 a, POGL_INT32 b)
+void POGLStaticUniform::SetInt32(POGL_INT32 a, POGL_INT32 b)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -107,7 +107,7 @@ void POGLGlobalUniform::SetInt32(POGL_INT32 a, POGL_INT32 b)
 	mInts[1] = b;
 }
 
-void POGLGlobalUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
+void POGLStaticUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -116,7 +116,7 @@ void POGLGlobalUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 	mInts[2] = c;
 }
 
-void POGLGlobalUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POGL_INT32 d)
+void POGLStaticUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POGL_INT32 d)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -127,7 +127,7 @@ void POGLGlobalUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POGL_
 
 }
 
-void POGLGlobalUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
+void POGLStaticUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -136,14 +136,14 @@ void POGLGlobalUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 		mInts[i] = (POGL_UINT32)ptr[i];
 }
 
-void POGLGlobalUniform::SetUInt32(POGL_UINT32 a)
+void POGLStaticUniform::SetUInt32(POGL_UINT32 a)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mInts[0] = a;
 }
 
-void POGLGlobalUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
+void POGLStaticUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -151,7 +151,7 @@ void POGLGlobalUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 	mInts[1] = b;
 }
 
-void POGLGlobalUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
+void POGLStaticUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -160,7 +160,7 @@ void POGLGlobalUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 	mInts[2] = c;
 }
 
-void POGLGlobalUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
+void POGLStaticUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -170,7 +170,7 @@ void POGLGlobalUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, P
 	mInts[3] = d;
 }
 
-void POGLGlobalUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
+void POGLStaticUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -179,14 +179,14 @@ void POGLGlobalUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 		mInts[i] = ptr[i];
 }
 
-void POGLGlobalUniform::SetFloat(POGL_FLOAT a)
+void POGLStaticUniform::SetFloat(POGL_FLOAT a)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mFloats[0] = a;
 }
 
-void POGLGlobalUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
+void POGLStaticUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -194,7 +194,7 @@ void POGLGlobalUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 	mFloats[1] = b;
 }
 
-void POGLGlobalUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
+void POGLStaticUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -203,7 +203,7 @@ void POGLGlobalUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 	mFloats[2] = c;
 }
 
-void POGLGlobalUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d)
+void POGLStaticUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -213,7 +213,7 @@ void POGLGlobalUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_
 	mFloats[3] = d;
 }
 
-void POGLGlobalUniform::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
+void POGLStaticUniform::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -222,14 +222,14 @@ void POGLGlobalUniform::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 		mFloats[i] = ptr[i];
 }
 
-void POGLGlobalUniform::SetDouble(POGL_DOUBLE a)
+void POGLStaticUniform::SetDouble(POGL_DOUBLE a)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mDoubles[0] = a;
 }
 
-void POGLGlobalUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
+void POGLStaticUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -237,7 +237,7 @@ void POGLGlobalUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 	mDoubles[1] = b;
 }
 
-void POGLGlobalUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
+void POGLStaticUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -246,7 +246,7 @@ void POGLGlobalUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 	mDoubles[2] = c;
 }
 
-void POGLGlobalUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d)
+void POGLStaticUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -256,7 +256,7 @@ void POGLGlobalUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, P
 	mDoubles[3] = d;
 }
 
-void POGLGlobalUniform::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
+void POGLStaticUniform::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -265,7 +265,7 @@ void POGLGlobalUniform::SetDouble(POGL_DOUBLE* ptr, POGL_UINT32 count)
 		mDoubles[i] = ptr[i];
 }
 
-void POGLGlobalUniform::SetMatrix(const POGL_MAT4& mat4)
+void POGLStaticUniform::SetMatrix(const POGL_MAT4& mat4)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -290,7 +290,7 @@ void POGLGlobalUniform::SetMatrix(const POGL_MAT4& mat4)
 	mValue._44 = mat4._44;
 }
 
-void POGLGlobalUniform::SetVector2(const POGL_VECTOR2& vec)
+void POGLStaticUniform::SetVector2(const POGL_VECTOR2& vec)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -298,7 +298,7 @@ void POGLGlobalUniform::SetVector2(const POGL_VECTOR2& vec)
 	mFloats[1] = vec.y;
 }
 
-void POGLGlobalUniform::SetVector3(const POGL_VECTOR3& vec)
+void POGLStaticUniform::SetVector3(const POGL_VECTOR3& vec)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -307,7 +307,7 @@ void POGLGlobalUniform::SetVector3(const POGL_VECTOR3& vec)
 	mFloats[2] = vec.z;
 }
 
-void POGLGlobalUniform::SetVector4(const POGL_VECTOR4& vec)
+void POGLStaticUniform::SetVector4(const POGL_VECTOR4& vec)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -317,12 +317,12 @@ void POGLGlobalUniform::SetVector4(const POGL_VECTOR4& vec)
 	mFloats[3] = vec.w;
 }
 
-IPOGLSamplerState* POGLGlobalUniform::GetSamplerState()
+IPOGLSamplerState* POGLStaticUniform::GetSamplerState()
 {
 	return this;
 }
 
-void POGLGlobalUniform::SetTexture(IPOGLTexture* texture)
+void POGLStaticUniform::SetTexture(IPOGLTexture* texture)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -333,21 +333,21 @@ void POGLGlobalUniform::SetTexture(IPOGLTexture* texture)
 		mTexture->AddRef();
 }
 
-void POGLGlobalUniform::SetMinFilter(POGLMinFilter::Enum minFilter)
+void POGLStaticUniform::SetMinFilter(POGLMinFilter::Enum minFilter)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mMinFilter = minFilter;
 }
 
-void POGLGlobalUniform::SetMagFilter(POGLMagFilter::Enum magFilter)
+void POGLStaticUniform::SetMagFilter(POGLMagFilter::Enum magFilter)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mMagFilter = magFilter;
 }
 
-void POGLGlobalUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
+void POGLStaticUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 	
@@ -355,7 +355,7 @@ void POGLGlobalUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap:
 	mWraps[1] = t;
 }
 
-void POGLGlobalUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r)
+void POGLStaticUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
@@ -364,14 +364,14 @@ void POGLGlobalUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap:
 	mWraps[2] = r;
 }
 
-void POGLGlobalUniform::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
+void POGLStaticUniform::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 
 	mCompareFunc = compareFunc;
 }
 
-void POGLGlobalUniform::SetCompareMode(POGLCompareMode::Enum compareMode)
+void POGLStaticUniform::SetCompareMode(POGLCompareMode::Enum compareMode)
 {
 	std::lock_guard<std::mutex> lock(mMutex);
 

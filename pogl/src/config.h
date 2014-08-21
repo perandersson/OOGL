@@ -52,6 +52,9 @@ typedef std::stringstream POGL_STRINGSTREAM;
 /* Atomic types */
 typedef std::atomic<POGL_UINT32> REF_COUNTER;
 
+/* UID type */
+typedef volatile POGL_UINT32 POGL_UID;
+
 #ifndef POGL_SAFE_RELEASE
 #define POGL_SAFE_RELEASE(x) if(x != nullptr) { x->Release(); x = nullptr; }
 #endif
