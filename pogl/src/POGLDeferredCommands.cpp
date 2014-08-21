@@ -290,11 +290,13 @@ void POGLResizeTexture2D_Release(POGL_HANDLE command)
 void POGLUniformSetInt_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)command;
-	state->FindUniformByName(cmd->name)->SetInt32(cmd->values, cmd->count);
+	const POGL_STRING& str = *cmd->name;
+	state->FindUniformByName(str)->SetInt32(cmd->values, cmd->count);
 }
 
 void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_MAT4_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MAT4_COMMAND_DATA*)command;
-	state->FindUniformByName(cmd->name)->SetMatrix(cmd->matrix);
+	const POGL_STRING& str = *cmd->name;
+	state->FindUniformByName(str)->SetMatrix(cmd->matrix);
 }

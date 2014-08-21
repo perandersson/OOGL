@@ -193,9 +193,14 @@ POGLSamplerObject* POGLProgram::GenSamplerObject(POGLRenderState* renderState)
 
 IPOGLUniform* POGLProgram::FindStateUniformByName(const POGL_CHAR* name)
 {
+	return FindStateUniformByName(POGL_STRING(name));
+}
+
+IPOGLUniform* POGLProgram::FindStateUniformByName(const POGL_STRING& name)
+{
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 
-	auto it = mUniforms.find(POGL_STRING(name));
+	auto it = mUniforms.find(name);
 	if (it == mUniforms.end()) {
 		return &POGL_UNIFORM_NOT_FOUND;
 	}

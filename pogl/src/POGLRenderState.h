@@ -89,6 +89,11 @@ public:
 	*/
 	void BindIndexBuffer(POGLIndexBuffer* buffer);
 
+	/*!
+		\brief Retrieves a uniform
+	*/
+	IPOGLUniform* FindUniformByName(const POGL_STRING& name);
+
 // IPOGLInterface
 public:
 	virtual void AddRef();

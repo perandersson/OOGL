@@ -16,7 +16,7 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a)
 {
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
-	strcpy(cmd->name, mName.c_str());
+	cmd->name = &mName;
 	cmd->values[0] = a;
 	cmd->count = 1;
 }
@@ -25,7 +25,7 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b)
 {
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
-	strcpy(cmd->name, mName.c_str());
+	cmd->name = &mName;
 	cmd->values[0] = a;
 	cmd->values[1] = b;
 	cmd->count = 2;
@@ -35,7 +35,7 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 {
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
-	strcpy(cmd->name, mName.c_str());
+	cmd->name = &mName;
 	cmd->values[0] = a;
 	cmd->values[1] = b;
 	cmd->values[2] = c;
@@ -46,7 +46,7 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POG
 {
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
-	strcpy(cmd->name, mName.c_str());
+	cmd->name = &mName;
 	cmd->values[0] = a;
 	cmd->values[1] = b;
 	cmd->values[2] = c;
@@ -61,7 +61,7 @@ void POGLDeferredUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
-	strcpy(cmd->name, mName.c_str());
+	cmd->name = &mName;
 	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
 		cmd->values[i] = (POGL_INT32)ptr[i];
 
@@ -147,7 +147,7 @@ void POGLDeferredUniform::SetMatrix(const POGL_MAT4& mat4)
 {
 	POGL_UNIFORM_SET_MAT4_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MAT4_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetMat4_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_MAT4_COMMAND_DATA));
-	strcpy(cmd->name, mName.c_str());
+	cmd->name = &mName;
 	cmd->matrix = mat4;
 }
 

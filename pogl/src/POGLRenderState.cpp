@@ -71,6 +71,11 @@ void POGLRenderState::Clear(POGL_UINT32 clearBits)
 	glClear(clear);
 }
 
+IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_STRING& name)
+{
+	return mProgram->FindStateUniformByName(name);
+}
+
 IPOGLUniform* POGLRenderState::FindUniformByName(const POGL_CHAR* name)
 {
 	return mProgram->FindStateUniformByName(name);

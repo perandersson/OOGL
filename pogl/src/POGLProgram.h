@@ -78,6 +78,11 @@ public:
 	*/
 	IPOGLUniform* FindStateUniformByName(const POGL_CHAR* name);
 
+	/*!
+		\brief Retrieves a uniform based on the given name
+	*/
+	IPOGLUniform* FindStateUniformByName(const POGL_STRING& name);
+
 // IPOGLProgram
 public:
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);

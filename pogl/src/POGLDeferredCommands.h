@@ -212,7 +212,7 @@ extern void POGLResizeTexture2D_Release(POGL_HANDLE command);
 struct POGL_UNIFORM_SET_INT_COMMAND_DATA
 {
 	// The name of the uniform
-	POGL_CHAR name[32];
+	const POGL_STRING* name;
 	
 	// The uniform value
 	POGL_INT32 values[4];
@@ -225,7 +225,7 @@ extern void POGLUniformSetInt_Command(POGLDeferredRenderContext* context, POGLRe
 struct POGL_UNIFORM_SET_MAT4_COMMAND_DATA
 {
 	// The name of the uniform
-	POGL_CHAR name[32];
+	const POGL_STRING* name;
 
 	// The uniform value
 	POGL_MAT4 matrix;
