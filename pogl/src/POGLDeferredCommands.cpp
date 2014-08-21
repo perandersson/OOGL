@@ -6,6 +6,7 @@
 #include "POGLRenderState.h"
 #include "POGLDeferredRenderContext.h"
 #include "POGLFramebuffer.h"
+#include "POGLProgram.h"
 #include "POGLEnum.h"
 
 void POGLNothing_Release(POGL_HANDLE)
@@ -227,7 +228,7 @@ void POGLSetViewport_Command(POGLDeferredRenderContext* context, POGLRenderState
 void POGLApplyProgram_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_APPLYPROGRAM_COMMAND* cmd = (POGL_APPLYPROGRAM_COMMAND*)command;
-	state->Apply(cmd->program);
+	state->Apply(cmd->program, cmd->data);
 }
 
 void POGLApplyProgram_Release(POGL_HANDLE command)

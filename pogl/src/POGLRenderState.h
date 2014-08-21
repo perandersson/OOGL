@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "POGLProgramData.h"
 #include <memory>
 
 class POGLRenderContext;
@@ -20,7 +21,12 @@ public:
 
 		\param program
 	*/
-	void Apply(IPOGLProgram* program);
+	void Apply(POGLProgram* program);
+
+	/*!
+		\brief Apply the supplied program and matching data
+	*/
+	void Apply(POGLProgram* program, const POGLProgramData& data);
 
 	/*!
 		\brief Check to see if the current program is of the supplied type

@@ -8,6 +8,7 @@
 #include "POGLTexture2D.h"
 #include "POGLDeferredRenderState.h"
 #include "POGLFramebuffer.h"
+#include "POGLProgram.h"
 
 POGLDeferredRenderContext::POGLDeferredRenderContext(IPOGLDevice* device)
 : mRefCount(1), mDevice(device), mRenderState(nullptr),
@@ -237,8 +238,10 @@ IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 
 	POGL_APPLYPROGRAM_COMMAND* cmd = (POGL_APPLYPROGRAM_COMMAND*)AddCommand(&POGLApplyProgram_Command, &POGLApplyProgram_Release,
 		sizeof(POGL_APPLYPROGRAM_COMMAND));
-	cmd->program = program;
+	cmd->program = static_cast<POGLProgram*>(program);
 	cmd->program->AddRef();
+	cmd->program->CopyProgramData(&cmd->data);
+
 	mRenderState->AddRef();
 	return mRenderState;
 }

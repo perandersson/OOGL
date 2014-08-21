@@ -309,7 +309,10 @@ void POGLRenderContext::CopyResource(IPOGLResource* source, IPOGLResource* desti
 
 IPOGLRenderState* POGLRenderContext::Apply(IPOGLProgram* program)
 {
-	mRenderState->Apply(program);
+	if (program == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing program");
+
+	mRenderState->Apply(static_cast<POGLProgram*>(program));
 	mRenderState->AddRef();
 	return mRenderState;
 }

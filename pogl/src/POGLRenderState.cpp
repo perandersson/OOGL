@@ -306,20 +306,23 @@ void POGLRenderState::SetViewport(const POGL_RECT& viewport)
 	CHECK_GL("Could not set viewport");
 }
 
-void POGLRenderState::Apply(IPOGLProgram* program)
+void POGLRenderState::Apply(POGLProgram* program)
 {
-	if (program == nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You are not allowed to apply a non-existing program");
+	// Retrieve the program data
+	POGLProgramData data;
+	program->CopyProgramData(&data);
 
+	// Apply the program with it's matching data
+	Apply(program, data);
+}
+
+void POGLRenderState::Apply(POGLProgram* program, const POGLProgramData& data)
+{
 	// Bind the program if neccessary
-	BindProgram(static_cast<POGLProgram*>(program));
+	BindProgram(program);
 
 	// Apply the global uniform values
 	mProgram->ApplyGlobalUniforms();
-
-	// Retrieve the program data
-	POGLProgramData data;
-	mProgram->CopyProgramData(&data);
 
 	//
 	// Update the render state with the (potentially) new properties

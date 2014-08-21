@@ -1,11 +1,13 @@
 #pragma once
 #include "config.h"
+#include "POGLProgramData.h"
 
 class POGLDeferredRenderContext;
 class POGLRenderState;
 class POGLVertexBuffer;
 class POGLTexture2D;
 class POGLFramebuffer;
+class POGLProgram;
 
 typedef void(*POGLCommandFuncPtr)(POGLDeferredRenderContext*, POGLRenderState*, POGL_HANDLE);
 typedef void(*POGLCommandReleaseFuncPtr)(POGL_HANDLE);
@@ -189,7 +191,11 @@ extern void POGLSetViewport_Command(POGLDeferredRenderContext* context, POGLRend
 
 struct POGL_APPLYPROGRAM_COMMAND
 {
-	IPOGLProgram* program;
+	// The program we want to apply
+	POGLProgram* program;
+
+	// The program state properties
+	POGLProgramData data;
 };
 extern void POGLApplyProgram_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLApplyProgram_Release(POGL_HANDLE command);
