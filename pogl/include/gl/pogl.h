@@ -11,7 +11,7 @@
 #include <cinttypes>
 
 #ifdef POGL_STATIC
-#	define POGLAPI 
+#	define POGLAPI
 #else
 #	if defined(WIN32)
 #		if defined(POGL_BUILD)
@@ -49,7 +49,7 @@
 #endif
 
 #ifndef BIT_ALL
-#define BIT_ALL ULONG_MAX
+#define BIT_ALL 0xFFFFFFFFUL
 #endif
 
 #ifndef BIT_NONE
@@ -57,10 +57,10 @@
 #endif
 
 #ifndef POGL_DECLARE_ALIGN
-#ifdef WIN32
+#if defined(_MSC_VER)
 #define POGL_DECLARE_ALIGN(x) __declspec(align(x))
-#else
-#error Add align declaration here
+#elif defined(__GNUC__)
+#define POGL_DECLARE_ALIGN(x) __attribute__ ((aligned(x)))
 #endif
 #endif
 
@@ -123,7 +123,7 @@ struct POGLAPI POGLDeviceInfoFlags
 {
 	enum Enum {
 		//
-		// This flag enables debug mode. Debug mode is differs depending on the graphics card you have. 
+		// This flag enables debug mode. Debug mode is differs depending on the graphics card you have.
 		// AMD, for example, enables us to attach CodeXL (a remote debugger) and change stuff in runtime
 		//
 		DEBUG_MODE = BIT(0)
@@ -589,11 +589,6 @@ typedef struct POGLAPI POGL_VECTOR3
 			POGL_FLOAT g;
 			POGL_FLOAT b;
 		};
-		struct {
-			POGL_FLOAT s;
-			POGL_FLOAT t;
-			POGL_FLOAT r;
-		};
 		POGL_FLOAT vec[3];
 	};
 
@@ -618,12 +613,6 @@ typedef struct POGLAPI POGL_VECTOR4
 			POGL_FLOAT g;
 			POGL_FLOAT b;
 			POGL_FLOAT a;
-		};
-		struct {
-			POGL_FLOAT s;
-			POGL_FLOAT t;
-			POGL_FLOAT r;
-			POGL_FLOAT q;
 		};
 		POGL_FLOAT vec[4];
 	};
@@ -657,7 +646,7 @@ struct POGLAPI POGL_RECT
 /*!
 	\brief A 4x4 matrix
 
-	Accessing the individual matrix values directly using the "m"- or "vec" field is column-major. If you 
+	Accessing the individual matrix values directly using the "m"- or "vec" field is column-major. If you
 	want to access the fields as if they are row-major then you can do:
 
 	{@code
@@ -695,11 +684,11 @@ struct POGLAPI POGL_MAT4
 		POGL_FLOAT vec[16];
 	};
 
-	POGL_MAT4() : 
+	POGL_MAT4() :
 		_11(1.0f), _21(0.0f), _31(0.0f), _41(0.0f),
 		_12(0.0f), _22(1.0f), _32(0.0f), _42(0.0f),
 		_13(0.0f), _23(0.0f), _33(1.0f), _43(0.0f),
-		_14(0.0f), _24(0.0f), _34(0.0f), _44(1.0f) 
+		_14(0.0f), _24(0.0f), _34(0.0f), _44(1.0f)
 	{}
 
 	POGL_MAT4(const POGL_MAT4& rhs) :
@@ -812,7 +801,7 @@ struct POGLAPI POGL_POSITION_COLOR_VERTEX
 
 /* Vertex layout for the POGL_POSITION_COLOR_VERTEX struct. */
 static const POGL_VERTEX_LAYOUT POGL_POSITION_COLOR_VERTEX_LAYOUT = {
-	{ 
+	{
 		{ sizeof(POGL_VECTOR3), POGLVertexType::FLOAT, false },
 		{ sizeof(POGL_COLOR4), POGLVertexType::FLOAT, false },
 		0
@@ -837,9 +826,9 @@ struct POGLAPI POGL_POSITION_TEXCOORD_VERTEX
 
 /* Vertex layout for the POGL_POSITION_TEXCOORD_VERTEX struct. */
 static const POGL_VERTEX_LAYOUT POGL_POSITION_TEXCOORD_VERTEX_LAYOUT = {
-	{ 
+	{
 		{ sizeof(POGL_VECTOR3), POGLVertexType::FLOAT, false },
-		{ 0 }, 
+		{ 0 },
 		{ sizeof(POGL_VECTOR2), POGLVertexType::FLOAT, false },
 		0
 	},
@@ -857,7 +846,7 @@ public:
 
 	/*!
 		\brief Increase the reference counter with 1
-		
+
 		Reference counters are used internally to prevent resources from being deleted when they are in use
 	*/
 	virtual void AddRef() = 0;
@@ -883,7 +872,7 @@ public:
 };
 
 /*!
-	\brief 
+	\brief
 */
 class POGLAPI IPOGLDevice : public IPOGLInterface
 {
@@ -896,7 +885,7 @@ public:
 		\return A device context
 	*/
 	virtual IPOGLRenderContext* GetRenderContext() = 0;
-	
+
 	/*!
 		\brief Creates a new deferred device context
 
@@ -924,7 +913,7 @@ public:
 };
 
 /*!
-	\brief 
+	\brief
 */
 class POGLAPI IPOGLRenderContext : public IPOGLInterface
 {
@@ -933,7 +922,7 @@ public:
 		\brief Retrieves the device
 	*/
 	virtual IPOGLDevice* GetDevice() = 0;
-	
+
 	/*!
 		\brief Creates a shader based on the supplied file
 
@@ -966,12 +955,12 @@ public:
 		\brief Creates a GPU program based on the supplied shaders
 
 		\param shaders
-				The shaders we want to link when creating the program. The array must end with a nullptr or 0. 
+				The shaders we want to link when creating the program. The array must end with a nullptr or 0.
 				{@code
 					IPOGLShader** shaders = {shader1, shader2, nullptr};
 					IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
 				}
-		\throwd POGLResourceException 
+		\throwd POGLResourceException
 				Exception is thrown if the exception failed to be loaded by some reason.
 		\return A GPU program that you can use when render geometry onto the screen
 	*/
@@ -999,7 +988,7 @@ public:
 		\brief Creates a 3D texture
 	*/
 	virtual IPOGLTexture3D* CreateTexture3D() = 0;
-	
+
 	/*!
 		\brief Resize the supplied texture
 
@@ -1009,12 +998,12 @@ public:
 				The new texture size
 	*/
 	virtual void ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE& size) = 0;
-	
+
 	/*!
 		\brief Creates a framebuffer that renders to the supplied textures
 
 		\param textures
-				The textures we want to use for the framebuffer. The array must end with a nullptr or 0. 
+				The textures we want to use for the framebuffer. The array must end with a nullptr or 0.
 				{@code
 					IPOGLTexture** textures = {texture1, texture2, nullptr};
 					context->CreateFramebuffer(textures);
@@ -1025,9 +1014,9 @@ public:
 
 	/*!
 		\brief Creates a framebuffer that renders to the supplied textures
-		
+
 		\param textures
-				The textures we want to use for the framebuffer. The array must end with a nullptr or 0. 
+				The textures we want to use for the framebuffer. The array must end with a nullptr or 0.
 				{@code
 					IPOGLTexture** textures = {texture1, texture2, nullptr};
 					context->CreateFramebuffer(textures);
@@ -1049,7 +1038,7 @@ public:
 		\return
 	*/
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
-	
+
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
 
@@ -1060,7 +1049,7 @@ public:
 		\return
 	*/
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
-	
+
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
 
@@ -1071,7 +1060,7 @@ public:
 		\return
 	*/
 	virtual IPOGLVertexBuffer* CreateVertexBuffer(const POGL_POSITION_COLOR_VERTEX* memory, POGL_UINT32 memorySize, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage) = 0;
-	
+
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
 
@@ -1092,7 +1081,7 @@ public:
 		\param bufferUsage
 	*/
 	virtual IPOGLIndexBuffer* CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage) = 0;
-	
+
 	/*!
 		\brief Clones the supplied resource and returns a new resource based of it
 
@@ -1112,7 +1101,7 @@ public:
 				Resource where the data will be copied to
 	*/
 	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination) = 0;
-	
+
 	/*!
 		\brief Copy the source resource into the destination resource
 
@@ -1127,7 +1116,7 @@ public:
 		\param size
 				How many bytes we are trying to copy
 		\throw POGLResourceException
-				If the source or destination buffer is invalid. If the sourceOffset + size is larger than the source resources memory. If 
+				If the source or destination buffer is invalid. If the sourceOffset + size is larger than the source resources memory. If
 				the destinationOffset + size is larger than the destination resource memory.
 	*/
 	virtual void CopyResource(IPOGLResource* source, IPOGLResource* destination, POGL_UINT32 sourceOffset, POGL_UINT32 destinationOffset, POGL_UINT32 size) = 0;
@@ -1144,10 +1133,10 @@ public:
 		\brief Map the data to a memory location and return a pointer to it
 	*/
 	virtual void* Map(IPOGLResource* resource, POGLResourceMapType::Enum e) = 0;
-	
+
 	/*!
 		\brief Map parts of the data to a memory location and return a pointer to it
-		
+
 		\param offset
 				The offset, in bytes, where we want to start saving the data
 		\param length
@@ -1197,9 +1186,9 @@ public:
 	virtual void ExecuteCommands(IPOGLRenderContext* context, bool clearCommands) = 0;
 
 	/*!
-		\brief Flush this command queue 
+		\brief Flush this command queue
 
-		Use this method when all the calls are complete for this context. 
+		Use this method when all the calls are complete for this context.
 	*/
 	virtual void Flush() = 0;
 };
@@ -1218,7 +1207,7 @@ public:
 		\param minFilter
 	*/
 	virtual void SetMinFilter(POGLMinFilter::Enum minFilter) = 0;
-	
+
 	/*!
 		\brief Set the Mag Filter
 
@@ -1230,12 +1219,12 @@ public:
 		\brief Set the texture warpping
 	*/
 	virtual void SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t) = 0;
-	
+
 	/*!
 		\brief Set the texture warpping
 	*/
 	virtual void SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r) = 0;
-	
+
 	/*!
 		\brief Set the compare function
 	*/
@@ -1293,7 +1282,7 @@ public:
 /*!
 	\brief Interface representing a shader resource
 
-	A shader resource is a part of a GPU program. By linking one or many shaders using the 
+	A shader resource is a part of a GPU program. By linking one or many shaders using the
 	IPOGLRenderContext you get a GPU program
 */
 class POGLAPI IPOGLShader : public IPOGLResource
@@ -1309,7 +1298,7 @@ public:
 */
 class POGLAPI IPOGLProgram : public IPOGLResource
 {
-public:	
+public:
 	/*!
 		\brief Locate the uniform with the given name
 	*/
@@ -1330,7 +1319,7 @@ public:
 			TRUE or FALSE
 	*/
 	virtual void SetDepthTest(bool b) = 0;
-	
+
 	/*!
 		\brief
 
@@ -1345,14 +1334,14 @@ public:
 		\brief
 	*/
 	virtual POGLDepthFunc::Enum GetDepthFunc() = 0;
-	
+
 	/*!
 		\brief
 	*/
 	virtual bool GetDepthMask() = 0;
 
 	/*!
-		\brief 
+		\brief
 
 		This effect needs to be re-applied for the change to come into effect. If you
 		want the change to be applied directly then call IPOGLRenderState::SetDepthMask(bool) instead.
@@ -1361,7 +1350,7 @@ public:
 			TRUE or FALSE
 	*/
 	virtual void SetDepthMask(bool b) = 0;
-	
+
 	/*!
 		\brief
 	*/
@@ -1378,7 +1367,7 @@ public:
 	virtual bool GetStencilTest() = 0;
 
 	/*!
-		\brief 
+		\brief
 
 		This effect needs to be re-applied for the change to come into effect. If you
 		want the change to be applied directly then call IPOGLRenderState::SetStencilTest(bool) instead.
@@ -1389,7 +1378,7 @@ public:
 	virtual void SetStencilTest(bool b) = 0;
 
 	/*!
-		\brief 
+		\brief
 	*/
 	virtual POGL_UINT32 GetStencilMask() = 0;
 
@@ -1414,7 +1403,7 @@ public:
 	virtual void SetBlend(bool b) = 0;
 
 	/*!
-		\brief 
+		\brief
 
 		\param e
 	*/
@@ -1467,7 +1456,7 @@ public:
 		\param vertexBuffer
 	*/
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer) = 0;
-	
+
 	/*!
 		\brief Draw the entire vertex buffer using the supplied index buffer
 
@@ -1475,7 +1464,7 @@ public:
 		\param indexBuffer
 	*/
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer) = 0;
-	
+
 	/*!
 		\brief Draw the entire vertex buffer using the supplied index buffer
 
@@ -1484,7 +1473,7 @@ public:
 		\param startIndex
 	*/
 	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex) = 0;
-	
+
 	/*!
 		\brief Draw the entire vertex buffer using the supplied index buffer
 
@@ -1504,7 +1493,7 @@ public:
 		\brief
 	*/
 	virtual void SetDepthFunc(POGLDepthFunc::Enum depthFunc) = 0;
-	
+
 	/*!
 		\brief
 	*/
@@ -1514,9 +1503,9 @@ public:
 		\brief
 	*/
 	virtual void SetColorMask(POGL_UINT8 colorMask) = 0;
-	
+
 	/*!
-		\brief 
+		\brief
 
 		\param b
 			TRUE or FALSE
@@ -1539,7 +1528,7 @@ public:
 		\brief
 	*/
 	virtual void SetBlend(bool b) = 0;
-	
+
 	/*!
 		\brief
 
@@ -1605,7 +1594,7 @@ class POGLAPI IPOGLTexture3D : public IPOGLTexture
 {
 public:
 	virtual POGL_UINT32 GetDepth() const = 0;
-	
+
 	/*!
 		\brief Retrieves the size (width and height) of this texture in pixels
 	*/
