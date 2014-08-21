@@ -404,3 +404,11 @@ void POGLUniformSetTexture_Release(POGL_HANDLE command)
 	if (cmd->texture != nullptr)
 		cmd->texture->Release();
 }
+
+void POGLUniformSetMinFilter_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->GetSamplerState()->SetMinFilter(cmd->minFilter);
+}

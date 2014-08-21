@@ -291,7 +291,10 @@ void POGLDeferredUniform::SetTexture(IPOGLTexture* texture)
 
 void POGLDeferredUniform::SetMinFilter(POGLMinFilter::Enum minFilter)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetMinFilter_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->minFilter = minFilter;
 }
 
 void POGLDeferredUniform::SetMagFilter(POGLMagFilter::Enum magFilter)

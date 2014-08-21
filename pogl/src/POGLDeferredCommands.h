@@ -282,3 +282,12 @@ struct POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA
 extern void POGLUniformSetTexture_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLUniformSetTexture_Release(POGL_HANDLE command);
 
+struct POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGLMinFilter::Enum minFilter;
+};
+extern void POGLUniformSetMinFilter_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
