@@ -301,6 +301,12 @@ void POGLUniformSetUInt_Command(POGLDeferredRenderContext* context, POGLRenderSt
 	state->FindUniformByName(str)->SetUInt32(cmd->values, cmd->count);
 }
 
+void POGLUniformSetFloat_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	state->FindUniformByName(str)->SetFloat(cmd->values, cmd->count);
+}
 void POGLUniformSetMat4_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_UNIFORM_SET_MAT4_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MAT4_COMMAND_DATA*)command;

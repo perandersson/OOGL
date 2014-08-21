@@ -84,7 +84,7 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 	cmd->name = &mName;
 	cmd->values[0] = a;
 	cmd->values[1] = b;
-	cmd->count = 1;
+	cmd->count = 2;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
@@ -95,7 +95,7 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 	cmd->values[0] = a;
 	cmd->values[1] = b;
 	cmd->values[2] = c;
-	cmd->count = 1;
+	cmd->count = 3;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
@@ -107,7 +107,7 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c,
 	cmd->values[1] = b;
 	cmd->values[2] = c;
 	cmd->values[3] = d;
-	cmd->count = 1;
+	cmd->count = 4;
 }
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
@@ -125,27 +125,57 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->count = 1;
 }
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->count = 2;
 }
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->values[2] = c;
+	cmd->count = 3;
 }
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->values[0] = a;
+	cmd->values[1] = b;
+	cmd->values[2] = c;
+	cmd->values[3] = d;
+	cmd->count = 4;
 }
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	const POGL_UINT32 clampedCount = count > 4 ? 4 : count;
+
+	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
+	cmd->name = &mName;
+	for (POGL_UINT32 i = 0; i < clampedCount; ++i)
+		cmd->values[i] = ptr[i];
+
+	cmd->count = clampedCount;
 }
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a)
