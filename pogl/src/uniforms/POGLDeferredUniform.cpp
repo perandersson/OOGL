@@ -307,20 +307,35 @@ void POGLDeferredUniform::SetMagFilter(POGLMagFilter::Enum magFilter)
 
 void POGLDeferredUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetTextureWrapST_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->textureWrap[0] = s;
+	cmd->textureWrap[1] = t;
 }
 
 void POGLDeferredUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t, POGLTextureWrap::Enum r)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetTextureWrapSTR_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->textureWrap[0] = s;
+	cmd->textureWrap[1] = t;
+	cmd->textureWrap[2] = r;
 }
 
 void POGLDeferredUniform::SetCompareFunc(POGLCompareFunc::Enum compareFunc)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SETCOMPAREFUNC_COMMAND_DATA* cmd = (POGL_UNIFORM_SETCOMPAREFUNC_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetCompareFunc_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SETCOMPAREFUNC_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->compareFunc = compareFunc;
 }
 
 void POGLDeferredUniform::SetCompareMode(POGLCompareMode::Enum compareMode)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA* cmd = (POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetCompareMode_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->compareMode = compareMode;
 }

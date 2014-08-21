@@ -301,3 +301,34 @@ struct POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA
 	POGLMagFilter::Enum magFilter;
 };
 extern void POGLUniformSetMagFilter_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+struct POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGLTextureWrap::Enum textureWrap[3];
+};
+extern void POGLUniformSetTextureWrapST_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLUniformSetTextureWrapSTR_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+struct POGL_UNIFORM_SETCOMPAREFUNC_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGLCompareFunc::Enum compareFunc;
+};
+extern void POGLUniformSetCompareFunc_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+struct POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGLCompareMode::Enum compareMode;
+};
+extern void POGLUniformSetCompareMode_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);

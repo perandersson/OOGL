@@ -420,3 +420,35 @@ void POGLUniformSetMagFilter_Command(POGLDeferredRenderContext* context, POGLRen
 	auto uniform = state->FindUniformByName(str);
 	uniform->GetSamplerState()->SetMagFilter(cmd->magFilter);
 }
+
+void POGLUniformSetTextureWrapST_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->GetSamplerState()->SetTextureWrap(cmd->textureWrap[0], cmd->textureWrap[1]);
+}
+
+void POGLUniformSetTextureWrapSTR_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTUREWRAP_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->GetSamplerState()->SetTextureWrap(cmd->textureWrap[0], cmd->textureWrap[1], cmd->textureWrap[2]);
+}
+
+void POGLUniformSetCompareFunc_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SETCOMPAREFUNC_COMMAND_DATA* cmd = (POGL_UNIFORM_SETCOMPAREFUNC_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->GetSamplerState()->SetCompareFunc(cmd->compareFunc);
+}
+
+void POGLUniformSetCompareMode_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA* cmd = (POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->GetSamplerState()->SetCompareMode(cmd->compareMode);
+}
