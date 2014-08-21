@@ -26,7 +26,7 @@ namespace {
 static POGLUniformNotFound POGL_UNIFORM_NOT_FOUND;
 
 POGLProgram::POGLProgram()
-: mRefCount(1), mProgramID(0), mUID(0), mData(new POGLProgramData)
+: mRefCount(1), mProgramID(0), mUID(0)
 {
 }
 
@@ -58,11 +58,6 @@ void POGLProgram::Release()
 		if (mProgramID != 0) {
 			glDeleteProgram(mProgramID);
 			mProgramID = 0;
-		}
-
-		if (mData != nullptr) {
-			delete mData;
-			mData = nullptr;
 		}
 
 		delete this;
@@ -233,115 +228,115 @@ POGLResourceType::Enum POGLProgram::GetType() const
 bool POGLProgram::GetDepthTest()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->depthTest;
+	return mData.depthTest;
 }
 
 void POGLProgram::SetDepthTest(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->depthTest = b;
+	mData.depthTest = b;
 }
 
 void POGLProgram::SetDepthFunc(POGLDepthFunc::Enum depthFunc)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->depthFunc = depthFunc;
+	mData.depthFunc = depthFunc;
 }
 
 POGLDepthFunc::Enum POGLProgram::GetDepthFunc()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->depthFunc;
+	return mData.depthFunc;
 }
 
 bool POGLProgram::GetDepthMask()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->depthMask;
+	return mData.depthMask;
 }
 
 void POGLProgram::SetDepthMask(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->depthMask = b;
+	mData.depthMask = b;
 }
 
 POGL_UINT8 POGLProgram::GetColorMask()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->colorMask;
+	return mData.colorMask;
 }
 
 void POGLProgram::SetColorMask(POGL_UINT8 colorMask)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->colorMask = colorMask;
+	mData.colorMask = colorMask;
 }
 
 bool POGLProgram::GetStencilTest()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->stencilTest;
+	return mData.stencilTest;
 }
 
 void POGLProgram::SetStencilTest(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->stencilTest = b;
+	mData.stencilTest = b;
 }
 
 POGL_UINT32 POGLProgram::GetStencilMask()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->stencilMask;
+	return mData.stencilMask;
 }
 
 void POGLProgram::SetStencilMask(POGL_UINT32 mask)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->stencilMask = mask;
+	mData.stencilMask = mask;
 }
 
 void POGLProgram::SetBlendFunc(POGLSrcFactor::Enum sfactor, POGLDstFactor::Enum dfactor)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->srcFactor = sfactor;
-	mData->dstFactor = dfactor;
+	mData.srcFactor = sfactor;
+	mData.dstFactor = dfactor;
 }
 
 void POGLProgram::SetBlend(bool b)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->blending = b;
+	mData.blending = b;
 }
 
 void POGLProgram::SetFrontFace(POGLFrontFace::Enum e)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->frontFace = e;
+	mData.frontFace = e;
 }
 
 POGLFrontFace::Enum POGLProgram::GetFrontFace()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->frontFace;
+	return mData.frontFace;
 }
 
 void POGLProgram::SetCullFace(POGLCullFace::Enum e)
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	mData->cullFace = e;
+	mData.cullFace = e;
 }
 
 POGLCullFace::Enum POGLProgram::GetCullFace()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	return mData->cullFace;
+	return mData.cullFace;
 }
 
 void POGLProgram::CopyProgramData(POGLProgramData* _out_Data)
 {
 	assert_not_null(_out_Data);
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
-	*_out_Data = *mData;
+	*_out_Data = mData;
 }

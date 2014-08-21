@@ -129,7 +129,7 @@ private:
 	GLuint mProgramID;
 	POGL_UID mUID;
 	std::recursive_mutex mMutex;
-	POGLProgramData* mData;
+	POGLProgramData mData;
 
 	Uniforms mUniforms;
 	StaticUniforms mStaticUniforms;
