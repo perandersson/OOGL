@@ -325,7 +325,7 @@ void POGLRenderState::Apply(POGLProgram* program, const POGLProgramData& data)
 	BindProgram(program);
 
 	// Apply the global uniform values
-	mProgram->ApplyGlobalUniforms();
+	mProgram->ApplyStaticUniforms();
 
 	//
 	// Update the render state with the (potentially) new properties

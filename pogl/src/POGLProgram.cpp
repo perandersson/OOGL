@@ -160,7 +160,7 @@ void POGLProgram::ApplyStateUniforms()
 	CHECK_GL("Could not apply uniforms");
 }
 
-void POGLProgram::ApplyGlobalUniforms()
+void POGLProgram::ApplyStaticUniforms()
 {
 	std::lock_guard<std::recursive_mutex> lock(mMutex);
 

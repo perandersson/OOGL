@@ -46,32 +46,12 @@ IPOGLShader* POGLRenderContext::CreateShaderFromFile(const POGL_CHAR* path, POGL
 
 IPOGLShader* POGLRenderContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
 {
-	if (size == 0 || memory == nullptr)
-		THROW_EXCEPTION(POGLResourceException, "You cannot generate a non-existing shader");
+	// Generate a shader ID based on the supplied memory, size and type
+	const GLuint shaderID = POGLFactory::CreateShader(memory, size, type);
 
-	const GLuint shaderID = glCreateShader(POGLEnum::Convert(type));
-	glShaderSource(shaderID, 1, (const GLchar**)&memory, (const GLint*)&size);
-	glCompileShader(shaderID);
-
-	GLint status = 0;
-	glGetShaderiv(shaderID, GL_COMPILE_STATUS, &status);
-	if (!status) {
-		GLchar infoLogg[2048];
-		glGetShaderInfoLog(shaderID, 2048, NULL, infoLogg);
-		glDeleteShader(shaderID);
-		switch (type) {
-		case POGLShaderType::GEOMETRY_SHADER:
-			THROW_EXCEPTION(POGLResourceException, "Could not compile geometry shader. Reason: '%s'", infoLogg);
-		case POGLShaderType::VERTEX_SHADER:
-			THROW_EXCEPTION(POGLResourceException, "Could not compile vertex shader. Reason: '%s'", infoLogg);
-		case POGLShaderType::FRAGMENT_SHADER:
-			THROW_EXCEPTION(POGLResourceException, "Could not compile fragment shader. Reason: '%s'", infoLogg);
-		default:
-			THROW_EXCEPTION(POGLResourceException, "Could not compile shader. Reason: '%s'", infoLogg);
-		}
-	}
-
-	return new POGLShader(shaderID, type);
+	POGLShader* shader = new POGLShader(type);
+	shader->PostConstruct(shaderID);
+	return shader;
 }
 
 IPOGLProgram* POGLRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)

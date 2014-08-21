@@ -4,8 +4,15 @@
 class POGLShader : public IPOGLShader
 {
 public:
-	POGLShader(GLuint shaderID, POGLShaderType::Enum shaderType);
+	POGLShader(POGLShaderType::Enum shaderType);
 	virtual ~POGLShader();
+
+	/*!
+		\brief Method called when this object is constructed by the immediately render context
+
+		\param shaderID
+	*/
+	void PostConstruct(GLuint shaderID);
 	
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer

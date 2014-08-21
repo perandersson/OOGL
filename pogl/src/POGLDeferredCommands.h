@@ -7,6 +7,7 @@ class POGLRenderState;
 class POGLVertexBuffer;
 class POGLTexture2D;
 class POGLFramebuffer;
+class POGLShader;
 class POGLProgram;
 
 typedef void(*POGLCommandFuncPtr)(POGLDeferredRenderContext*, POGLRenderState*, POGL_HANDLE);
@@ -72,6 +73,20 @@ struct POGL_CREATETEXTURE2D_COMMAND_DATA
 };
 extern void POGLCreateTexture2D_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLCreateTexture2D_Release(POGL_HANDLE command);
+
+struct POGL_CREATESHADER_COMMAND_DATA
+{
+	// The shader
+	POGLShader* shader;
+
+	// The offset where the data begins
+	POGL_UINT32 memoryOffset;
+
+	// The size (in bytes) of the shader buffer data
+	POGL_UINT32 dataSize;
+};
+extern void POGLCreateShader_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLCreateShader_Release(POGL_HANDLE command);
 
 struct POGL_MAPVERTEXBUFFER_COMMAND_DATA
 {

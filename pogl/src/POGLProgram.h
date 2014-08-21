@@ -64,7 +64,7 @@ public:
 	/*!
 		\brief Apply the global uniform properties
 	*/
-	void ApplyGlobalUniforms();
+	void ApplyStaticUniforms();
 	
 	/*!
 		\brief Generate a sampler object based on the supplied property

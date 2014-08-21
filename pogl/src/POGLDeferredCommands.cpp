@@ -6,6 +6,7 @@
 #include "POGLRenderState.h"
 #include "POGLDeferredRenderContext.h"
 #include "POGLFramebuffer.h"
+#include "POGLShader.h"
 #include "POGLProgram.h"
 #include "POGLEnum.h"
 
@@ -88,6 +89,20 @@ void POGLCreateTexture2D_Release(POGL_HANDLE command)
 {
 	POGL_CREATETEXTURE2D_COMMAND_DATA* cmd = (POGL_CREATETEXTURE2D_COMMAND_DATA*)command;
 	cmd->texture->Release();
+}
+
+void POGLCreateShader_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_CREATESHADER_COMMAND_DATA* cmd = (POGL_CREATESHADER_COMMAND_DATA*)command;
+	const POGL_HANDLE memory = context->GetMapPointer(cmd->memoryOffset);
+	const GLuint shaderID = POGLFactory::CreateShader((const POGL_CHAR*)memory, cmd->dataSize, cmd->shader->GetShaderType());
+	cmd->shader->PostConstruct(shaderID);
+}
+
+void POGLCreateShader_Release(POGL_HANDLE command)
+{
+	POGL_CREATESHADER_COMMAND_DATA* cmd = (POGL_CREATESHADER_COMMAND_DATA*)command;
+	cmd->shader->Release();
 }
 
 void POGLMapVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)

@@ -8,6 +8,7 @@
 #include "POGLTexture2D.h"
 #include "POGLDeferredRenderState.h"
 #include "POGLFramebuffer.h"
+#include "POGLShader.h"
 #include "POGLProgram.h"
 
 POGLDeferredRenderContext::POGLDeferredRenderContext(IPOGLDevice* device)
@@ -84,12 +85,30 @@ IPOGLDevice* POGLDeferredRenderContext::GetDevice()
 
 IPOGLShader* POGLDeferredRenderContext::CreateShaderFromFile(const POGL_CHAR* path, POGLShaderType::Enum type)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_ISTREAM stream(path);
+	if (!stream.is_open())
+		THROW_EXCEPTION(POGLResourceException, "Shader at path: '%s' could not be found", path);
+
+	// Read the entire file into memory
+	POGL_STRING str((std::istreambuf_iterator<POGL_CHAR>(stream)), std::istreambuf_iterator<POGL_CHAR>());
+	return CreateShaderFromMemory(str.c_str(), str.length(), type);
 }
 
 IPOGLShader* POGLDeferredRenderContext::CreateShaderFromMemory(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	if (size == 0 || memory == nullptr)
+		THROW_EXCEPTION(POGLResourceException, "You cannot generate a non-existing shader");
+
+	POGL_CREATESHADER_COMMAND_DATA* cmd = (POGL_CREATESHADER_COMMAND_DATA*)AddCommand(&POGLCreateShader_Command, &POGLCreateShader_Release,
+		sizeof(POGL_CREATESHADER_COMMAND_DATA));
+	cmd->dataSize = size;
+	cmd->memoryOffset = GetMapOffset(size);
+	memcpy(GetMapPointer(cmd->memoryOffset), memory, size);
+	
+	POGLShader* shader = new POGLShader(type);
+	cmd->shader = shader;
+	cmd->shader->AddRef();
+	return shader;
 }
 
 IPOGLProgram* POGLDeferredRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)

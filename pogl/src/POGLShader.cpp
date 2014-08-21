@@ -8,13 +8,19 @@ namespace {
 	}
 }
 
-POGLShader::POGLShader(GLuint shaderID, POGLShaderType::Enum shaderType)
-: mRefCount(1), mUID(GenShaderProgramUID()), mShaderID(shaderID), mShaderType(shaderType)
+POGLShader::POGLShader(POGLShaderType::Enum shaderType)
+: mRefCount(1), mUID(0), mShaderID(0), mShaderType(shaderType)
 {
 }
 
 POGLShader::~POGLShader()
 {
+}
+
+void POGLShader::PostConstruct(GLuint shaderID)
+{
+	mShaderID = shaderID;
+	mUID = GenShaderProgramUID();
 }
 
 void POGLShader::AddRef()
