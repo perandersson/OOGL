@@ -412,3 +412,11 @@ void POGLUniformSetMinFilter_Command(POGLDeferredRenderContext* context, POGLRen
 	auto uniform = state->FindUniformByName(str);
 	uniform->GetSamplerState()->SetMinFilter(cmd->minFilter);
 }
+
+void POGLUniformSetMagFilter_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA*)command;
+	const POGL_STRING& str = *cmd->name;
+	auto uniform = state->FindUniformByName(str);
+	uniform->GetSamplerState()->SetMagFilter(cmd->magFilter);
+}

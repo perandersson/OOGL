@@ -291,3 +291,13 @@ struct POGL_UNIFORM_SET_MINFILTER_COMMAND_DATA
 	POGLMinFilter::Enum minFilter;
 };
 extern void POGLUniformSetMinFilter_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+
+struct POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA
+{
+	// The name of the uniform
+	const POGL_STRING* name;
+
+	// The uniform value
+	POGLMagFilter::Enum magFilter;
+};
+extern void POGLUniformSetMagFilter_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);

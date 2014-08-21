@@ -299,7 +299,10 @@ void POGLDeferredUniform::SetMinFilter(POGLMinFilter::Enum minFilter)
 
 void POGLDeferredUniform::SetMagFilter(POGLMagFilter::Enum magFilter)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetMagFilter_Command, &POGLNothing_Release,
+		sizeof(POGL_UNIFORM_SET_MAGFILTER_COMMAND_DATA));
+	cmd->name = &mName;
+	cmd->magFilter = magFilter;
 }
 
 void POGLDeferredUniform::SetTextureWrap(POGLTextureWrap::Enum s, POGLTextureWrap::Enum t)
