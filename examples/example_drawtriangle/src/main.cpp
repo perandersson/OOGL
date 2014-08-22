@@ -128,7 +128,7 @@ int main()
 			// The IPOGLRenderState will prevent uneccessary state changes if you call this method multiple times with the same vertex buffer
 			//
 
-			state->Bind(vertexBuffer);
+			state->BindBuffer(vertexBuffer);
 
 			//
 			// Draw the triangle vertex buffer. This will automatically bind the vertex buffer if it's not already bound

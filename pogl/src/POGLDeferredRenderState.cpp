@@ -90,7 +90,7 @@ void POGLDeferredRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 	}
 }
 
-void POGLDeferredRenderState::Bind(IPOGLVertexBuffer* vertexBuffer)
+void POGLDeferredRenderState::BindBuffer(IPOGLVertexBuffer* vertexBuffer)
 {
 	POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(vertexBuffer);
 	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;
@@ -103,7 +103,7 @@ void POGLDeferredRenderState::Bind(IPOGLVertexBuffer* vertexBuffer)
 	}
 }
 
-void POGLDeferredRenderState::Bind(IPOGLIndexBuffer* indexBuffer)
+void POGLDeferredRenderState::BindBuffer(IPOGLIndexBuffer* indexBuffer)
 {
 	POGLIndexBuffer* impl = static_cast<POGLIndexBuffer*>(indexBuffer);
 	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;

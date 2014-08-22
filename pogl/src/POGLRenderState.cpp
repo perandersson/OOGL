@@ -124,13 +124,13 @@ void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 	mFramebufferUID = uid;
 }
 
-void POGLRenderState::Bind(IPOGLVertexBuffer* vertexBuffer)
+void POGLRenderState::BindBuffer(IPOGLVertexBuffer* vertexBuffer)
 {
 	POGLVertexBuffer* buffer = static_cast<POGLVertexBuffer*>(vertexBuffer);
 	BindVertexBuffer(buffer);
 }
 
-void POGLRenderState::Bind(IPOGLIndexBuffer* indexBuffer)
+void POGLRenderState::BindBuffer(IPOGLIndexBuffer* indexBuffer)
 {
 	POGLIndexBuffer* buffer = static_cast<POGLIndexBuffer*>(indexBuffer);
 	BindIndexBuffer(buffer);

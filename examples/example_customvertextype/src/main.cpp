@@ -133,7 +133,7 @@ int main()
 			//
 			// Draw the vertex buffer in the same way as normal
 			//
-			state->Bind(vertexBuffer);
+			state->BindBuffer(vertexBuffer);
 			state->Draw();
 
 			state->Release();

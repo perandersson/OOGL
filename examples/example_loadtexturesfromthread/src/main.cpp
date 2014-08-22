@@ -144,8 +144,8 @@ int main()
 			textureUniform->SetTexture(texture0);
 			translateUniform->SetFloat(-1.0f, 1.0f);
 			scaleUniform->SetFloat(0.5f, 0.5f);
-			state->Bind(fullscreenVB);
-			state->Bind(fullscreenIB);
+			state->BindBuffer(fullscreenVB);
+			state->BindBuffer(fullscreenIB);
 			state->Draw();
 
 			textureUniform->SetTexture(texture1);

@@ -1466,12 +1466,12 @@ public:
 	/*!
 		\brief Bind the supplied vertex buffer
 	*/
-	virtual void Bind(IPOGLVertexBuffer* vertexBuffer) = 0;
+	virtual void BindBuffer(IPOGLVertexBuffer* vertexBuffer) = 0;
 
 	/*!
 		\brief Bind the supplied vertex buffer
 	*/
-	virtual void Bind(IPOGLIndexBuffer* indexBuffer) = 0;
+	virtual void BindBuffer(IPOGLIndexBuffer* indexBuffer) = 0;
 	
 	/*!
 		\brief Draw the bound buffers

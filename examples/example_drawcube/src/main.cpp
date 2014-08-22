@@ -127,8 +127,8 @@ int main()
 			// Bind the vertex- and index buffer
 			//
 
-			state->Bind(vertexBuffer);
-			state->Bind(indexBuffer);
+			state->BindBuffer(vertexBuffer);
+			state->BindBuffer(indexBuffer);
 
 			//
 			// Draw the box

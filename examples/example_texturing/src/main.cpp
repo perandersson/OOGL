@@ -72,8 +72,8 @@ int main()
 
 			state->FindUniformByName("Texture")->SetTexture(texture);
 
-			state->Bind(vertexBuffer);
-			state->Bind(indexBuffers);
+			state->BindBuffer(vertexBuffer);
+			state->BindBuffer(indexBuffers);
 			state->Draw();
 			state->Release();
 			device->EndFrame();

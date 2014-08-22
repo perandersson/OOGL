@@ -77,14 +77,14 @@ int main()
 			// Bind the normal vertex buffer and draw it onto the screen
 			//
 
-			state->Bind(vertexBuffer);
+			state->BindBuffer(vertexBuffer);
 			state->Draw();
 
 			//
 			// Bind the inverted vertex buffer and draw it onto the screen
 			//
 
-			state->Bind(vertexBufferInv);
+			state->BindBuffer(vertexBufferInv);
 			state->Draw();
 
 			//
