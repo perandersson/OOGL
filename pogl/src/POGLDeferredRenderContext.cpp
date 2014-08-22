@@ -343,16 +343,6 @@ void POGLDeferredRenderContext::SetViewport(const POGL_RECT& viewport)
 	mRenderState->SetViewport(viewport);
 }
 
-void POGLDeferredRenderContext::Bind(IPOGLVertexBuffer* vertexBuffer)
-{
-	mRenderState->Bind(vertexBuffer);
-}
-
-void POGLDeferredRenderContext::Bind(IPOGLIndexBuffer* indexBuffer)
-{
-	mRenderState->Bind(indexBuffer);
-}
-
 void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context)
 {
 	ExecuteCommands(context, true);

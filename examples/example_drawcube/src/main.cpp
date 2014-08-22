@@ -104,14 +104,6 @@ int main()
 		program->SetDepthTest(true);
 		program->SetDepthFunc(POGLDepthFunc::LESS);
 		
-		// 
-		// Bind the vertex- and index buffer to the context.
-		// This will set the vertex- and index buffer to the POGLRenderState internally
-		//
-
-		context->Bind(vertexBuffer);
-		context->Bind(indexBuffer);
-
 		//
 		// Apply the program. No need to apply it in the render loop since we only have one program and
 		// we don't update the program's properties.
@@ -130,7 +122,14 @@ int main()
 			angle += POGLGetTimeSinceLastTick() * ROTATION_SPEED;
 			if (angle > 360.0f)
 				angle = 360.0f - angle;
-			
+
+			// 
+			// Bind the vertex- and index buffer
+			//
+
+			state->Bind(vertexBuffer);
+			state->Bind(indexBuffer);
+
 			//
 			// Draw the box
 			//

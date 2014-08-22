@@ -1168,26 +1168,6 @@ public:
 		\param viewport
 	*/
 	virtual void SetViewport(const POGL_RECT& viewport) = 0;
-
-	/*!
-		\brief Bind the supplied vertex buffer. 
-
-		This method does the same thing as IPOGLRenderState::Bind(IPOGLVertexBuffer*). This method is only
-		syntactic sugar so that you're not required to attach a program before binding the buffer.
-
-		\param vertexBuffer
-	*/
-	virtual void Bind(IPOGLVertexBuffer* vertexBuffer) = 0;
-	
-	/*!
-		\brief Bind the supplied index buffer. 
-
-		This method does the same thing as IPOGLRenderState::Bind(IPOGLIndexBuffer*). This method is only
-		syntactic sugar so that you're not required to attach a program before binding the buffer.
-
-		\param indexBuffer
-	*/
-	virtual void Bind(IPOGLIndexBuffer* indexBuffer) = 0;
 };
 
 /*!

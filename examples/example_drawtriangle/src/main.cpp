@@ -104,7 +104,7 @@ int main()
 		//
 
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
-		
+
 		//
 		// Poll the opened window's events. This is NOT part of the POGL library
 		//
