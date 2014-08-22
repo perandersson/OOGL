@@ -1,5 +1,6 @@
 #pragma once
 #include "config.h"
+#include "POGLDeferredStateValue.h"
 #include <memory>
 
 class POGLDeferredRenderContext;
@@ -11,6 +12,11 @@ class POGLDeferredRenderState : public IPOGLRenderState
 public:
 	POGLDeferredRenderState(POGLDeferredRenderContext* context);
 	~POGLDeferredRenderState();
+
+	/*!
+		\brief Unset this RenderState's internal state values. 
+	*/
+	void Flush();
 
 // IPOGLInterface
 public:
@@ -41,6 +47,22 @@ public:
 private:
 	REF_COUNTER mRefCount;
 	POGLDeferredRenderContext* mRenderContext;
+
+	POGLDeferredStateValue<POGL_UINT32> mFramebuffer;
+	POGLDeferredStateValue<POGL_UINT32> mVertexBuffer;
+	POGLDeferredStateValue<POGL_UINT32> mIndexBuffer;
+	POGLDeferredStateValue<bool> mDepthTest;
+	POGLDeferredStateValue<POGLDepthFunc::Enum> mDepthFunc;
+	POGLDeferredStateValue<bool> mDepthMask;
+	POGLDeferredStateValue<POGL_UINT8> mColorMask;
+	POGLDeferredStateValue<bool> mStencilTest;
+	POGLDeferredStateValue<POGL_UINT32> mStencilMask;
+	POGLDeferredStateValue<POGLSrcFactor::Enum> mSrcFactor;
+	POGLDeferredStateValue<POGLDstFactor::Enum> mDstFactor;
+	POGLDeferredStateValue<bool> mBlend;
+	POGLDeferredStateValue<POGLFrontFace::Enum> mFrontFace;
+	POGLDeferredStateValue<POGLCullFace::Enum> mCullFace;
+	POGLDeferredStateValue<POGL_RECT> mViewport;
 
 	Uniforms mUniforms;
 };

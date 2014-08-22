@@ -554,6 +554,8 @@ typedef struct POGLAPI POGL_SIZE
 	POGL_SIZE(const POGL_SIZE& rhs) : x(rhs.x), y(rhs.y) {}
 
 	POGL_SIZE& operator=(const POGL_SIZE& rhs);
+	bool operator==(const POGL_SIZE& rhs) const;
+	bool operator!=(const POGL_SIZE& rhs) const;
 } POGL_POINTI;
 
 struct POGLAPI POGL_VECTOR2
@@ -574,6 +576,8 @@ struct POGLAPI POGL_VECTOR2
 	POGL_VECTOR2(const POGL_VECTOR2& rhs) : x(rhs.x), y(rhs.y) {}
 
 	POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs);
+	bool operator==(const POGL_VECTOR2& rhs) const;
+	bool operator!=(const POGL_VECTOR2& rhs) const;
 };
 
 typedef struct POGLAPI POGL_VECTOR3
@@ -597,6 +601,8 @@ typedef struct POGLAPI POGL_VECTOR3
 	POGL_VECTOR3(const POGL_VECTOR3& rhs) : x(rhs.x), y(rhs.y), z(rhs.z) {}
 
 	POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs);
+	bool operator==(const POGL_VECTOR3& rhs) const;
+	bool operator!=(const POGL_VECTOR3& rhs) const;
 } POGL_COLOR3;
 
 typedef struct POGLAPI POGL_VECTOR4
@@ -622,6 +628,8 @@ typedef struct POGLAPI POGL_VECTOR4
 	POGL_VECTOR4(const POGL_VECTOR4& rhs) : x(rhs.x), y(rhs.y), z(rhs.z), w(rhs.w) {}
 
 	POGL_VECTOR4& operator=(const POGL_VECTOR4& rhs);
+	bool operator==(const POGL_VECTOR4& rhs) const;
+	bool operator!=(const POGL_VECTOR4& rhs) const;
 } POGL_COLOR4;
 
 struct POGLAPI POGL_RECT
@@ -641,6 +649,8 @@ struct POGLAPI POGL_RECT
 	POGL_RECT(const POGL_RECT& rhs) : x(rhs.x), y(rhs.y), width(rhs.width), height(rhs.height) {}
 
 	POGL_RECT& operator=(const POGL_RECT& rhs);
+	bool operator==(const POGL_RECT& rhs) const;
+	bool operator!=(const POGL_RECT& rhs) const;
 };
 
 /*!

@@ -315,17 +315,11 @@ void POGLRenderState::Apply(POGLProgram* program)
 	POGLProgramData data;
 	program->CopyProgramData(&data);
 
-	// Apply the program with it's matching data
-	Apply(program, data);
-}
-
-void POGLRenderState::Apply(POGLProgram* program, const POGLProgramData& data)
-{
 	// Bind the program if neccessary
 	BindProgram(program);
 
 	// Apply the global uniform values
-	mProgram->ApplyStaticUniforms();
+	program->ApplyStaticUniforms();
 
 	//
 	// Update the render state with the (potentially) new properties

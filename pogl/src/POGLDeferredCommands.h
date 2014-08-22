@@ -222,9 +222,6 @@ struct POGL_APPLYPROGRAM_COMMAND
 {
 	// The program we want to apply
 	POGLProgram* program;
-
-	// The program state properties
-	POGLProgramData data;
 };
 extern void POGLApplyProgram_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLApplyProgram_Release(POGL_HANDLE command);

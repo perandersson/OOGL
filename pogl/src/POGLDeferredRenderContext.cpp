@@ -275,7 +275,6 @@ IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 		sizeof(POGL_APPLYPROGRAM_COMMAND));
 	cmd->program = static_cast<POGLProgram*>(program);
 	cmd->program->AddRef();
-	cmd->program->CopyProgramData(&cmd->data);
 
 	mRenderState->AddRef();
 	return mRenderState;
@@ -400,6 +399,9 @@ void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context, boo
 
 void POGLDeferredRenderContext::Flush()
 {
+	// Ensure that the currently assigned states are unset
+	mRenderState->Flush();
+
 	mFlushedCommandsMutex.lock();
 	mFlushedCommands = mMemoryPool;
 	mFlushedCommandsSize = mMemoryPoolOffset;

@@ -24,11 +24,6 @@ public:
 	void Apply(POGLProgram* program);
 
 	/*!
-		\brief Apply the supplied program and matching data
-	*/
-	void Apply(POGLProgram* program, const POGLProgramData& data);
-
-	/*!
 		\brief Check to see if the current program is of the supplied type
 	*/
 	inline bool IsProgramActive(POGL_UINT32 programUID) const {

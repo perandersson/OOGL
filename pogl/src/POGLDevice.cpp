@@ -50,11 +50,31 @@ POGL_SIZE& POGL_SIZE::operator = (const POGL_SIZE& rhs)
 	return *this;
 }
 
+bool POGL_SIZE::operator==(const POGL_SIZE& rhs) const
+{
+	return width == rhs.width;
+}
+
+bool POGL_SIZE::operator!=(const POGL_SIZE& rhs) const
+{
+	return height != rhs.height;
+}
+
 POGL_VECTOR2& POGL_VECTOR2::operator=(const POGL_VECTOR2& rhs)
 {
 	x = rhs.x;
 	y = rhs.y;
 	return *this;
+}
+
+bool POGL_VECTOR2::operator==(const POGL_VECTOR2& rhs) const
+{
+	return FLT_EQ(x, rhs.x) && FLT_EQ(y, rhs.x);
+}
+
+bool POGL_VECTOR2::operator!=(const POGL_VECTOR2& rhs) const
+{
+	return FLT_NEQ(x, rhs.x) || FLT_NEQ(y, rhs.x);
 }
 
 POGL_VECTOR3& POGL_VECTOR3::operator = (const POGL_VECTOR3& rhs)
@@ -63,6 +83,16 @@ POGL_VECTOR3& POGL_VECTOR3::operator = (const POGL_VECTOR3& rhs)
 	y = rhs.y;
 	z = rhs.z;
 	return *this;
+}
+
+bool POGL_VECTOR3::operator==(const POGL_VECTOR3& rhs) const
+{
+	return FLT_EQ(x, rhs.x) && FLT_EQ(y, rhs.x) && FLT_EQ(z, rhs.z);
+}
+
+bool POGL_VECTOR3::operator!=(const POGL_VECTOR3& rhs) const
+{
+	return FLT_NEQ(x, rhs.x) || FLT_NEQ(y, rhs.x) || FLT_NEQ(z, rhs.z);
 }
 
 POGL_VECTOR4& POGL_VECTOR4::operator = (const POGL_VECTOR4& rhs)
@@ -74,6 +104,16 @@ POGL_VECTOR4& POGL_VECTOR4::operator = (const POGL_VECTOR4& rhs)
 	return *this;
 }
 
+bool POGL_VECTOR4::operator==(const POGL_VECTOR4& rhs) const
+{
+	return FLT_EQ(x, rhs.x) && FLT_EQ(y, rhs.x) && FLT_EQ(z, rhs.z) && FLT_EQ(w, rhs.w);
+}
+
+bool POGL_VECTOR4::operator!=(const POGL_VECTOR4& rhs) const
+{
+	return FLT_NEQ(x, rhs.x) || FLT_NEQ(y, rhs.x) || FLT_NEQ(z, rhs.z) || FLT_NEQ(w, rhs.w);
+}
+
 POGL_RECT& POGL_RECT::operator = (const POGL_RECT& rhs)
 {
 	x = rhs.x;
@@ -81,6 +121,16 @@ POGL_RECT& POGL_RECT::operator = (const POGL_RECT& rhs)
 	width = rhs.width;
 	height = rhs.height;
 	return *this;
+}
+
+bool POGL_RECT::operator==(const POGL_RECT& rhs) const
+{
+	return x == rhs.x && y == rhs.y && width == rhs.width && height == rhs.height;
+}
+
+bool POGL_RECT::operator!=(const POGL_RECT& rhs) const
+{
+	return x != rhs.x || y != rhs.y || width != rhs.width || height != rhs.height;
 }
 
 POGL_POSITION_VERTEX& POGL_POSITION_VERTEX::operator=(const POGL_POSITION_VERTEX& rhs) 

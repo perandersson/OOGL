@@ -261,7 +261,7 @@ void POGLSetViewport_Command(POGLDeferredRenderContext* context, POGLRenderState
 void POGLApplyProgram_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_APPLYPROGRAM_COMMAND* cmd = (POGL_APPLYPROGRAM_COMMAND*)command;
-	state->Apply(cmd->program, cmd->data);
+	state->Apply(cmd->program);
 }
 
 void POGLApplyProgram_Release(POGL_HANDLE command)
