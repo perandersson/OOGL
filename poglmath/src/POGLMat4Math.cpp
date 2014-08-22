@@ -95,8 +95,23 @@ void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const P
 	M(3, 2) = 0.0f;
 	M(3, 3) = 1.0f;
 
-	POGL_VECTOR3 negativeEye(-eye.x, -eye.y, -eye.z);
+	POGL_VECTOR3 negativeEye;
+	POGLVec3Invert(eye, &negativeEye);
 	POGLMat4Translate(negativeEye, _out_Mat4);
+}
+
+void POGLVec3Invert(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec3)
+{
+	_out_Vec3->x = v.x * -1.f;
+	_out_Vec3->y = v.y * -1.f;
+	_out_Vec3->z = v.z * -1.f;
+}
+
+void POGLVec3Invert(POGL_VECTOR3* v)
+{
+	v->x *= -1.f;
+	v->y *= -1.f;
+	v->z *= -1.f;
 }
 
 void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL_FLOAT zNear, POGL_FLOAT zFar, POGL_MAT4* _out_Mat4)
@@ -291,4 +306,27 @@ void POGLMat4Multiply(const POGL_MAT4& lhs, const POGL_MAT4& rhs, POGL_MAT4* _ou
 	tmp_M[15] = (a[3] * b[12] + a[7] * b[13] + a[11] * b[14] + a[15] * b[15]);
 
 	*_out_Mat4 = tmp;
+}
+
+POGLAPI void POGLMat4Transpose(const POGL_MAT4& from, POGL_MAT4* _out_Mat4)
+{
+	const POGL_FLOAT* m = from.vec;
+	POGL_FLOAT* to = _out_Mat4->vec;
+
+	to[0] = m[0];
+	to[1] = m[4];
+	to[2] = m[8];
+	to[3] = m[12];
+	to[4] = m[1];
+	to[5] = m[5];
+	to[6] = m[9];
+	to[7] = m[13];
+	to[8] = m[2];
+	to[9] = m[6];
+	to[10] = m[10];
+	to[11] = m[14];
+	to[12] = m[3];
+	to[13] = m[7];
+	to[14] = m[11];
+	to[15] = m[15];
 }

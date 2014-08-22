@@ -16,9 +16,9 @@ void POGLVec3Normalize(POGL_VECTOR3* v)
 	v->z *= lengthMul;
 }
 
-void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3* result)
+void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3* _out_Vec3)
 {
-	result->x = (v1.y * v2.z - v1.z * v2.y);
-	result->y = (v1.z * v2.x - v1.x * v2.z);
-	result->z = (v1.x * v2.y - v1.y * v2.x);
+	_out_Vec3->x = (v1.y * v2.z - v1.z * v2.y);
+	_out_Vec3->y = (v1.z * v2.x - v1.x * v2.z);
+	_out_Vec3->z = (v1.x * v2.y - v1.y * v2.x);
 }

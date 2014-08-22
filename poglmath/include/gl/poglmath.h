@@ -22,11 +22,21 @@ extern POGLAPI POGL_FLOAT POGLVec3Length(const POGL_VECTOR3& v);
 extern POGLAPI void POGLVec3Normalize(POGL_VECTOR3* v);
 
 /*!
+	\brief Invert the supplied vector
+*/
+extern POGLAPI void POGLVec3Invert(POGL_VECTOR3* v);
+
+/*!
+	\brief Invert the supplied vector
+*/
+extern POGLAPI void POGLVec3Invert(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec3);
+
+/*!
 	\brief Calculate the cross product between the first- and second vector.
 
-	result = v1 x v2
+	_out_Vec3 = v1 x v2
 */
-extern POGLAPI void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3* result);
+extern POGLAPI void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3* _out_Vec3);
 
 /*!
 	\brief Calculate the orthographic matrix based on the supplied values
@@ -81,6 +91,16 @@ extern POGLAPI void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL
 	\param _out_Mat4
 */
 extern POGLAPI void POGLMat4Multiply(const POGL_MAT4& lhs, const POGL_MAT4& rhs, POGL_MAT4* _out_Mat4);
+
+/*!
+	\brief Transpose the supplied from matrix
+
+	\param from
+			The matrix we want to transpose
+	\param _out_Mat4
+			The 
+*/
+extern POGLAPI void POGLMat4Transpose(const POGL_MAT4& from, POGL_MAT4* _out_Mat4);
 
 /*!
 	\brief Translate the supplied output matrix with the supplied vector
