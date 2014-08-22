@@ -43,26 +43,10 @@ public:
 		return mPrimitiveType;
 	}
 
-	/*!
-		\brief Draw this vertex buffer
-	*/
-	void Draw(POGL_UINT32 startIndex);
+	void Draw();
+	void Draw(POGL_UINT32 count);
+	void Draw(POGL_UINT32 count, POGL_UINT32 offset);
 	
-	/*!
-		\brief Draw this vertex buffer
-	*/
-	void Draw(POGL_UINT32 startIndex, POGL_UINT32 count);
-	
-	/*!
-		\brief Draw this vertex buffer
-	*/
-	void Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
-
-	/*!
-		\brief Draw this vertex buffer
-	*/
-	void Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
-
 	/*!
 		\brief Set buffer-, count and vertex array object after the construction is complete.
 

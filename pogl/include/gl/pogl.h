@@ -1168,6 +1168,26 @@ public:
 		\param viewport
 	*/
 	virtual void SetViewport(const POGL_RECT& viewport) = 0;
+
+	/*!
+		\brief Bind the supplied vertex buffer. 
+
+		This method does the same thing as IPOGLRenderState::Bind(IPOGLVertexBuffer*). This method is only
+		syntactic sugar so that you're not required to attach a program before binding the buffer.
+
+		\param vertexBuffer
+	*/
+	virtual void Bind(IPOGLVertexBuffer* vertexBuffer) = 0;
+	
+	/*!
+		\brief Bind the supplied index buffer. 
+
+		This method does the same thing as IPOGLRenderState::Bind(IPOGLIndexBuffer*). This method is only
+		syntactic sugar so that you're not required to attach a program before binding the buffer.
+
+		\param indexBuffer
+	*/
+	virtual void Bind(IPOGLIndexBuffer* indexBuffer) = 0;
 };
 
 /*!
@@ -1464,38 +1484,35 @@ public:
 	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer) = 0;
 
 	/*!
-		\brief Draw the entire vertex buffer
-
-		\param vertexBuffer
+		\brief Bind the supplied vertex buffer
 	*/
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer) = 0;
+	virtual void Bind(IPOGLVertexBuffer* vertexBuffer) = 0;
 
 	/*!
-		\brief Draw the entire vertex buffer using the supplied index buffer
-
-		\param vertexBuffer
-		\param indexBuffer
+		\brief Bind the supplied vertex buffer
 	*/
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer) = 0;
+	virtual void Bind(IPOGLIndexBuffer* indexBuffer) = 0;
+	
+	/*!
+		\brief Draw the bound buffers
+	*/
+	virtual void Draw() = 0;
 
 	/*!
-		\brief Draw the entire vertex buffer using the supplied index buffer
+		\brief Draw the bound buffers
 
-		\param vertexBuffer
-		\param indexBuffer
-		\param startIndex
-	*/
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex) = 0;
-
-	/*!
-		\brief Draw the entire vertex buffer using the supplied index buffer
-
-		\param vertexBuffer
-		\param indexBuffer
-		\param startIndex
 		\param count
+				How many vertices we want to draw
 	*/
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count) = 0;
+	virtual void Draw(POGL_UINT32 count) = 0;
+
+	/*!
+		\brief Draw the bound buffers
+
+		\param count
+		\param offset
+	*/
+	virtual void Draw(POGL_UINT32 count, POGL_UINT32 offset) = 0;
 
 	/*!
 		\brief

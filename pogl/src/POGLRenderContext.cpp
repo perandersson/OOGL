@@ -316,6 +316,16 @@ void POGLRenderContext::SetViewport(const POGL_RECT& viewport)
 	mRenderState->SetViewport(viewport);
 }
 
+void POGLRenderContext::Bind(IPOGLVertexBuffer* vertexBuffer)
+{
+	mRenderState->BindVertexBuffer(static_cast<POGLVertexBuffer*>(vertexBuffer));
+}
+
+void POGLRenderContext::Bind(IPOGLIndexBuffer* indexBuffer)
+{
+	mRenderState->BindIndexBuffer(static_cast<POGLIndexBuffer*>(indexBuffer));
+}
+
 void POGLRenderContext::InitializeRenderState()
 {
 	if (mRenderState == nullptr) {

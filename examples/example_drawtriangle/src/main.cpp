@@ -123,11 +123,18 @@ int main()
 
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
+			// 
+			// Bind the vertex buffer before drawing it. 
+			// The IPOGLRenderState will prevent uneccessary state changes if you call this method multiple times with the same vertex buffer
+			//
+
+			state->Bind(vertexBuffer);
+
 			//
 			// Draw the triangle vertex buffer. This will automatically bind the vertex buffer if it's not already bound
 			//
 
-			state->Draw(vertexBuffer);
+			state->Draw();
 
 			//
 			// Nofiy the rendering engine that we are finished using the bound program this frame.

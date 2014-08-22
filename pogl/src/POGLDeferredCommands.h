@@ -5,6 +5,7 @@
 class POGLDeferredRenderContext;
 class POGLRenderState;
 class POGLVertexBuffer;
+class POGLIndexBuffer;
 class POGLTexture2D;
 class POGLFramebuffer;
 class POGLShader;
@@ -148,23 +149,40 @@ struct POGL_SETFRAMEBUFFER_COMMAND_DATA
 extern void POGLSetFramebuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLSetFramebuffer_Release(POGL_HANDLE command);
 
-struct POGL_DRAW_COMMAND_DATA
+struct POGL_BINDVERTEXBUFFER_COMMAND_DATA
 {
 	/* The vertex buffer we want to draw */
-	IPOGLVertexBuffer* vertexBuffer;
+	POGLVertexBuffer* vertexBuffer;
+};
+extern void POGLBindVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLBindVertexBuffer_Release(POGL_HANDLE command);
 
-	/* The index buffer we want to draw */
-	IPOGLIndexBuffer* indexBuffer;
+struct POGL_BINDINDEXBUFFER_COMMAND_DATA
+{
+	/* The vertex buffer we want to draw */
+	POGLIndexBuffer* indexBuffer;
+};
+extern void POGLBindIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLBindIndexBuffer_Release(POGL_HANDLE command);
 
-	/* Where we want to start render the vertex buffer */
-	POGL_UINT32 startIndex;
+extern void POGLDraw_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 
+struct POGL_DRAWCOUNT_COMMAND_DATA
+{
 	/* How many vertices we want to draw */
 	POGL_UINT32 count;
 };
-extern void POGLDraw_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLDrawCount_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
-extern void POGLDraw_Release(POGL_HANDLE command);
+
+struct POGL_DRAWCOUNTOFFSET_COMMAND_DATA
+{
+	/* How many vertices we want to draw */
+	POGL_UINT32 count;
+
+	/* Where we want to start render the vertex buffer */
+	POGL_UINT32 offset;
+};
+extern void POGLDrawCountOffset_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 
 struct POGL_BOOLEAN_COMMAND_DATA
 {

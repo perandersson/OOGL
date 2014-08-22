@@ -133,8 +133,8 @@ int main()
 			//
 			// Draw the vertex buffer in the same way as normal
 			//
-
-			state->Draw(vertexBuffer);
+			state->Bind(vertexBuffer);
+			state->Draw();
 
 			state->Release();
 			device->EndFrame();

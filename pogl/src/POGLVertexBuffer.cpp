@@ -53,26 +53,19 @@ POGL_UINT32 POGLVertexBuffer::GetCount() const
 	return mCount;
 }
 
-void POGLVertexBuffer::Draw(POGL_UINT32 startIndex)
+void POGLVertexBuffer::Draw()
 {
-	glDrawArrays(mPrimitiveType, startIndex, mCount);
+	glDrawArrays(mPrimitiveType, 0, mCount);
 }
 
-void POGLVertexBuffer::Draw(POGL_UINT32 startIndex, POGL_UINT32 count)
+void POGLVertexBuffer::Draw(POGL_UINT32 count)
 {
-	glDrawArrays(mPrimitiveType, startIndex, count);
+	glDrawArrays(mPrimitiveType, 0, count);
 }
 
-void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
+void POGLVertexBuffer::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 {
-	assert_not_null(indexBuffer);
-	indexBuffer->Draw(this, mPrimitiveType, startIndex);
-}
-
-void POGLVertexBuffer::Draw(POGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
-{
-	assert_not_null(indexBuffer);
-	indexBuffer->Draw(this, mPrimitiveType, startIndex, count);
+	glDrawArrays(mPrimitiveType, offset, count);
 }
 
 void POGLVertexBuffer::PostConstruct(GLuint bufferID, GLuint vaoID)

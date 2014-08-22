@@ -44,14 +44,18 @@ POGL_UINT32 POGLIndexBuffer::GetCount() const
 	return mNumIndices;
 }
 
-void POGLIndexBuffer::Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex)
+void POGLIndexBuffer::Draw(GLenum primitiveType)
 {
-	const GLvoid* indices = (const GLvoid*)(startIndex * mTypeSize);
-	glDrawElements(primitiveType, mNumIndices, mElementType, indices);
+	glDrawElements(primitiveType, mNumIndices, mElementType, NULL);
 }
 
-void POGLIndexBuffer::Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count)
+void POGLIndexBuffer::Draw(GLenum primitiveType, POGL_UINT32 count)
 {
-	const GLvoid* indices = (const GLvoid*)(startIndex * mTypeSize);
+	glDrawElements(primitiveType, count, mElementType, NULL);
+}
+
+void POGLIndexBuffer::Draw(GLenum primitiveType, POGL_UINT32 count, POGL_UINT32 offset)
+{
+	const GLvoid* indices = (const GLvoid*)(offset * mTypeSize);
 	glDrawElements(primitiveType, count, mElementType, indices);
 }

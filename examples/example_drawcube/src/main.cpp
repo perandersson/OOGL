@@ -88,7 +88,7 @@ int main()
 		POGLMat4Perspective(45.0f, 1.2f, 0.1f, 100.0f, &perspective);
 	
 		POGL_MAT4 lookAt;
-		POGLMat4LookAt(POGL_VECTOR3(-20.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
+		POGLMat4LookAt(POGL_VECTOR3(0.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
 
 		//
 		// Set default uniforms for this program
@@ -104,12 +104,23 @@ int main()
 		program->SetDepthTest(true);
 		program->SetDepthFunc(POGLDepthFunc::LESS);
 		
-		//
-		// Poll the opened window's events. This is NOT part of the POGL library
+		// 
+		// Bind the vertex- and index buffer to the context.
+		// This will set the vertex- and index buffer to the POGLRenderState internally
 		//
 
+		context->Bind(vertexBuffer);
+		context->Bind(indexBuffer);
+
 		//
-		// Rotate the cube based on the total application time
+		// Apply the program. No need to apply it in the render loop since we only have one program and
+		// we don't update the program's properties.
+		//
+
+		IPOGLRenderState* state = context->Apply(program);
+
+		//
+		// Poll the opened window's events. This is NOT part of the POGL library
 		//
 
 		POGL_FLOAT angle = 0.0f;
@@ -119,18 +130,47 @@ int main()
 			angle += POGLGetTimeSinceLastTick() * ROTATION_SPEED;
 			if (angle > 360.0f)
 				angle = 360.0f - angle;
-			POGL_MAT4 modelMatrix;
-			POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
-
-			IPOGLRenderState* state = context->Apply(program);
-
-			state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
+			
+			//
+			// Draw the box
+			//
 
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-			state->Draw(vertexBuffer, indexBuffer);
-			state->Release();
+
+			//
+			// Set the same model multiple times
+			//
+
+			IPOGLUniform* modelMatrixUniform = state->FindUniformByName("ModelMatrix");
+
+			POGL_MAT4 modelMatrix;
+			POGLMat4Translate(POGL_VECTOR3(-5.0f, 0.0f, 0.0f), &modelMatrix);
+			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+			modelMatrixUniform->SetMatrix(modelMatrix);
+			state->Draw();
+
+			modelMatrix = POGL_MAT4();
+			POGLMat4Translate(POGL_VECTOR3(5.0f, 0.0f, 0.0f), &modelMatrix);
+			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+			modelMatrixUniform->SetMatrix(modelMatrix);
+			state->Draw();
+
+			modelMatrix = POGL_MAT4();
+			POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, 5.0f), &modelMatrix);
+			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+			modelMatrixUniform->SetMatrix(modelMatrix);
+			state->Draw();
+
+			modelMatrix = POGL_MAT4();
+			POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, -5.0f), &modelMatrix);
+			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+			modelMatrixUniform->SetMatrix(modelMatrix);
+			state->Draw();
+
 			device->EndFrame();
 		}
+
+		state->Release();
 
 		indexBuffer->Release();
 		vertexBuffer->Release();

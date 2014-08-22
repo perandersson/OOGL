@@ -21,6 +21,7 @@ public:
 				The function called when releasing the command
 		\param size
 				The memory size of the command
+		\return A pointer to the command
 	*/
 	POGL_HANDLE AddCommand(POGLCommandFuncPtr function, POGLCommandReleaseFuncPtr releaseFunction, POGL_UINT32 size);
 	
@@ -38,7 +39,7 @@ public:
 
 		\param size
 				The size that is required
-		\return A pointer to a memory location where we are allowed to write the amount of bytes supplied to this method
+		\return The offset of the memory pool we are allowed to write the amount of bytes supplied to this method
 	*/
 	POGL_UINT32 GetMapOffset(POGL_UINT32 size);
 
@@ -72,6 +73,8 @@ public:
 	virtual void* Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	virtual void Unmap(IPOGLResource* resource);
 	virtual void SetViewport(const POGL_RECT& viewport);
+	virtual void Bind(IPOGLVertexBuffer* vertexBuffer);
+	virtual void Bind(IPOGLIndexBuffer* indexBuffer);
 
 // IPOGLDeferredRenderContext
 public:

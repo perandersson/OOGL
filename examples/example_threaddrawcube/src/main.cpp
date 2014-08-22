@@ -104,7 +104,7 @@ int main()
 				POGLMat4Perspective(45.0f, 1.2f, 0.1f, 100.0f, &perspective);
 
 				POGL_MAT4 lookAt;
-				POGLMat4LookAt(POGL_VECTOR3(-20.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
+				POGLMat4LookAt(POGL_VECTOR3(0.0f, 20.0f, 20.0f), POGL_VECTOR3(0.f, 0.f, 0.f), POGL_VECTOR3(0.0f, 1.0f, 0.0f), &lookAt);
 
 				//
 				// Set static uniforms for this program
@@ -127,27 +127,62 @@ int main()
 				std::mutex m;
 				std::unique_lock<std::mutex> lock(m);
 				while (running) {
-					POGL_MAT4 modelMatrix;
-					POGLMat4Rotate(angle, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
-
+					
 					// 
-					// Apply the program (note that the program is actually loaded, but not initialized, in this thread)
+					// Apply the program (note that the program is actually loaded, but not initialized, in this thread).
+					// This has to be done in inside the running render loop. 
+					//
+					// Why is this important here? It's important because the commands will be cleared after the flush method is invoked
+					// and we can't know for sure if some other program or buffer is bound somewhere else in the program (from this thread's point of view).
+					// 
+					// Any unneccessary state-changes are prevented when the apply command is executed on the immediately render context (if the program is already bound).
 					//
 
 					IPOGLRenderState* state = deferredContext->Apply(program);
 
 					//
-					// Set the model matrix (rotation only in this case)
+					// Bind the vertex- and index buffers
 					//
 
-					state->FindUniformByName("ModelMatrix")->SetMatrix(modelMatrix);
+					state->Bind(vertexBuffer);
+					state->Bind(indexBuffer);
 
 					//
 					// Draw the box
 					//
 
 					state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-					state->Draw(vertexBuffer, indexBuffer);
+
+					//
+					// Set the same model multiple times
+					//
+
+					IPOGLUniform* modelMatrixUniform = state->FindUniformByName("ModelMatrix");
+
+					POGL_MAT4 modelMatrix;
+					POGLMat4Translate(POGL_VECTOR3(-5.0f, 0.0f, 0.0f), &modelMatrix);
+					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+					modelMatrixUniform->SetMatrix(modelMatrix);
+					state->Draw();
+
+					modelMatrix = POGL_MAT4();
+					POGLMat4Translate(POGL_VECTOR3(5.0f, 0.0f, 0.0f), &modelMatrix);
+					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+					modelMatrixUniform->SetMatrix(modelMatrix);
+					state->Draw();
+
+					modelMatrix = POGL_MAT4();
+					POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, 5.0f), &modelMatrix);
+					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+					modelMatrixUniform->SetMatrix(modelMatrix);
+					state->Draw();
+
+					modelMatrix = POGL_MAT4();
+					POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, -5.0f), &modelMatrix);
+					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
+					modelMatrixUniform->SetMatrix(modelMatrix);
+					state->Draw();
+
 					state->Release();
 
 					//

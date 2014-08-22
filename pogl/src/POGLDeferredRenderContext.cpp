@@ -18,6 +18,7 @@ mFlushedCommands(nullptr), mFlushedCommandsSize(0),
 mMapMemoryPool(nullptr), mMapMemoryPoolSize(0), mMapMemoryPoolOffset(0),
 mMapping(false)
 {
+	mRenderState = new POGLDeferredRenderState(this);
 }
 
 POGLDeferredRenderContext::~POGLDeferredRenderContext()
@@ -267,10 +268,6 @@ IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 	if (program == nullptr)
 		THROW_EXCEPTION(POGLStateException, "You are not allowed to apply a non-existing program");
 
-	if (mRenderState == nullptr) {
-		mRenderState = new POGLDeferredRenderState(this);
-	}
-
 	POGL_APPLYPROGRAM_COMMAND* cmd = (POGL_APPLYPROGRAM_COMMAND*)AddCommand(&POGLApplyProgram_Command, &POGLApplyProgram_Release,
 		sizeof(POGL_APPLYPROGRAM_COMMAND));
 	cmd->program = static_cast<POGLProgram*>(program);
@@ -344,6 +341,16 @@ void POGLDeferredRenderContext::Unmap(IPOGLResource* resource)
 void POGLDeferredRenderContext::SetViewport(const POGL_RECT& viewport)
 {
 	mRenderState->SetViewport(viewport);
+}
+
+void POGLDeferredRenderContext::Bind(IPOGLVertexBuffer* vertexBuffer)
+{
+	mRenderState->Bind(vertexBuffer);
+}
+
+void POGLDeferredRenderContext::Bind(IPOGLIndexBuffer* indexBuffer)
+{
+	mRenderState->Bind(indexBuffer);
 }
 
 void POGLDeferredRenderContext::ExecuteCommands(IPOGLRenderContext* context)

@@ -2,6 +2,7 @@
 #include "POGLDeferredCommands.h"
 #include "POGLFactory.h"
 #include "POGLVertexBuffer.h"
+#include "POGLIndexBuffer.h"
 #include "POGLTexture2D.h"
 #include "POGLRenderState.h"
 #include "POGLDeferredRenderContext.h"
@@ -172,24 +173,47 @@ void POGLSetFramebuffer_Release(POGL_HANDLE command)
 		cmd->framebuffer->Release();
 }
 
+void POGLBindVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_BINDVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDVERTEXBUFFER_COMMAND_DATA*)command;
+	state->BindVertexBuffer(cmd->vertexBuffer);
+}
+
+void POGLBindVertexBuffer_Release(POGL_HANDLE command)
+{
+	POGL_BINDVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDVERTEXBUFFER_COMMAND_DATA*)command;
+	if (cmd->vertexBuffer != nullptr)
+		cmd->vertexBuffer->Release();
+}
+
+void POGLBindIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_BINDINDEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDINDEXBUFFER_COMMAND_DATA*)command;
+	state->BindIndexBuffer(cmd->indexBuffer);
+}
+
+void POGLBindIndexBuffer_Release(POGL_HANDLE command)
+{
+	POGL_BINDINDEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDINDEXBUFFER_COMMAND_DATA*)command;
+	if (cmd->indexBuffer != nullptr)
+		cmd->indexBuffer->Release();
+}
+
 void POGLDraw_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
-	POGL_DRAW_COMMAND_DATA* cmd = (POGL_DRAW_COMMAND_DATA*)command;
-	state->Draw(cmd->vertexBuffer, cmd->indexBuffer, cmd->startIndex);
+	state->Draw();
 }
 
 void POGLDrawCount_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
-	POGL_DRAW_COMMAND_DATA* cmd = (POGL_DRAW_COMMAND_DATA*)command;
-	state->Draw(cmd->vertexBuffer, cmd->indexBuffer, cmd->startIndex, cmd->count);
+	POGL_DRAWCOUNT_COMMAND_DATA* cmd = (POGL_DRAWCOUNT_COMMAND_DATA*)command;
+	state->Draw(cmd->count);
 }
 
-void POGLDraw_Release(POGL_HANDLE command)
+void POGLDrawCountOffset_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
-	POGL_DRAW_COMMAND_DATA* cmd = (POGL_DRAW_COMMAND_DATA*)command;
-	cmd->vertexBuffer->Release();
-	if (cmd->indexBuffer != nullptr)
-		cmd->indexBuffer->Release();
+	POGL_DRAWCOUNTOFFSET_COMMAND_DATA* cmd = (POGL_DRAWCOUNTOFFSET_COMMAND_DATA*)command;
+	state->Draw(cmd->count, cmd->offset);
 }
 
 void POGLSetDepthTest_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)

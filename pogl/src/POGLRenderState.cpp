@@ -22,8 +22,13 @@ mFramebuffer(nullptr), mFramebufferUID(0)
 {
 	glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, (GLint*)&mMaxActiveTextures);
 	mTextureUID = new POGL_UID[mMaxActiveTextures];
-	mTextures.resize(mMaxActiveTextures, nullptr);
+	mTextures = new POGLTextureResource*[mMaxActiveTextures];
 	mSamplerObjectUID = new POGL_UID[mMaxActiveTextures];
+	for (POGL_UINT32 i = 0; i < mMaxActiveTextures; ++i) {
+		mTextureUID[i] = 0;
+		mTextures[i] = nullptr;
+		mSamplerObjectUID[i] = 0;
+	}
 }
 
 POGLRenderState::~POGLRenderState()
@@ -37,19 +42,18 @@ void POGLRenderState::AddRef()
 
 void POGLRenderState::Release()
 {
-	mApplyCurrentProgramState = true;
 	if (--mRefCount == 0) {
 		POGL_SAFE_RELEASE_UID(mProgram);
 		POGL_SAFE_RELEASE_UID(mVertexBuffer);
 		POGL_SAFE_RELEASE_UID(mIndexBuffer);
 		POGL_SAFE_RELEASE_UID(mFramebuffer);
 
-		auto size = mTextures.size();
-		for (POGL_UINT32 i = 0; i < size; ++i) {
+		for (POGL_UINT32 i = 0; i < mMaxActiveTextures; ++i) {
 			POGL_SAFE_RELEASE(mTextures[i]);
 			mTextureUID[i] = 0;
 		}
 
+		delete[] mTextures;
 		delete[] mTextureUID;
 		delete[] mSamplerObjectUID;
 
@@ -120,48 +124,108 @@ void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 	mFramebufferUID = uid;
 }
 
-void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer)
+void POGLRenderState::Bind(IPOGLVertexBuffer* vertexBuffer)
 {
-	assert_not_null(vertexBuffer);
-	Draw(vertexBuffer, nullptr, 0);
+	POGLVertexBuffer* buffer = static_cast<POGLVertexBuffer*>(vertexBuffer);
+	BindVertexBuffer(buffer);
 }
 
-void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer)
+void POGLRenderState::Bind(IPOGLIndexBuffer* indexBuffer)
 {
-	assert_not_null(vertexBuffer);
-	Draw(vertexBuffer, indexBuffer, 0);
+	POGLIndexBuffer* buffer = static_cast<POGLIndexBuffer*>(indexBuffer);
+	BindIndexBuffer(buffer);
 }
 
-void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
+void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
 {
-	if (vertexBuffer == nullptr)
-		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw a non-existing vertex buffer");
+	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
+	if (mVertexBufferUID == uid) {
+		return;
+	}
 
-	POGLVertexBuffer* vbo = static_cast<POGLVertexBuffer*>(vertexBuffer);
-	POGLIndexBuffer* ibo = static_cast<POGLIndexBuffer*>(indexBuffer);
-	BindBuffers(vbo, ibo);
+	if (mVertexBuffer != nullptr)
+		mVertexBuffer->Release();
+	mVertexBuffer = buffer;
+	if (mVertexBuffer != nullptr)
+		mVertexBuffer->AddRef();
 
-	if (ibo == nullptr)
-		vbo->Draw(startIndex);
+	const GLuint vaoID = mVertexBuffer != nullptr ? mVertexBuffer->GetVAOID() : 0;
+	glBindVertexArray(vaoID);
+	mVertexBufferUID = uid;
+
+	CHECK_GL("Could not bind the supplied vertex array object");
+}
+
+void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
+{
+	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
+	if (mIndexBufferUID == uid) {
+		return;
+	}
+
+	if (mIndexBuffer != nullptr)
+		mIndexBuffer->Release();
+	mIndexBuffer = buffer;
+	if (mIndexBuffer != nullptr)
+		mIndexBuffer->AddRef();
+
+	const GLuint bufferID = buffer != nullptr ? buffer->GetBufferID() : 0;
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	mIndexBufferUID = uid;
+
+	CHECK_GL("Could not bind the supplied index buffer");
+}
+
+void POGLRenderState::Draw()
+{
+	if (mVertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+	
+	if (mApplyCurrentProgramState) {
+		mProgram->ApplyStateUniforms();
+		mApplyCurrentProgramState = false;
+	}
+
+	if (mIndexBuffer != nullptr)
+		mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType());
 	else
-		vbo->Draw(ibo, startIndex);
+		mVertexBuffer->Draw();
 
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 
-void POGLRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
+void POGLRenderState::Draw(POGL_UINT32 count)
 {
-	if (vertexBuffer == nullptr)
-		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw a non-existing vertex buffer");
+	if (mVertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
 
-	POGLVertexBuffer* vbo = static_cast<POGLVertexBuffer*>(vertexBuffer);
-	POGLIndexBuffer* ibo = static_cast<POGLIndexBuffer*>(indexBuffer);
-	BindBuffers(vbo, ibo);
+	if (mApplyCurrentProgramState) {
+		mProgram->ApplyStateUniforms();
+		mApplyCurrentProgramState = false;
+	}
 
-	if (ibo == nullptr)
-		vbo->Draw(startIndex, count);
+	if (mIndexBuffer != nullptr)
+		mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count);
 	else
-		vbo->Draw(ibo, startIndex, count);
+		mVertexBuffer->Draw(count);
+
+	CHECK_GL("Cannot draw vertex- and index buffer");
+}
+
+void POGLRenderState::Draw(POGL_UINT32 count, POGL_UINT32 offset)
+{
+	if (mVertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mApplyCurrentProgramState) {
+		mProgram->ApplyStateUniforms();
+		mApplyCurrentProgramState = false;
+	}
+
+	if (mIndexBuffer != nullptr)
+		mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count, offset);
+	else
+		mVertexBuffer->Draw(count, offset);
 
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
@@ -352,6 +416,8 @@ void POGLRenderState::BindSamplerObject(POGLSamplerObject* samplerObject, POGL_U
 
 void POGLRenderState::BindProgram(POGLProgram* program)
 {
+	mApplyCurrentProgramState = true;
+
 	const POGL_UINT32 uid = program->GetUID();
 	if (uid == mProgramUID) {
 		return;
@@ -364,60 +430,8 @@ void POGLRenderState::BindProgram(POGLProgram* program)
 	mProgram->AddRef();
 	mProgramUID = uid;
 	glUseProgram(mProgram->GetProgramID());
-	mApplyCurrentProgramState = true;
 
 	CHECK_GL("Could not bind the supplied program");
-}
-
-void POGLRenderState::BindBuffers(POGLVertexBuffer* vertexBuffer, POGLIndexBuffer* indexBuffer)
-{
-	if (mApplyCurrentProgramState) {
-		mProgram->ApplyStateUniforms();
-		mApplyCurrentProgramState = false;
-	}
-
-	BindVertexBuffer(vertexBuffer);
-	BindIndexBuffer(indexBuffer);
-}
-
-void POGLRenderState::BindVertexBuffer(POGLVertexBuffer* buffer)
-{
-	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
-	if (mVertexBufferUID == uid) {
-		return;
-	}
-
-	if (mVertexBuffer != nullptr)
-		mVertexBuffer->Release();
-	mVertexBuffer = buffer;
-	if (mVertexBuffer != nullptr)
-		mVertexBuffer->AddRef();
-
-	const GLuint vaoID = mVertexBuffer != nullptr ? mVertexBuffer->GetVAOID() : 0;
-	glBindVertexArray(vaoID);
-	mVertexBufferUID = uid;
-
-	CHECK_GL("Could not bind the supplied vertex array object");
-}
-
-void POGLRenderState::BindIndexBuffer(POGLIndexBuffer* buffer)
-{
-	const POGL_UINT32 uid = buffer != nullptr ? buffer->GetUID() : 0;
-	if (mIndexBufferUID == uid) {
-		return;
-	}
-
-	if (mIndexBuffer != nullptr)
-		mIndexBuffer->Release();
-	mIndexBuffer = buffer;
-	if (mIndexBuffer != nullptr)
-		mIndexBuffer->AddRef();
-
-	const GLuint bufferID = buffer != nullptr ? buffer->GetBufferID() : 0;
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-	mIndexBufferUID = uid;
-
-	CHECK_GL("Could not bind the supplied index buffer");
 }
 
 void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UINT32 idx)

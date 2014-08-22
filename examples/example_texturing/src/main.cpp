@@ -72,7 +72,9 @@ int main()
 
 			state->FindUniformByName("Texture")->SetTexture(texture);
 
-			state->Draw(vertexBuffer, indexBuffers);
+			state->Bind(vertexBuffer);
+			state->Bind(indexBuffers);
+			state->Draw();
 			state->Release();
 			device->EndFrame();
 		}

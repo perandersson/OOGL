@@ -80,7 +80,7 @@ IPOGLUniform* POGLDeferredRenderState::FindUniformByName(const POGL_CHAR* name)
 void POGLDeferredRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 {
 	POGLFramebuffer* impl = static_cast<POGLFramebuffer*>(framebuffer);
-	const POGL_UINT32 uid = framebuffer != nullptr ? impl->GetUID() : 0;
+	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;
 	if (mFramebuffer.Set(uid)) {
 		POGL_SETFRAMEBUFFER_COMMAND_DATA* cmd = (POGL_SETFRAMEBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLSetFramebuffer_Command, &POGLSetFramebuffer_Release,
 			sizeof(POGL_SETFRAMEBUFFER_COMMAND_DATA));
@@ -90,65 +90,50 @@ void POGLDeferredRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 	}
 }
 
-void POGLDeferredRenderState::Draw(IPOGLVertexBuffer* vertexBuffer)
+void POGLDeferredRenderState::Bind(IPOGLVertexBuffer* vertexBuffer)
 {
-	assert_not_null(vertexBuffer);
-
-	Draw(vertexBuffer, nullptr, 0);
-}
-
-void POGLDeferredRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer)
-{
-	assert_not_null(vertexBuffer);
-
-	Draw(vertexBuffer, indexBuffer, 0);
-}
-
-void POGLDeferredRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex)
-{
-	assert_not_null(vertexBuffer);
-
-	POGLVertexBuffer* vbImpl = static_cast<POGLVertexBuffer*>(vertexBuffer);
-	const POGL_UINT32 vbUID = vbImpl != nullptr ? vbImpl->GetUID() : 0;
-	POGLIndexBuffer* ibImpl = static_cast<POGLIndexBuffer*>(indexBuffer);
-	const POGL_UINT32 ibUID = ibImpl != nullptr ? ibImpl->GetUID() : 0;
-
-	bool changed = mVertexBuffer.Set(vbUID);
-	changed |= mIndexBuffer.Set(ibUID);
-	if (changed) {
-		POGL_DRAW_COMMAND_DATA* cmd = (POGL_DRAW_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDraw_Command, &POGLDraw_Release,
-			sizeof(POGL_DRAW_COMMAND_DATA));
-		cmd->vertexBuffer = vertexBuffer;
-		vertexBuffer->AddRef();
-		cmd->indexBuffer = indexBuffer;
-		if (indexBuffer != nullptr)
-			indexBuffer->AddRef();
-		cmd->startIndex = startIndex;
+	POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(vertexBuffer);
+	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;
+	if (mVertexBuffer.Set(uid)) {
+		POGL_BINDVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDVERTEXBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLBindVertexBuffer_Command, &POGLBindVertexBuffer_Release,
+			sizeof(POGL_BINDVERTEXBUFFER_COMMAND_DATA));
+		cmd->vertexBuffer = impl;
+		if (impl != nullptr)
+			impl->AddRef();
 	}
 }
 
-void POGLDeferredRenderState::Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count)
+void POGLDeferredRenderState::Bind(IPOGLIndexBuffer* indexBuffer)
 {
-	assert_not_null(vertexBuffer);
-
-	POGLVertexBuffer* vbImpl = static_cast<POGLVertexBuffer*>(vertexBuffer);
-	const POGL_UINT32 vbUID = vbImpl != nullptr ? vbImpl->GetUID() : 0;
-	POGLIndexBuffer* ibImpl = static_cast<POGLIndexBuffer*>(indexBuffer);
-	const POGL_UINT32 ibUID = ibImpl != nullptr ? ibImpl->GetUID() : 0;
-
-	bool changed = mVertexBuffer.Set(vbUID);
-	changed |= mIndexBuffer.Set(ibUID);
-	if (changed) {
-		POGL_DRAW_COMMAND_DATA* cmd = (POGL_DRAW_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDrawCount_Command, &POGLDraw_Release,
-			sizeof(POGL_DRAW_COMMAND_DATA));
-		cmd->vertexBuffer = vertexBuffer;
-		vertexBuffer->AddRef();
-		cmd->indexBuffer = indexBuffer;
-		if (indexBuffer != nullptr)
-			indexBuffer->AddRef();
-		cmd->startIndex = startIndex;
-		cmd->count = count;
+	POGLIndexBuffer* impl = static_cast<POGLIndexBuffer*>(indexBuffer);
+	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;
+	if (mIndexBuffer.Set(uid)) {
+		POGL_BINDINDEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDINDEXBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLBindIndexBuffer_Command, &POGLBindIndexBuffer_Release,
+			sizeof(POGL_BINDINDEXBUFFER_COMMAND_DATA));
+		cmd->indexBuffer = impl;
+		if (impl != nullptr)
+			impl->AddRef();
 	}
+}
+
+void POGLDeferredRenderState::Draw()
+{
+	mRenderContext->AddCommand(&POGLDraw_Command, &POGLNothing_Release, 0);
+}
+
+void POGLDeferredRenderState::Draw(POGL_UINT32 count)
+{
+	POGL_DRAWCOUNT_COMMAND_DATA* cmd = (POGL_DRAWCOUNT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDrawCount_Command, &POGLNothing_Release,
+		sizeof(POGL_DRAWCOUNT_COMMAND_DATA));
+	cmd->count = count;
+}
+
+void POGLDeferredRenderState::Draw(POGL_UINT32 count, POGL_UINT32 offset)
+{
+	POGL_DRAWCOUNTOFFSET_COMMAND_DATA* cmd = (POGL_DRAWCOUNTOFFSET_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDrawCountOffset_Command, &POGLNothing_Release,
+		sizeof(POGL_DRAWCOUNTOFFSET_COMMAND_DATA));
+	cmd->count = count;
+	cmd->offset = offset;
 }
 
 void POGLDeferredRenderState::SetDepthTest(bool b)

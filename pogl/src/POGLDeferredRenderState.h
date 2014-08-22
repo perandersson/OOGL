@@ -28,10 +28,11 @@ public:
 	virtual void Clear(POGL_UINT32 clearBits);
 	virtual IPOGLUniform* FindUniformByName(const POGL_CHAR* name);
 	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer);
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer);
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer);
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex);
-	virtual void Draw(IPOGLVertexBuffer* vertexBuffer, IPOGLIndexBuffer* indexBuffer, POGL_UINT32 startIndex, POGL_UINT32 count);
+	virtual void Bind(IPOGLVertexBuffer* vertexBuffer);
+	virtual void Bind(IPOGLIndexBuffer* indexBuffer);
+	virtual void Draw();
+	virtual void Draw(POGL_UINT32 count);
+	virtual void Draw(POGL_UINT32 count, POGL_UINT32 offset);
 	virtual void SetDepthTest(bool b);
 	virtual void SetDepthFunc(POGLDepthFunc::Enum depthFunc);
 	virtual void SetDepthMask(bool b);

@@ -55,20 +55,46 @@ int main()
 		program->SetBlend(true);
 		program->SetBlendFunc(POGLSrcFactor::SRC_COLOR, POGLDstFactor::ONE_MINUS_SRC_COLOR);
 
+		//
+		// Apply the program to this context
+		// 
+		// Since we are only using one program, and we are not changing any parameters on the program while rendering
+		// it's recommended to apply the state only once.
+		// 
+		// POGL will prevent all unneccessary state changes, so trying to apply the same program more than once will not really do anything.
+		//
+
+		IPOGLRenderState* state = context->Apply(program);
+
+		// 
+		// Render loop
+		//
+
 		while (POGLProcessEvents()) {
-			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
-			// Draw the two triangles
+			// Bind the normal vertex buffer and draw it onto the screen
 			//
 
-			state->Draw(vertexBuffer);
-			state->Draw(vertexBufferInv);
+			state->Bind(vertexBuffer);
+			state->Draw();
 
-			state->Release();
+			//
+			// Bind the inverted vertex buffer and draw it onto the screen
+			//
+
+			state->Bind(vertexBufferInv);
+			state->Draw();
+
+			//
+			// End the current frame
+			//
+
 			device->EndFrame();
 		}
+
+		state->Release();
 
 		//
 		// Release resources

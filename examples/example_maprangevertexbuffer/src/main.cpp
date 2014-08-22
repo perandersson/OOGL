@@ -136,7 +136,8 @@ int main()
 
 			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-			state->Draw(vertexBuffer);
+			state->Bind(vertexBuffer);
+			state->Draw();
 			state->Release();
 
 			//

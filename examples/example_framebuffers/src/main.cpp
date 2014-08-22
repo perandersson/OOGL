@@ -120,7 +120,8 @@ int main()
 			//
 
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
-			state->Draw(vertexBuffer);
+			state->Bind(vertexBuffer);
+			state->Draw();
 			state->Release();
 
 			//
@@ -144,7 +145,9 @@ int main()
 			state->FindUniformByName("Texture0")->SetTexture(texture0); 
 			state->FindUniformByName("Texture1")->SetTexture(texture1);
 
-			state->Draw(fullscreenVB, fullscreenIB);
+			state->Bind(fullscreenVB);
+			state->Bind(fullscreenIB);
+			state->Draw();
 			state->Release();
 
 			//

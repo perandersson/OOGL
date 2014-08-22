@@ -1,7 +1,6 @@
 #pragma once
 #include "config.h"
 
-class POGLVertexBuffer;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
@@ -46,9 +45,10 @@ public:
 	inline GLenum GetElementType() const {
 		return mElementType;
 	}
-	
-	void Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex);
-	void Draw(POGLVertexBuffer* vertexBuffer, GLenum primitiveType, POGL_UINT32 startIndex, POGL_UINT32 count);
+
+	void Draw(GLenum primitiveType);
+	void Draw(GLenum primitiveType, POGL_UINT32 count);
+	void Draw(GLenum primitiveType, POGL_UINT32 count, POGL_UINT32 offset);
 
 // IPOGLInterface
 public:
