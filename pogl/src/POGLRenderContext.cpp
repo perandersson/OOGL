@@ -223,9 +223,11 @@ IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const POGL_POSITION_TEX
 
 IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
 {
-	assert_not_null(memory);
-	assert_with_message(memorySize > 0, "You cannot create a index buffer of no size");
-	assert_with_message(type != POGLVertexType::FLOAT && type != POGLVertexType::DOUBLE, "You are not allowed to create an index buffer of a decimal type");
+	if (memorySize == 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot create a non-existing index buffer");
+
+	if (type == POGLVertexType::FLOAT || type == POGLVertexType::DOUBLE)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to create an index buffer of a decimal type");
 
 	const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(type);
 	const POGL_UINT32 numIndices = memorySize / typeSize;
