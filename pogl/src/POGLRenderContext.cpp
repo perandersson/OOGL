@@ -171,9 +171,11 @@ IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, 
 
 IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
-	assert_not_null(memory);
-	assert_with_message(memorySize > 0, "You cannot create a vertex buffer of no size");
-	assert_not_null(layout);
+	if (memorySize == 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot create a non-existing vertex buffer");
+
+	if (layout == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You cannot create a vertex buffer without a layout");
 
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
