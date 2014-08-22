@@ -122,49 +122,44 @@ int main()
 			angle += POGLGetTimeSinceLastTick() * ROTATION_SPEED;
 			if (angle > 360.0f)
 				angle = 360.0f - angle;
-
-			// 
-			// Bind the vertex- and index buffer
-			//
-
-			state->BindBuffer(vertexBuffer);
-			state->BindBuffer(indexBuffer);
-
-			//
-			// Draw the box
-			//
-
+			
+			state->SetVertexBuffer(vertexBuffer);
+			state->SetIndexBuffer(indexBuffer);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
-			// Set the same model multiple times
+			// Retrieve the ModelMatrix for the currently bound program
 			//
 
 			IPOGLUniform* modelMatrixUniform = state->FindUniformByName("ModelMatrix");
+
+			//
+			// Draw four translated and rotated cubes onto the screen
+			//
 
 			POGL_MAT4 modelMatrix;
 			POGLMat4Translate(POGL_VECTOR3(-5.0f, 0.0f, 0.0f), &modelMatrix);
 			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 			modelMatrixUniform->SetMatrix(modelMatrix);
-			state->Draw();
+			state->DrawIndexed();
 
 			modelMatrix = POGL_MAT4();
 			POGLMat4Translate(POGL_VECTOR3(5.0f, 0.0f, 0.0f), &modelMatrix);
 			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 			modelMatrixUniform->SetMatrix(modelMatrix);
-			state->Draw();
+			state->DrawIndexed();
 
 			modelMatrix = POGL_MAT4();
 			POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, 5.0f), &modelMatrix);
 			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 			modelMatrixUniform->SetMatrix(modelMatrix);
-			state->Draw();
+			state->DrawIndexed();
 
 			modelMatrix = POGL_MAT4();
 			POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, -5.0f), &modelMatrix);
 			POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 			modelMatrixUniform->SetMatrix(modelMatrix);
-			state->Draw();
+			state->DrawIndexed();
 
 			device->EndFrame();
 		}

@@ -124,13 +124,13 @@ void POGLRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 	mFramebufferUID = uid;
 }
 
-void POGLRenderState::BindBuffer(IPOGLVertexBuffer* vertexBuffer)
+void POGLRenderState::SetVertexBuffer(IPOGLVertexBuffer* vertexBuffer)
 {
 	POGLVertexBuffer* buffer = static_cast<POGLVertexBuffer*>(vertexBuffer);
 	BindVertexBuffer(buffer);
 }
 
-void POGLRenderState::BindBuffer(IPOGLIndexBuffer* indexBuffer)
+void POGLRenderState::SetIndexBuffer(IPOGLIndexBuffer* indexBuffer)
 {
 	POGLIndexBuffer* buffer = static_cast<POGLIndexBuffer*>(indexBuffer);
 	BindIndexBuffer(buffer);
@@ -186,11 +186,7 @@ void POGLRenderState::Draw()
 		mApplyCurrentProgramState = false;
 	}
 
-	if (mIndexBuffer != nullptr)
-		mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType());
-	else
-		mVertexBuffer->Draw();
-
+	mVertexBuffer->Draw();
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 
@@ -204,11 +200,7 @@ void POGLRenderState::Draw(POGL_UINT32 count)
 		mApplyCurrentProgramState = false;
 	}
 
-	if (mIndexBuffer != nullptr)
-		mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count);
-	else
-		mVertexBuffer->Draw(count);
-
+	mVertexBuffer->Draw(count);
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 
@@ -222,11 +214,58 @@ void POGLRenderState::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 		mApplyCurrentProgramState = false;
 	}
 
-	if (mIndexBuffer != nullptr)
-		mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count, offset);
-	else
-		mVertexBuffer->Draw(count, offset);
+	mVertexBuffer->Draw(count, offset);
+	CHECK_GL("Cannot draw vertex- and index buffer");
+}
 
+void POGLRenderState::DrawIndexed()
+{
+	if (mVertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mIndexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mApplyCurrentProgramState) {
+		mProgram->ApplyStateUniforms();
+		mApplyCurrentProgramState = false;
+	}
+
+	mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType());
+	CHECK_GL("Cannot draw vertex- and index buffer");
+}
+
+void POGLRenderState::DrawIndexed(POGL_UINT32 count)
+{
+	if (mVertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mIndexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mApplyCurrentProgramState) {
+		mProgram->ApplyStateUniforms();
+		mApplyCurrentProgramState = false;
+	}
+
+	mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count);
+	CHECK_GL("Cannot draw vertex- and index buffer");
+}
+
+void POGLRenderState::DrawIndexed(POGL_UINT32 count, POGL_UINT32 offset)
+{
+	if (mVertexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mIndexBuffer == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to draw unbound vertices onto the screen");
+
+	if (mApplyCurrentProgramState) {
+		mProgram->ApplyStateUniforms();
+		mApplyCurrentProgramState = false;
+	}
+
+	mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count, offset);
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 

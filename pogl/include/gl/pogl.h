@@ -1464,22 +1464,26 @@ public:
 	virtual void SetFramebuffer(IPOGLFramebuffer* framebuffer) = 0;
 
 	/*!
-		\brief Bind the supplied vertex buffer
+		\brief Set the active vertex buffer
+
+		\param vertexBuffer
 	*/
-	virtual void BindBuffer(IPOGLVertexBuffer* vertexBuffer) = 0;
+	virtual void SetVertexBuffer(IPOGLVertexBuffer* vertexBuffer) = 0;
 
 	/*!
-		\brief Bind the supplied vertex buffer
+		\brief Set the active index buffer
+
+		\param indexBuffer
 	*/
-	virtual void BindBuffer(IPOGLIndexBuffer* indexBuffer) = 0;
+	virtual void SetIndexBuffer(IPOGLIndexBuffer* indexBuffer) = 0;
 	
 	/*!
-		\brief Draw the bound buffers
+		\brief Draw the active vertex buffer
 	*/
 	virtual void Draw() = 0;
 
 	/*!
-		\brief Draw the bound buffers
+		\brief Draw the active vertex buffer
 
 		\param count
 				How many vertices we want to draw
@@ -1487,12 +1491,37 @@ public:
 	virtual void Draw(POGL_UINT32 count) = 0;
 
 	/*!
-		\brief Draw the bound buffers
+		\brief Draw the active vertex buffer
 
 		\param count
+				How many vertices we want to draw
 		\param offset
+				Where the first vertex is located
 	*/
 	virtual void Draw(POGL_UINT32 count, POGL_UINT32 offset) = 0;
+
+	/*!
+		\brief Draw the active vertex- and index buffer
+	*/
+	virtual void DrawIndexed() = 0;
+	
+	/*!
+		\brief Draw the active vertex- and index buffer
+
+		\param count
+				How many vertices we want to draw
+	*/
+	virtual void DrawIndexed(POGL_UINT32 count) = 0;
+
+	/*!
+		\brief Draw the active vertex- and index buffer
+
+		\param count
+				How many vertices we want to draw
+		\param offset
+				Where the first vertex is located
+	*/
+	virtual void DrawIndexed(POGL_UINT32 count, POGL_UINT32 offset) = 0;
 
 	/*!
 		\brief

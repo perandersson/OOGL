@@ -144,24 +144,24 @@ int main()
 			textureUniform->SetTexture(texture0);
 			translateUniform->SetFloat(-1.0f, 1.0f);
 			scaleUniform->SetFloat(0.5f, 0.5f);
-			state->BindBuffer(fullscreenVB);
-			state->BindBuffer(fullscreenIB);
-			state->Draw();
+			state->SetVertexBuffer(fullscreenVB);
+			state->SetIndexBuffer(fullscreenIB);
+			state->DrawIndexed();
 
 			textureUniform->SetTexture(texture1);
 			translateUniform->SetFloat(1.0f, 1.0f);
 			scaleUniform->SetFloat(0.5f, 0.5f);
-			state->Draw();
+			state->DrawIndexed();
 
 			textureUniform->SetTexture(texture2);
 			translateUniform->SetFloat(-1.0f, -1.0f);
 			scaleUniform->SetFloat(0.5f, 0.5f);
-			state->Draw();
+			state->DrawIndexed();
 
 			textureUniform->SetTexture(texture3);
 			translateUniform->SetFloat(1.0f, -1.0f);
 			scaleUniform->SetFloat(0.5f, 0.5f);
-			state->Draw();
+			state->DrawIndexed();
 
 			state->Release();
 

@@ -131,9 +131,9 @@ int main()
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
-			// Draw the vertex buffer in the same way as normal
+			// Set the active vertex buffer and draw it onto the screen
 			//
-			state->BindBuffer(vertexBuffer);
+			state->SetVertexBuffer(vertexBuffer);
 			state->Draw();
 
 			state->Release();

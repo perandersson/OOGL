@@ -215,28 +215,28 @@ void POGLSetFramebuffer_Release(POGL_HANDLE command)
 		cmd->framebuffer->Release();
 }
 
-void POGLBindVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+void POGLSetVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
-	POGL_BINDVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDVERTEXBUFFER_COMMAND_DATA*)command;
+	POGL_SETVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_SETVERTEXBUFFER_COMMAND_DATA*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
 }
 
-void POGLBindVertexBuffer_Release(POGL_HANDLE command)
+void POGLSetVertexBuffer_Release(POGL_HANDLE command)
 {
-	POGL_BINDVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDVERTEXBUFFER_COMMAND_DATA*)command;
+	POGL_SETVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_SETVERTEXBUFFER_COMMAND_DATA*)command;
 	if (cmd->vertexBuffer != nullptr)
 		cmd->vertexBuffer->Release();
 }
 
-void POGLBindIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+void POGLSetIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
-	POGL_BINDINDEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDINDEXBUFFER_COMMAND_DATA*)command;
+	POGL_SETINDEXBUFFER_COMMAND_DATA* cmd = (POGL_SETINDEXBUFFER_COMMAND_DATA*)command;
 	state->BindIndexBuffer(cmd->indexBuffer);
 }
 
-void POGLBindIndexBuffer_Release(POGL_HANDLE command)
+void POGLSetIndexBuffer_Release(POGL_HANDLE command)
 {
-	POGL_BINDINDEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDINDEXBUFFER_COMMAND_DATA*)command;
+	POGL_SETINDEXBUFFER_COMMAND_DATA* cmd = (POGL_SETINDEXBUFFER_COMMAND_DATA*)command;
 	if (cmd->indexBuffer != nullptr)
 		cmd->indexBuffer->Release();
 }
@@ -246,16 +246,33 @@ void POGLDraw_Command(POGLDeferredRenderContext* context, POGLRenderState* state
 	state->Draw();
 }
 
+void POGLDrawIndexed_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	state->DrawIndexed();
+}
+
 void POGLDrawCount_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_DRAWCOUNT_COMMAND_DATA* cmd = (POGL_DRAWCOUNT_COMMAND_DATA*)command;
 	state->Draw(cmd->count);
 }
 
+void POGLDrawIndexedCount_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_DRAWCOUNT_COMMAND_DATA* cmd = (POGL_DRAWCOUNT_COMMAND_DATA*)command;
+	state->DrawIndexed(cmd->count);
+}
+
 void POGLDrawCountOffset_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_DRAWCOUNTOFFSET_COMMAND_DATA* cmd = (POGL_DRAWCOUNTOFFSET_COMMAND_DATA*)command;
 	state->Draw(cmd->count, cmd->offset);
+}
+
+void POGLDrawIndexedCountOffset_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_DRAWCOUNTOFFSET_COMMAND_DATA* cmd = (POGL_DRAWCOUNTOFFSET_COMMAND_DATA*)command;
+	state->DrawIndexed(cmd->count, cmd->offset);
 }
 
 void POGLSetDepthTest_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)

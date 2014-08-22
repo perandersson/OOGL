@@ -129,8 +129,8 @@ int main()
 					
 					// 
 					// Apply the program (note that the program is actually loaded, but not initialized, in this thread).
-					// This has to be done in inside the running render loop. 
 					//
+					// This has to be done in inside the running render loop. 
 					// Why is this important here? It's important because the commands will be cleared after the flush method is invoked
 					// and we can't know for sure if some other program or buffer is bound somewhere else in the program (from this thread's point of view).
 					// 
@@ -140,15 +140,11 @@ int main()
 					IPOGLRenderState* state = deferredContext->Apply(program);
 
 					//
-					// Bind the vertex- and index buffers
+					// Set the active vertex- and index buffers
 					//
 
-					state->BindBuffer(vertexBuffer);
-					state->BindBuffer(indexBuffer);
-
-					//
-					// Draw the box
-					//
+					state->SetVertexBuffer(vertexBuffer);
+					state->SetIndexBuffer(indexBuffer);
 
 					state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
@@ -162,25 +158,25 @@ int main()
 					POGLMat4Translate(POGL_VECTOR3(-5.0f, 0.0f, 0.0f), &modelMatrix);
 					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 					modelMatrixUniform->SetMatrix(modelMatrix);
-					state->Draw();
+					state->DrawIndexed();
 
 					modelMatrix = POGL_MAT4();
 					POGLMat4Translate(POGL_VECTOR3(5.0f, 0.0f, 0.0f), &modelMatrix);
 					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 					modelMatrixUniform->SetMatrix(modelMatrix);
-					state->Draw();
+					state->DrawIndexed();
 
 					modelMatrix = POGL_MAT4();
 					POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, 5.0f), &modelMatrix);
 					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 					modelMatrixUniform->SetMatrix(modelMatrix);
-					state->Draw();
+					state->DrawIndexed();
 
 					modelMatrix = POGL_MAT4();
 					POGLMat4Translate(POGL_VECTOR3(0.0f, 0.0f, -5.0f), &modelMatrix);
 					POGLMat4Rotate(angle, modelMatrix, POGL_VECTOR3(0.0f, 1.0f, 0.0f), &modelMatrix);
 					modelMatrixUniform->SetMatrix(modelMatrix);
-					state->Draw();
+					state->DrawIndexed();
 
 					state->Release();
 

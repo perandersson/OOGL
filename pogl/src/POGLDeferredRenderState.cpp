@@ -90,26 +90,26 @@ void POGLDeferredRenderState::SetFramebuffer(IPOGLFramebuffer* framebuffer)
 	}
 }
 
-void POGLDeferredRenderState::BindBuffer(IPOGLVertexBuffer* vertexBuffer)
+void POGLDeferredRenderState::SetVertexBuffer(IPOGLVertexBuffer* vertexBuffer)
 {
 	POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(vertexBuffer);
 	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;
 	if (mVertexBuffer.Set(uid)) {
-		POGL_BINDVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDVERTEXBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLBindVertexBuffer_Command, &POGLBindVertexBuffer_Release,
-			sizeof(POGL_BINDVERTEXBUFFER_COMMAND_DATA));
+		POGL_SETVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_SETVERTEXBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLSetVertexBuffer_Command, &POGLSetVertexBuffer_Release,
+			sizeof(POGL_SETVERTEXBUFFER_COMMAND_DATA));
 		cmd->vertexBuffer = impl;
 		if (impl != nullptr)
 			impl->AddRef();
 	}
 }
 
-void POGLDeferredRenderState::BindBuffer(IPOGLIndexBuffer* indexBuffer)
+void POGLDeferredRenderState::SetIndexBuffer(IPOGLIndexBuffer* indexBuffer)
 {
 	POGLIndexBuffer* impl = static_cast<POGLIndexBuffer*>(indexBuffer);
 	const POGL_UINT32 uid = impl != nullptr ? impl->GetUID() : 0;
 	if (mIndexBuffer.Set(uid)) {
-		POGL_BINDINDEXBUFFER_COMMAND_DATA* cmd = (POGL_BINDINDEXBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLBindIndexBuffer_Command, &POGLBindIndexBuffer_Release,
-			sizeof(POGL_BINDINDEXBUFFER_COMMAND_DATA));
+		POGL_SETINDEXBUFFER_COMMAND_DATA* cmd = (POGL_SETINDEXBUFFER_COMMAND_DATA*)mRenderContext->AddCommand(&POGLSetIndexBuffer_Command, &POGLSetIndexBuffer_Release,
+			sizeof(POGL_SETINDEXBUFFER_COMMAND_DATA));
 		cmd->indexBuffer = impl;
 		if (impl != nullptr)
 			impl->AddRef();
@@ -131,6 +131,26 @@ void POGLDeferredRenderState::Draw(POGL_UINT32 count)
 void POGLDeferredRenderState::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 {
 	POGL_DRAWCOUNTOFFSET_COMMAND_DATA* cmd = (POGL_DRAWCOUNTOFFSET_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDrawCountOffset_Command, &POGLNothing_Release,
+		sizeof(POGL_DRAWCOUNTOFFSET_COMMAND_DATA));
+	cmd->count = count;
+	cmd->offset = offset;
+}
+
+void POGLDeferredRenderState::DrawIndexed()
+{
+	mRenderContext->AddCommand(&POGLDrawIndexed_Command, &POGLNothing_Release, 0);
+}
+
+void POGLDeferredRenderState::DrawIndexed(POGL_UINT32 count)
+{
+	POGL_DRAWCOUNT_COMMAND_DATA* cmd = (POGL_DRAWCOUNT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDrawIndexedCount_Command, &POGLNothing_Release,
+		sizeof(POGL_DRAWCOUNT_COMMAND_DATA));
+	cmd->count = count;
+}
+
+void POGLDeferredRenderState::DrawIndexed(POGL_UINT32 count, POGL_UINT32 offset)
+{
+	POGL_DRAWCOUNTOFFSET_COMMAND_DATA* cmd = (POGL_DRAWCOUNTOFFSET_COMMAND_DATA*)mRenderContext->AddCommand(&POGLDrawIndexedCountOffset_Command, &POGLNothing_Release,
 		sizeof(POGL_DRAWCOUNTOFFSET_COMMAND_DATA));
 	cmd->count = count;
 	cmd->offset = offset;

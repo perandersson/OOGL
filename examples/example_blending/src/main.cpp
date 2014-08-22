@@ -74,17 +74,17 @@ int main()
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
 			//
-			// Bind the normal vertex buffer and draw it onto the screen
+			// Set the active vertex buffer and draw it onto the screen
 			//
 
-			state->BindBuffer(vertexBuffer);
+			state->SetVertexBuffer(vertexBuffer);
 			state->Draw();
 
 			//
-			// Bind the inverted vertex buffer and draw it onto the screen
+			// Set the active vertex buffer and draw it onto the screen
 			//
 
-			state->BindBuffer(vertexBufferInv);
+			state->SetVertexBuffer(vertexBufferInv);
 			state->Draw();
 
 			//
