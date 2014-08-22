@@ -4,8 +4,13 @@
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
-	POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage);
+	POGLIndexBuffer(POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum type, GLenum bufferUsage);
 	~POGLIndexBuffer();
+
+	/*!
+		\brief Method called after this buffer's construction is completed
+	*/
+	void PostConstruct(GLuint bufferID);
 	
 	/*!
 		\brief Retrieves a unique ID for this object

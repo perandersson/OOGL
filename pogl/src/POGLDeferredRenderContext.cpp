@@ -10,6 +10,7 @@
 #include "POGLFramebuffer.h"
 #include "POGLShader.h"
 #include "POGLProgram.h"
+#include "POGLIndexBuffer.h"
 
 POGLDeferredRenderContext::POGLDeferredRenderContext(IPOGLDevice* device)
 : mRefCount(1), mDevice(device), mRenderState(nullptr),
@@ -213,17 +214,28 @@ IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** te
 
 IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const void* memory, POGL_UINT32 memorySize, const POGL_VERTEX_LAYOUT* layout, POGLPrimitiveType::Enum primitiveType, POGLBufferUsage::Enum bufferUsage)
 {
+	if (memorySize == 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot create a non-existing vertex buffer");
+
+	if (layout == nullptr)
+		THROW_EXCEPTION(POGLStateException, "You cannot create a vertex buffer without a layout");
+
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
-	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage);
+	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, usage);
 	POGL_CREATEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEVERTEXBUFFER_COMMAND_DATA*)AddCommand(&POGLCreateVertexBuffer_Command, &POGLCreateVertexBuffer_Release,
 		sizeof(POGL_CREATEVERTEXBUFFER_COMMAND_DATA));
 	cmd->vertexBuffer = vb;
 	cmd->vertexBuffer->AddRef();
-	cmd->memoryOffset = GetMapOffset(memorySize);
-	memcpy(GetMapPointer(cmd->memoryOffset), memory, memorySize);
+	if (memory != nullptr) {
+		cmd->memoryOffset = GetMapOffset(memorySize);
+		memcpy(GetMapPointer(cmd->memoryOffset), memory, memorySize);
+	}
+	else {
+		cmd->memoryOffset = -1;
+	}
 	cmd->dataSize = memorySize;
 	return vb;
 }
@@ -245,7 +257,31 @@ IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const POGL_POSI
 
 IPOGLIndexBuffer* POGLDeferredRenderContext::CreateIndexBuffer(const void* memory, POGL_UINT32 memorySize, POGLVertexType::Enum type, POGLBufferUsage::Enum bufferUsage)
 {
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	if (memorySize == 0)
+		THROW_EXCEPTION(POGLStateException, "You cannot create a non-existing index buffer");
+
+	if (type == POGLVertexType::FLOAT || type == POGLVertexType::DOUBLE)
+		THROW_EXCEPTION(POGLStateException, "You are not allowed to create an index buffer of a decimal type");
+
+	const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(type);
+	const POGL_UINT32 numIndices = memorySize / typeSize;
+	const GLenum usage = POGLEnum::Convert(bufferUsage);
+	const GLenum indiceType = POGLEnum::Convert(type);
+
+	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
+	POGL_CREATEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEINDEXBUFFER_COMMAND_DATA*)AddCommand(&POGLCreateIndexBuffer_Command, &POGLCreateIndexBuffer_Release,
+		sizeof(POGL_CREATEINDEXBUFFER_COMMAND_DATA));
+	cmd->indexBuffer = ib;
+	cmd->indexBuffer->AddRef(); 
+	if (memory != nullptr) {
+		cmd->memoryOffset = GetMapOffset(memorySize);
+		memcpy(GetMapPointer(cmd->memoryOffset), memory, memorySize);
+	}
+	else {
+		cmd->memoryOffset = -1;
+	}
+	cmd->dataSize = memorySize;
+	return ib;
 }
 
 IPOGLResource* POGLDeferredRenderContext::CloneResource(IPOGLResource* resource)

@@ -202,6 +202,10 @@ IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POG
 
 	mRenderState->SetVertexBuffer(vb);
 
+	const GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
+
 	// Finished
 	return vb;
 }
@@ -240,14 +244,23 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 	//
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
+	if (memory != nullptr)
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
+
+	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
+	ib->PostConstruct(bufferID);
+
+	//
+	// Make sure to mark this buffer as the current index buffer
+	//
+
+	mRenderState->SetIndexBuffer(ib);
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
+		THROW_EXCEPTION(POGLResourceException, "Failed to create a index buffer. Reason: 0x%x", error);
 
-	POGLIndexBuffer* ib = new POGLIndexBuffer(bufferID, typeSize, numIndices, indiceType, usage);
-	mRenderState->SetIndexBuffer(ib);
+	// Finished
 	return ib;
 }
 

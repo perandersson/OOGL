@@ -53,13 +53,27 @@ struct POGL_CREATEVERTEXBUFFER_COMMAND_DATA
 	POGLVertexBuffer* vertexBuffer;
 
 	// The offset where the data begins
-	POGL_UINT32 memoryOffset;
+	POGL_INT32 memoryOffset;
 
 	// The size (in bytes) of the vertex buffer data
 	POGL_UINT32 dataSize;
 };
 extern void POGLCreateVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
-extern void POGLCreateVertexBuffer_Release(POGL_HANDLE command);
+extern void POGLCreateVertexBuffer_Release(POGL_HANDLE command); 
+
+struct POGL_CREATEINDEXBUFFER_COMMAND_DATA
+{
+	// The vertex buffer we want to create
+	POGLIndexBuffer* indexBuffer;
+
+	// The offset where the data begins
+	POGL_INT32 memoryOffset;
+
+	// The size (in bytes) of the vertex buffer data
+	POGL_UINT32 dataSize;
+};
+extern void POGLCreateIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLCreateIndexBuffer_Release(POGL_HANDLE command);
 
 struct POGL_CREATETEXTURE2D_COMMAND_DATA
 {

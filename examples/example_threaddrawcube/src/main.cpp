@@ -24,51 +24,6 @@ int main()
 		IPOGLRenderContext* context = device->GetRenderContext();
 
 		//
-		// Create vertex data for a cube.
-		//
-
-		const POGL_POSITION_COLOR_VERTEX VERTICES[] = {
-			// Front vertices
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, 1.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, -1.0f, 1.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, 1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, 1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f)),
-
-			// Back vertices
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, -1.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, -1.0f, -1.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, -1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
-			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, -1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f))
-		};
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
-
-		//
-		// Create the index buffer for the cube
-		//
-
-		const POGL_UINT32 INDICES[] = {
-			// front
-			0, 1, 2,
-			2, 3, 0,
-			// top
-			3, 2, 6,
-			6, 7, 3,
-			// back
-			7, 6, 5,
-			5, 4, 7,
-			// bottom
-			4, 5, 1,
-			1, 0, 4,
-			// left
-			4, 0, 3,
-			3, 7, 4,
-			// right
-			1, 5, 6,
-			6, 2, 1
-		};
-		IPOGLIndexBuffer* indexBuffer = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::STATIC);
-
-		//
 		// Set viewport
 		//
 
@@ -79,8 +34,52 @@ int main()
 
 		IPOGLDeferredRenderContext* deferredContext = device->CreateDeferredRenderContext();
 		std::condition_variable condition;
-		std::thread t([deferredContext, vertexBuffer, indexBuffer, &angle, &condition, &running] {
+		std::thread t([deferredContext, &angle, &condition, &running] {
 			try {
+				//
+				// Create vertex data for a cube.
+				//
+
+				const POGL_POSITION_COLOR_VERTEX VERTICES[] = {
+					// Front vertices
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, 1.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, -1.0f, 1.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, 1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, 1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f)),
+
+					// Back vertices
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, -1.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, -1.0f, -1.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, -1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
+					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, -1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f))
+				};
+				IPOGLVertexBuffer* vertexBuffer = deferredContext->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+
+				//
+				// Create the index buffer for the cube
+				//
+
+				const POGL_UINT32 INDICES[] = {
+					// front
+					0, 1, 2,
+					2, 3, 0,
+					// top
+					3, 2, 6,
+					6, 7, 3,
+					// back
+					7, 6, 5,
+					5, 4, 7,
+					// bottom
+					4, 5, 1,
+					1, 0, 4,
+					// left
+					4, 0, 3,
+					3, 7, 4,
+					// right
+					1, 5, 6,
+					6, 2, 1
+				};
+				IPOGLIndexBuffer* indexBuffer = deferredContext->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::STATIC);
 
 				// 
 				// Create the shaders in this thread and use it as if it was created in the main thread
@@ -201,6 +200,8 @@ int main()
 						condition.wait(lock);
 				}
 
+				vertexBuffer->Release();
+				indexBuffer->Release();
 				program->Release();
 			}
 			catch (POGLException e) {
@@ -237,8 +238,6 @@ int main()
 		t.join();
 
 		deferredContext->Release();
-		indexBuffer->Release();
-		vertexBuffer->Release();
 		context->Release();
 		device->Release();
 	}

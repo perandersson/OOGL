@@ -8,14 +8,20 @@ namespace {
 	}
 }
 
-POGLIndexBuffer::POGLIndexBuffer(GLuint bufferID, POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum elementType, GLenum bufferUsage)
-: mRefCount(1), mUID(GenIndexBufferUID()), mBufferID(bufferID), mTypeSize(typeSize), mNumIndices(numIndices), mElementType(elementType), mBufferUsage(bufferUsage)
+POGLIndexBuffer::POGLIndexBuffer(POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum elementType, GLenum bufferUsage)
+: mRefCount(1), mUID(0), mBufferID(0), mTypeSize(typeSize), mNumIndices(numIndices), mElementType(elementType), mBufferUsage(bufferUsage)
 {
 
 }
 
 POGLIndexBuffer::~POGLIndexBuffer()
 {
+}
+
+void POGLIndexBuffer::PostConstruct(GLuint bufferID)
+{
+	mBufferID = bufferID;
+	mUID = GenIndexBufferUID();
 }
 
 void POGLIndexBuffer::AddRef()

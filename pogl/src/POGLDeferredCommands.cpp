@@ -32,24 +32,66 @@ void POGLCreateVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRend
 	cmd->vertexBuffer->PostConstruct(bufferID, vaoID);
 
 	//
-	// Set the vertex buffer as the "current buffer" on the render state
+	// Map the data if needed
+	//
+
+	if (cmd->memoryOffset != -1) {
+		glBufferData(GL_ARRAY_BUFFER, cmd->dataSize, 0, cmd->vertexBuffer->GetBufferUsage());
+		void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
+		glUnmapBuffer(GL_ARRAY_BUFFER);
+	}
+
+	//
+	// Set the vertex buffer as the "current buffer" on the render state (because the GenVertexArrayObjectID will bind the vertex array object for us)
 	//
 
 	state->SetVertexBuffer(cmd->vertexBuffer);
 
-	//
-	// Map the data
-	//
-
-	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	const GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
 }
 
 void POGLCreateVertexBuffer_Release(POGL_HANDLE command)
 {
 	POGL_CREATEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEVERTEXBUFFER_COMMAND_DATA*)command;
 	cmd->vertexBuffer->Release();
+}
+
+void POGLCreateIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_CREATEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEINDEXBUFFER_COMMAND_DATA*)command;
+
+	const GLuint bufferID = POGLFactory::GenBufferID();
+	cmd->indexBuffer->PostConstruct(bufferID);
+
+	//
+	// Set the vertex buffer as the "current buffer" on the render state
+	//
+
+	state->BindIndexBuffer(cmd->indexBuffer);
+
+	//
+	// Map the data if needed
+	//
+
+	if (cmd->memoryOffset != -1) {
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cmd->dataSize, 0, cmd->indexBuffer->GetBufferUsage());
+		void* map = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
+		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+	}
+
+	const GLenum error = glGetError();
+	if (error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Failed to create a index buffer. Reason: 0x%x", error);
+}
+
+void POGLCreateIndexBuffer_Release(POGL_HANDLE command)
+{
+	POGL_CREATEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEINDEXBUFFER_COMMAND_DATA*)command;
+	cmd->indexBuffer->Release();
 }
 
 void POGLCreateTexture2D_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
