@@ -131,6 +131,7 @@ int main()
 
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			state->BindBuffer(vertexBuffer);
+			state->BindBuffer((IPOGLIndexBuffer*)nullptr);
 			state->Draw();
 			state->Release();
 
