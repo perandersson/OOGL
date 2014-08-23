@@ -578,6 +578,9 @@ struct POGLAPI POGL_VECTOR2
 	POGL_VECTOR2& operator=(const POGL_VECTOR2& rhs);
 	bool operator==(const POGL_VECTOR2& rhs) const;
 	bool operator!=(const POGL_VECTOR2& rhs) const;
+	POGL_VECTOR2 operator-() const;
+	POGL_FLOAT operator[](POGL_UINT32 idx) const;
+	POGL_FLOAT& operator[](POGL_UINT32 idx);
 };
 
 typedef struct POGLAPI POGL_VECTOR3
@@ -603,6 +606,9 @@ typedef struct POGLAPI POGL_VECTOR3
 	POGL_VECTOR3& operator=(const POGL_VECTOR3& rhs);
 	bool operator==(const POGL_VECTOR3& rhs) const;
 	bool operator!=(const POGL_VECTOR3& rhs) const;
+	POGL_VECTOR3 operator-() const;
+	POGL_FLOAT operator[](POGL_UINT32 idx) const;
+	POGL_FLOAT& operator[](POGL_UINT32 idx);
 } POGL_COLOR3;
 
 typedef struct POGLAPI POGL_VECTOR4
@@ -630,6 +636,9 @@ typedef struct POGLAPI POGL_VECTOR4
 	POGL_VECTOR4& operator=(const POGL_VECTOR4& rhs);
 	bool operator==(const POGL_VECTOR4& rhs) const;
 	bool operator!=(const POGL_VECTOR4& rhs) const;
+	POGL_VECTOR4 operator-() const;
+	POGL_FLOAT operator[](POGL_UINT32 idx) const;
+	POGL_FLOAT& operator[](POGL_UINT32 idx);
 } POGL_COLOR4;
 
 struct POGLAPI POGL_RECT
@@ -661,21 +670,14 @@ struct POGLAPI POGL_RECT
 
 	{@code
 		POGL_MAT4 mat;
-		POGL_FLOAT value = mat(row, column);
+		POGL_FLOAT value = mat[column * 4 + row];
 	}
 
 	You can also do:
 
 	{@code
 		POGL_MAT4 mat;
-		POGL_FLOAT value = math.vec[column * 4 + row];
-	}
-
-	You can also do:
-
-	{@code
-		POGL_MAT4 mat;
-		POGL_FLOAT value = math.m[column][row];
+		POGL_FLOAT value = mat.m[column][row];
 	}
 */
 struct POGLAPI POGL_MAT4
@@ -708,8 +710,8 @@ struct POGLAPI POGL_MAT4
 		_14(rhs._14), _24(rhs._24), _34(rhs._34), _44(rhs._44)
 	{}
 
-	POGL_FLOAT operator() (POGL_UINT32 row, POGL_UINT32 column) const { return m[column][row]; }
-	POGL_FLOAT& operator() (POGL_UINT32 row, POGL_UINT32 column) { return m[column][row]; }
+	POGL_FLOAT operator[](POGL_UINT32 idx) const;
+	POGL_FLOAT& operator[](POGL_UINT32 idx);
 };
 
 /*!

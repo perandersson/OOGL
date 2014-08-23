@@ -77,6 +77,21 @@ bool POGL_VECTOR2::operator!=(const POGL_VECTOR2& rhs) const
 	return FLT_NEQ(x, rhs.x) || FLT_NEQ(y, rhs.x);
 }
 
+POGL_VECTOR2 POGL_VECTOR2::operator-() const
+{
+	return POGL_VECTOR2(-x, -y);
+}
+
+POGL_FLOAT POGL_VECTOR2::operator[](POGL_UINT32 idx) const
+{
+	return vec[idx];
+}
+
+POGL_FLOAT& POGL_VECTOR2::operator[](POGL_UINT32 idx)
+{
+	return vec[idx];
+}
+
 POGL_VECTOR3& POGL_VECTOR3::operator = (const POGL_VECTOR3& rhs)
 {
 	x = rhs.x;
@@ -93,6 +108,21 @@ bool POGL_VECTOR3::operator==(const POGL_VECTOR3& rhs) const
 bool POGL_VECTOR3::operator!=(const POGL_VECTOR3& rhs) const
 {
 	return FLT_NEQ(x, rhs.x) || FLT_NEQ(y, rhs.x) || FLT_NEQ(z, rhs.z);
+}
+
+POGL_VECTOR3 POGL_VECTOR3::operator-() const
+{
+	return POGL_VECTOR3(-x, -y, -z);
+}
+
+POGL_FLOAT POGL_VECTOR3::operator[](POGL_UINT32 idx) const
+{
+	return vec[idx];
+}
+
+POGL_FLOAT& POGL_VECTOR3::operator[](POGL_UINT32 idx)
+{
+	return vec[idx];
 }
 
 POGL_VECTOR4& POGL_VECTOR4::operator = (const POGL_VECTOR4& rhs)
@@ -112,6 +142,31 @@ bool POGL_VECTOR4::operator==(const POGL_VECTOR4& rhs) const
 bool POGL_VECTOR4::operator!=(const POGL_VECTOR4& rhs) const
 {
 	return FLT_NEQ(x, rhs.x) || FLT_NEQ(y, rhs.x) || FLT_NEQ(z, rhs.z) || FLT_NEQ(w, rhs.w);
+}
+
+POGL_VECTOR4 POGL_VECTOR4::operator-() const
+{
+	return POGL_VECTOR4(-x, -y, -z, -w);
+}
+
+POGL_FLOAT POGL_VECTOR4::operator[](POGL_UINT32 idx) const
+{
+	return vec[idx];
+}
+
+POGL_FLOAT& POGL_VECTOR4::operator[](POGL_UINT32 idx)
+{
+	return vec[idx];
+}
+
+POGL_FLOAT POGL_MAT4::operator[](POGL_UINT32 idx) const
+{
+	return vec[idx];
+}
+
+POGL_FLOAT& POGL_MAT4::operator[](POGL_UINT32 idx)
+{
+	return vec[idx];
 }
 
 POGL_RECT& POGL_RECT::operator = (const POGL_RECT& rhs)

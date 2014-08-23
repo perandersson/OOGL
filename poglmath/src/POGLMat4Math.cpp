@@ -29,6 +29,10 @@
 #define M(row, col) m[col * 4 + row]
 #endif
 
+#ifndef MREF
+#define MREF(m, row, col) m[col * 4 + row]
+#endif
+
 static const POGL_MAT4 POGL_MAT4_IDENTITY;
 
 void POGLMat4Ortho(POGL_FLOAT left, POGL_FLOAT right, POGL_FLOAT bottom, POGL_FLOAT top, POGL_FLOAT zNear, POGL_FLOAT zFar, POGL_MAT4* _out_Mat4)
@@ -98,20 +102,6 @@ void POGLMat4LookAt(const POGL_VECTOR3& eye, const POGL_VECTOR3& center, const P
 	POGL_VECTOR3 negativeEye;
 	POGLVec3Invert(eye, &negativeEye);
 	POGLMat4Translate(negativeEye, _out_Mat4);
-}
-
-void POGLVec3Invert(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec3)
-{
-	_out_Vec3->x = v.x * -1.f;
-	_out_Vec3->y = v.y * -1.f;
-	_out_Vec3->z = v.z * -1.f;
-}
-
-void POGLVec3Invert(POGL_VECTOR3* v)
-{
-	v->x *= -1.f;
-	v->y *= -1.f;
-	v->z *= -1.f;
 }
 
 void POGLMat4Perspective(POGL_FLOAT fovy, POGL_FLOAT aspect, POGL_FLOAT zNear, POGL_FLOAT zFar, POGL_MAT4* _out_Mat4)
@@ -329,4 +319,118 @@ POGLAPI void POGLMat4Transpose(const POGL_MAT4& from, POGL_MAT4* _out_Mat4)
 	to[13] = m[7];
 	to[14] = m[11];
 	to[15] = m[15];
+}
+
+bool POGLMat4Inverse(const POGL_MAT4& from, POGL_MAT4* _out_Mat4)
+{
+#define SWAP_ROWS(a, b) { POGL_FLOAT *_tmp = a; (a)=(b); (b)=_tmp; }
+	const POGL_FLOAT* m = from.vec;
+	POGL_FLOAT* out = _out_Mat4->vec;
+	POGL_FLOAT wtmp[4][8];
+	POGL_FLOAT m0, m1, m2, m3, s;
+	POGL_FLOAT *r0, *r1, *r2, *r3;
+
+	r0 = wtmp[0], r1 = wtmp[1], r2 = wtmp[2], r3 = wtmp[3];
+
+	r0[0] = MREF(m, 0, 0), r0[1] = MREF(m, 0, 1),
+	r0[2] = MREF(m, 0, 2), r0[3] = MREF(m, 0, 3),
+	r0[4] = 1.0, r0[5] = r0[6] = r0[7] = 0.0,
+
+	r1[0] = MREF(m, 1, 0), r1[1] = MREF(m, 1, 1),
+	r1[2] = MREF(m, 1, 2), r1[3] = MREF(m, 1, 3),
+	r1[5] = 1.0, r1[4] = r1[6] = r1[7] = 0.0,
+
+	r2[0] = MREF(m, 2, 0), r2[1] = MREF(m, 2, 1),
+	r2[2] = MREF(m, 2, 2), r2[3] = MREF(m, 2, 3),
+	r2[6] = 1.0, r2[4] = r2[5] = r2[7] = 0.0,
+
+	r3[0] = MREF(m, 3, 0), r3[1] = MREF(m, 3, 1),
+	r3[2] = MREF(m, 3, 2), r3[3] = MREF(m, 3, 3),
+	r3[7] = 1.0, r3[4] = r3[5] = r3[6] = 0.0;
+
+	/* choose pivot - or die */
+	if (fabsf(r3[0])>fabsf(r2[0])) SWAP_ROWS(r3, r2);
+	if (fabsf(r2[0])>fabsf(r1[0])) SWAP_ROWS(r2, r1);
+	if (fabsf(r1[0])>fabsf(r0[0])) SWAP_ROWS(r1, r0);
+	if (0.0 == r0[0]) return false;
+
+	/* eliminate first variable     */
+	m1 = r1[0]/r0[0]; m2 = r2[0]/r0[0]; m3 = r3[0]/r0[0];
+	s = r0[1]; r1[1] -= m1 * s; r2[1] -= m2 * s; r3[1] -= m3 * s;
+	s = r0[2]; r1[2] -= m1 * s; r2[2] -= m2 * s; r3[2] -= m3 * s;
+	s = r0[3]; r1[3] -= m1 * s; r2[3] -= m2 * s; r3[3] -= m3 * s;
+	s = r0[4];
+	if (s != 0.0) { r1[4] -= m1 * s; r2[4] -= m2 * s; r3[4] -= m3 * s; }
+	s = r0[5];
+	if (s != 0.0) { r1[5] -= m1 * s; r2[5] -= m2 * s; r3[5] -= m3 * s; }
+	s = r0[6];
+	if (s != 0.0) { r1[6] -= m1 * s; r2[6] -= m2 * s; r3[6] -= m3 * s; }
+	s = r0[7];
+	if (s != 0.0) { r1[7] -= m1 * s; r2[7] -= m2 * s; r3[7] -= m3 * s; }
+
+	/* choose pivot - or die */
+	if (fabsf(r3[1])>fabsf(r2[1])) SWAP_ROWS(r3, r2);
+	if (fabsf(r2[1])>fabsf(r1[1])) SWAP_ROWS(r2, r1);
+	if (0.0 == r1[1]) return false;
+
+	/* eliminate second variable */
+	m2 = r2[1]/r1[1]; m3 = r3[1]/r1[1];
+	r2[2] -= m2 * r1[2]; r3[2] -= m3 * r1[2];
+	r2[3] -= m2 * r1[3]; r3[3] -= m3 * r1[3];
+	s = r1[4]; if (0.0 != s) { r2[4] -= m2 * s; r3[4] -= m3 * s; }
+	s = r1[5]; if (0.0 != s) { r2[5] -= m2 * s; r3[5] -= m3 * s; }
+	s = r1[6]; if (0.0 != s) { r2[6] -= m2 * s; r3[6] -= m3 * s; }
+	s = r1[7]; if (0.0 != s) { r2[7] -= m2 * s; r3[7] -= m3 * s; }
+
+	/* choose pivot - or die */
+	if (fabsf(r3[2])>fabsf(r2[2])) SWAP_ROWS(r3, r2);
+	if (0.0 == r2[2])  return false;
+
+	/* eliminate third variable */
+	m3 = r3[2]/r2[2];
+	r3[3] -= m3 * r2[3], r3[4] -= m3 * r2[4],
+	r3[5] -= m3 * r2[5], r3[6] -= m3 * r2[6],
+	r3[7] -= m3 * r2[7];
+
+	/* last check */
+	if (0.0 == r3[3]) return false;
+
+	s = 1.0F/r3[3];             /* now back substitute row 3 */
+	r3[4] *= s; r3[5] *= s; r3[6] *= s; r3[7] *= s;
+
+	m2 = r2[3];                 /* now back substitute row 2 */
+	s  = 1.0F/r2[2];
+	r2[4] = s * (r2[4] - r3[4] * m2), r2[5] = s * (r2[5] - r3[5] * m2),
+	r2[6] = s * (r2[6] - r3[6] * m2), r2[7] = s * (r2[7] - r3[7] * m2);
+	m1 = r1[3];
+	r1[4] -= r3[4] * m1, r1[5] -= r3[5] * m1,
+	r1[6] -= r3[6] * m1, r1[7] -= r3[7] * m1;
+	m0 = r0[3];
+	r0[4] -= r3[4] * m0, r0[5] -= r3[5] * m0,
+	r0[6] -= r3[6] * m0, r0[7] -= r3[7] * m0;
+
+	m1 = r1[2];                 /* now back substitute row 1 */
+	s  = 1.0F/r1[1];
+	r1[4] = s * (r1[4] - r2[4] * m1), r1[5] = s * (r1[5] - r2[5] * m1),
+	r1[6] = s * (r1[6] - r2[6] * m1), r1[7] = s * (r1[7] - r2[7] * m1);
+	m0 = r0[2];
+	r0[4] -= r2[4] * m0, r0[5] -= r2[5] * m0,
+	r0[6] -= r2[6] * m0, r0[7] -= r2[7] * m0;
+
+	m0 = r0[1];                 /* now back substitute row 0 */
+	s  = 1.0F/r0[0];
+	r0[4] = s * (r0[4] - r1[4] * m0), r0[5] = s * (r0[5] - r1[5] * m0),
+	r0[6] = s * (r0[6] - r1[6] * m0), r0[7] = s * (r0[7] - r1[7] * m0);
+
+	MREF(out, 0, 0) = r0[4]; MREF(out, 0, 1) = r0[5],
+	MREF(out, 0, 2) = r0[6]; MREF(out, 0, 3) = r0[7],
+	MREF(out, 1, 0) = r1[4]; MREF(out, 1, 1) = r1[5],
+	MREF(out, 1, 2) = r1[6]; MREF(out, 1, 3) = r1[7],
+	MREF(out, 2, 0) = r2[4]; MREF(out, 2, 1) = r2[5],
+	MREF(out, 2, 2) = r2[6]; MREF(out, 2, 3) = r2[7],
+	MREF(out, 3, 0) = r3[4]; MREF(out, 3, 1) = r3[5],
+	MREF(out, 3, 2) = r3[6]; MREF(out, 3, 3) = r3[7];
+
+#undef SWAP_ROWS
+	return true;
 }
