@@ -239,22 +239,24 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum indiceType = POGLEnum::Convert(type);
 
+	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
+	ib->PostConstruct(bufferID);
+
 	// 
 	// Fill the buffer with data
 	//
 
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
-	if (memory != nullptr)
+	if (memory != nullptr) {
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
 
-	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
-	ib->PostConstruct(bufferID);
+		//
+		// Make sure to mark this buffer as the current index buffer
+		//
 
-	//
-	// Make sure to mark this buffer as the current index buffer
-	//
+		mRenderState->ForceSetIndexBuffer(ib);
 
-	mRenderState->ForceSetIndexBuffer(ib);
+	}
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
