@@ -20,6 +20,10 @@ mCompareFunc(POGLCompareFunc::DEFAULT), mCompareMode(POGLCompareMode::DEFAULT)
 
 POGLStaticUniform::~POGLStaticUniform()
 {
+	if (mTexture != nullptr) {
+		mTexture->Release();
+		mTexture = nullptr;
+	}
 }
 
 void POGLStaticUniform::SetAssociatedUniform(POGLDefaultUniform* uniform)
