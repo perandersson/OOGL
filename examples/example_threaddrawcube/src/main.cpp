@@ -90,8 +90,8 @@ int main()
 
 				IPOGLShader* vertexShader = deferredContext->CreateShaderFromFile(POGL_TOCHAR("simple.vs"), POGLShaderType::VERTEX_SHADER);
 				IPOGLShader* fragmentShader = deferredContext->CreateShaderFromFile(POGL_TOCHAR("simple.fs"), POGLShaderType::FRAGMENT_SHADER);
-				IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
-				IPOGLProgram* program = deferredContext->CreateProgramFromShaders(shaders);
+				IPOGLShader* shaders[] = { vertexShader, fragmentShader };
+				IPOGLProgram* program = deferredContext->CreateProgramFromShaders(shaders, 2);
 				vertexShader->Release();
 				fragmentShader->Release();
 

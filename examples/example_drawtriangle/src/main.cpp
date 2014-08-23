@@ -67,8 +67,8 @@ int main()
 
 		IPOGLShader* vertexShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_VS, sizeof(SIMPLE_EFFECT_VS), POGLShaderType::VERTEX_SHADER);
 		IPOGLShader* fragmentShader = context->CreateShaderFromMemory(SIMPLE_EFFECT_FS, sizeof(SIMPLE_EFFECT_FS), POGLShaderType::FRAGMENT_SHADER);
-		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader };
+		IPOGLProgram* program = context->CreateProgramFromShaders(shaders, 2);
 
 		//
 		// We release the shader resources, since they are not needed anymore. You are allowed to reuse the shader resources 

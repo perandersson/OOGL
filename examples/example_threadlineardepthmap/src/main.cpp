@@ -10,8 +10,8 @@ IPOGLProgram* LoadLinearDepthProgram(IPOGLRenderContext* context)
 {
 	IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("lineardepth.vs"), POGLShaderType::VERTEX_SHADER);
 	IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("lineardepth.fs"), POGLShaderType::FRAGMENT_SHADER);
-	IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
-	IPOGLProgram* linearDepthProgram = context->CreateProgramFromShaders(shaders);
+	IPOGLShader* shaders[] = { vertexShader, fragmentShader };
+	IPOGLProgram* linearDepthProgram = context->CreateProgramFromShaders(shaders, 2);
 	vertexShader->Release();
 	fragmentShader->Release();
 	return linearDepthProgram;
@@ -21,8 +21,8 @@ IPOGLProgram* LoadResultProgram(IPOGLRenderContext* context)
 {
 	IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("result.vs"), POGLShaderType::VERTEX_SHADER);
 	IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("result.fs"), POGLShaderType::FRAGMENT_SHADER);
-	IPOGLShader* shaders2[] = { vertexShader, fragmentShader, nullptr };
-	IPOGLProgram* resultProgram = context->CreateProgramFromShaders(shaders2);
+	IPOGLShader* shaders2[] = { vertexShader, fragmentShader };
+	IPOGLProgram* resultProgram = context->CreateProgramFromShaders(shaders2, 2);
 	vertexShader->Release();
 	fragmentShader->Release();
 	return resultProgram;
@@ -127,8 +127,8 @@ int main()
 		IPOGLTexture2D* linearDepthTexture = context->CreateTexture2D(POGL_SIZE(1024, 768), POGLTextureFormat::RGBA32F, nullptr);
 		IPOGLTexture2D* depthTexture = context->CreateTexture2D(POGL_SIZE(1024, 768), POGLTextureFormat::DEPTH24, nullptr);
 
-		IPOGLTexture* textures[] = { linearDepthTexture, nullptr };
-		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, depthTexture);
+		IPOGLTexture* textures[] = { linearDepthTexture };
+		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, 1, depthTexture);
 
 		//
 		// Release the depth texture. We don't really need it anymore

@@ -32,8 +32,8 @@ int main()
 
 		IPOGLShader* vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("render_to_texture.vs"), POGLShaderType::VERTEX_SHADER);
 		IPOGLShader* fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("render_to_texture.fs"), POGLShaderType::FRAGMENT_SHADER);
-		IPOGLShader* shaders[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLProgram* framebufferProgram = context->CreateProgramFromShaders(shaders);
+		IPOGLShader* shaders[] = { vertexShader, fragmentShader };
+		IPOGLProgram* framebufferProgram = context->CreateProgramFromShaders(shaders, 2);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -43,8 +43,8 @@ int main()
 
 		vertexShader = context->CreateShaderFromFile(POGL_TOCHAR("result.vs"), POGLShaderType::VERTEX_SHADER);
 		fragmentShader = context->CreateShaderFromFile(POGL_TOCHAR("result.fs"), POGLShaderType::FRAGMENT_SHADER);
-		IPOGLShader* shaders2[] = { vertexShader, fragmentShader, nullptr };
-		IPOGLProgram* resultProgram = context->CreateProgramFromShaders(shaders2);
+		IPOGLShader* shaders2[] = { vertexShader, fragmentShader };
+		IPOGLProgram* resultProgram = context->CreateProgramFromShaders(shaders2, 2);
 		vertexShader->Release();
 		fragmentShader->Release();
 
@@ -90,8 +90,8 @@ int main()
 		// textures array defines the color location used in the fragment shader
 		//
 
-		IPOGLTexture* textures[] = { texture0, texture1, nullptr };
-		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, depthTexture);
+		IPOGLTexture* textures[] = { texture0, texture1 };
+		IPOGLFramebuffer* framebuffer = context->CreateFramebuffer(textures, 2, depthTexture);
 
 		//
 		// Release the depth texture. We don't really need it anymore

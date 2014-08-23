@@ -36,7 +36,7 @@ public:
 	/*!
 		\brief Generates a framebuffer ID based on the supplied parameters
 	*/
-	static GLuint GenFramebufferObjectID(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture);
+	static GLuint GenFramebufferObjectID(IPOGLTexture** textures, POGL_UINT32 count, IPOGLTexture* depthStencilTexture);
 
 	/*!
 		\brief Creates a shader OpenGL ID based on the supplied parameters
@@ -46,5 +46,5 @@ public:
 	/*!
 		\brief Creates a program ID based on the supplied shaders
 	*/
-	static GLuint CreateProgram(IPOGLShader** shaders);
+	static GLuint CreateProgram(IPOGLShader** shaders, POGL_UINT32 count);
 };

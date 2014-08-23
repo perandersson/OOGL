@@ -54,13 +54,13 @@ IPOGLShader* POGLRenderContext::CreateShaderFromMemory(const POGL_CHAR* memory, 
 	return shader;
 }
 
-IPOGLProgram* POGLRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)
+IPOGLProgram* POGLRenderContext::CreateProgramFromShaders(IPOGLShader** shaders, POGL_UINT32 count)
 {
 	if (shaders == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You must supply at least one shader to be able to create a program");
 
 	// Attach all the shaders to the program
-	const GLuint programID = POGLFactory::CreateProgram(shaders);
+	const GLuint programID = POGLFactory::CreateProgram(shaders, count);
 	POGLProgram* program = new POGLProgram();
 	program->PostConstruct(programID, GetRenderState());
 	return program;
@@ -134,18 +134,18 @@ void POGLRenderContext::ResizeTexture2D(IPOGLTexture2D* texture, const POGL_SIZE
 	CHECK_GL("Could not set new texture size");
 }
 
-IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures)
+IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count)
 {
-	return CreateFramebuffer(textures, nullptr);
+	return CreateFramebuffer(textures, count, nullptr);
 }
 
-IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture)
+IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count, IPOGLTexture* depthStencilTexture)
 {
 	//
 	// Generate a framebuffer ID
 	//
 
-	const GLuint framebufferID = POGLFactory::GenFramebufferObjectID(textures, depthStencilTexture);
+	const GLuint framebufferID = POGLFactory::GenFramebufferObjectID(textures, count, depthStencilTexture);
 
 	//
 	// Convert the textures array into a std::vector
@@ -153,9 +153,8 @@ IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, 
 
 	std::vector<IPOGLTexture*> texturesVector;
 	if (textures != nullptr) {
-		for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
-			IPOGLTexture* texture = *ptr;
-			texturesVector.push_back(texture);
+		for (POGL_UINT32 i = 0; i < count; ++i) {
+			texturesVector.push_back(textures[i]);
 		}
 	}
 	

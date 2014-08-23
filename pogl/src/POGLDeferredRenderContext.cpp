@@ -113,18 +113,16 @@ IPOGLShader* POGLDeferredRenderContext::CreateShaderFromMemory(const POGL_CHAR* 
 	return shader;
 }
 
-IPOGLProgram* POGLDeferredRenderContext::CreateProgramFromShaders(IPOGLShader** shaders)
+IPOGLProgram* POGLDeferredRenderContext::CreateProgramFromShaders(IPOGLShader** shaders, POGL_UINT32 count)
 {
 	if (shaders == nullptr)
 		THROW_EXCEPTION(POGLResourceException, "You must supply at least one shader to be able to create a program");
 
 	POGL_CREATEPROGRAM_COMMAND_DATA* cmd = (POGL_CREATEPROGRAM_COMMAND_DATA*)AddCommand(&POGLCreateProgram_Command, &POGLCreateProgram_Release,
 		sizeof(POGL_CREATEPROGRAM_COMMAND_DATA));
-	POGL_UINT32 count = 0;
-	memset(cmd->shaders, 0, sizeof(cmd->shaders));
-	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
-		POGLShader* shader = static_cast<POGLShader*>(*ptr);
-		cmd->shaders[count++] = shader;
+	for (POGL_UINT32 i = 0; i < count; ++i) {
+		POGLShader* shader = static_cast<POGLShader*>(shaders[i]);
+		cmd->shaders[i] = shader;
 		shader->AddRef();
 	}
 	cmd->shaderCount = count;
@@ -188,18 +186,17 @@ void POGLDeferredRenderContext::ResizeTexture2D(IPOGLTexture2D* texture, const P
 	cmd->newSize = size;
 }
 
-IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** textures)
+IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count)
 {
-	return CreateFramebuffer(textures, nullptr);
+	return CreateFramebuffer(textures, count, nullptr);
 }
 
-IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthTexture)
+IPOGLFramebuffer* POGLDeferredRenderContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count, IPOGLTexture* depthTexture)
 {
 	std::vector<IPOGLTexture*> texturesVector;
 	if (textures != nullptr) {
-		for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
-			IPOGLTexture* texture = *ptr;
-			texturesVector.push_back(texture);
+		for (POGL_UINT32 i = 0; i < count; ++i) {
+			texturesVector.push_back(textures[i]);
 		}
 	}
 

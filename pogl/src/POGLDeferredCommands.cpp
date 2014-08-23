@@ -153,7 +153,7 @@ void POGLCreateProgram_Command(POGLDeferredRenderContext* context, POGLRenderSta
 {
 	POGL_CREATEPROGRAM_COMMAND_DATA* cmd = (POGL_CREATEPROGRAM_COMMAND_DATA*)command;
 
-	const GLuint programID = POGLFactory::CreateProgram(cmd->shaders);
+	const GLuint programID = POGLFactory::CreateProgram(cmd->shaders, cmd->shaderCount);
 	cmd->program->PostConstruct(programID, state);
 }
 
@@ -367,7 +367,7 @@ void POGLCreateFrameBuffer_Command(POGLDeferredRenderContext* context, POGLRende
 	}
 
 	IPOGLTexture* depthStencilTexture = cmd->framebuffer->GetDepthStencilTexture();
-	GLuint frameBufferID = POGLFactory::GenFramebufferObjectID(textures, depthStencilTexture);
+	GLuint frameBufferID = POGLFactory::GenFramebufferObjectID(textures, size, depthStencilTexture);
 	cmd->framebuffer->PostConstruct(frameBufferID);
 	depthStencilTexture->Release();
 	

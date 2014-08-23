@@ -115,7 +115,7 @@ GLuint POGLFactory::GenVertexArrayObjectID(GLuint bufferID, const POGL_VERTEX_LA
 	return id;
 }
 
-GLuint POGLFactory::GenFramebufferObjectID(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture)
+GLuint POGLFactory::GenFramebufferObjectID(IPOGLTexture** textures, POGL_UINT32 count, IPOGLTexture* depthStencilTexture)
 {
 	const GLuint framebufferID = GenFramebufferID();
 
@@ -123,20 +123,18 @@ GLuint POGLFactory::GenFramebufferObjectID(IPOGLTexture** textures, IPOGLTexture
 	CHECK_GL("Could not bind framebuffer");
 
 	if (textures != nullptr) {
-		POGL_UINT32 idx = 0;
-		for (IPOGLTexture** ptr = textures; *ptr != nullptr; ++ptr) {
-			IPOGLTexture* texture = *ptr;
+		for (POGL_UINT32 i = 0; i < count; ++i) {
+			IPOGLTexture* texture = textures[i];
 			const POGLResourceType::Enum type = texture->GetType();
 			if (type == POGLResourceType::TEXTURE2D) {
 				POGLTexture2D* t2d = static_cast<POGLTexture2D*>(texture);
 				POGLTextureResource* resource = t2d->GetResourcePtr();
-				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + idx, resource->GetTextureID(), 0);
+				glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0 + i, resource->GetTextureID(), 0);
 				CHECK_GL("Could not attach framebuffer texture to frame buffer");
 			}
 			else {
 				THROW_NOT_IMPLEMENTED_EXCEPTION();
 			}
-			idx++;
 		}
 	}
 	if (depthStencilTexture != nullptr) {
@@ -234,12 +232,12 @@ GLuint POGLFactory::CreateShader(const POGL_CHAR* memory, POGL_UINT32 size, POGL
 }
 
 
-GLuint POGLFactory::CreateProgram(IPOGLShader** shaders)
+GLuint POGLFactory::CreateProgram(IPOGLShader** shaders, POGL_UINT32 count)
 {
 	// Attach all the shaders to the program
 	const GLuint programID = glCreateProgram();
-	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
-		POGLShader* shader = static_cast<POGLShader*>(*ptr);
+	for (POGL_UINT32 i = 0; i < count; ++i) {
+		POGLShader* shader = static_cast<POGLShader*>(shaders[i]);
 		glAttachShader(programID, shader->GetShaderID());
 
 	}
@@ -248,8 +246,8 @@ GLuint POGLFactory::CreateProgram(IPOGLShader** shaders)
 	glLinkProgram(programID);
 
 	// Detach the shaders when linking is complete: http://www.opengl.org/wiki/GLSL_Object
-	for (IPOGLShader** ptr = shaders; *ptr != nullptr; ++ptr) {
-		POGLShader* shader = static_cast<POGLShader*>(*ptr);
+	for (POGL_UINT32 i = 0; i < count; ++i) {
+		POGLShader* shader = static_cast<POGLShader*>(shaders[i]);
 		glDetachShader(programID, shader->GetShaderID());
 	}
 

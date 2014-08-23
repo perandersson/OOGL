@@ -967,16 +967,18 @@ public:
 		\brief Creates a GPU program based on the supplied shaders
 
 		\param shaders
-				The shaders we want to link when creating the program. The array must end with a nullptr or 0.
+				The shaders we want to link when creating the program.
 				{@code
-					IPOGLShader** shaders = {shader1, shader2, nullptr};
-					IPOGLProgram* program = context->CreateProgramFromShaders(shaders);
+					IPOGLShader** shaders = { shader1, shader2 };
+					IPOGLProgram* program = context->CreateProgramFromShaders(shaders, 2);
 				}
-		\throwd POGLResourceException
+		\param count
+				The number of shaders we want to link
+		\throws POGLResourceException
 				Exception is thrown if the exception failed to be loaded by some reason.
 		\return A GPU program that you can use when render geometry onto the screen
 	*/
-	virtual IPOGLProgram* CreateProgramFromShaders(IPOGLShader** shaders) = 0;
+	virtual IPOGLProgram* CreateProgramFromShaders(IPOGLShader** shaders, POGL_UINT32 count) = 0;
 
 	/*!
 		\brief Creates a 3D texture
@@ -1015,29 +1017,33 @@ public:
 		\brief Creates a framebuffer that renders to the supplied textures
 
 		\param textures
-				The textures we want to use for the framebuffer. The array must end with a nullptr or 0.
+				The textures we want to use for the framebuffer.
 				{@code
-					IPOGLTexture** textures = {texture1, texture2, nullptr};
-					context->CreateFramebuffer(textures);
+					IPOGLTexture** textures = { texture1, texture2 };
+					context->CreateFramebuffer(textures, 2);
 				}
+		\param count
+				The number of textures
 		\return A framebuffer instance. You can use the framebuffer instance with the IPOGLRenderState to render to a texture
 	*/
-	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures) = 0;
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count) = 0;
 
 	/*!
 		\brief Creates a framebuffer that renders to the supplied textures
 
 		\param textures
-				The textures we want to use for the framebuffer. The array must end with a nullptr or 0.
+				The textures we want to use for the framebuffer.
 				{@code
-					IPOGLTexture** textures = {texture1, texture2, nullptr};
-					context->CreateFramebuffer(textures);
+					IPOGLTexture** textures = { texture1, texture2 };
+					context->CreateFramebuffer(textures, 2, depthBuffer);
 				}
+		\param count
+				The number of textures
 		\param depthStencilTexture
 				A depth- and/or stencil texture
 		\return A framebuffer instance. You can use the framebuffer instance with the IPOGLRenderState to render to a texture
 	*/
-	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, IPOGLTexture* depthStencilTexture) = 0;
+	virtual IPOGLFramebuffer* CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count, IPOGLTexture* depthStencilTexture) = 0;
 
 	/*!
 		\brief Creates a vertex buffer based on the supplied parameters
