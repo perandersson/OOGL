@@ -247,15 +247,14 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 	//
 
 	if (memory != nullptr) {
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
 
 		//
 		// Make sure to mark this buffer as the current index buffer
 		//
 
 		mRenderState->ForceSetIndexBuffer(ib);
-
 	}
 
 	const GLenum error = glGetError();
