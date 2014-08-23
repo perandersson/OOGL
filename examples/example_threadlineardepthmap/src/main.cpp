@@ -162,7 +162,7 @@ int main()
 		std::condition_variable condition;
 		IPOGLDeferredRenderContext* deferredContext = device->CreateDeferredRenderContext();
 		std::thread t([&condition, &running, deferredContext, linearDepthProgram, framebuffer, cubeVertexBuffer, cubeIndexBuffer] {
-
+			
 			std::mutex m;
 			std::unique_lock<std::mutex> lock(m);
 			while (running) {
@@ -206,6 +206,8 @@ int main()
 
 				deferredContext->Flush();
 
+				// Sleep for 16 milliseconds (force 60fps). The texture containing the position do not need to be updated more often
+				std::this_thread::sleep_for(std::chrono::milliseconds(16));
 				if (running)
 					condition.wait(lock);
 			}
