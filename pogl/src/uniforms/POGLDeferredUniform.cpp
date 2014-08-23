@@ -7,6 +7,8 @@ POGLDeferredUniform::POGLDeferredUniform(const POGL_STRING& name, POGLDeferredRe
 : mName(name), mRenderContext(context), mAssigned(false), mTexture(nullptr)
 {
 	mInts[0] = mInts[1] = mInts[2] = mInts[3] = UINT_MAX;
+	mFloats[0] = mFloats[1] = mFloats[2] = mFloats[3] = FLT_MAX;
+	mDoubles[0] = mDoubles[1] = mDoubles[2] = mDoubles[3] = DBL_MAX;
 	mCount = 0;
 }
 
@@ -159,6 +161,9 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32* ptr, POGL_UINT32 count)
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a)
 {
+	if (IsFloatEquals(a))
+		return;
+
 	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -168,6 +173,9 @@ void POGLDeferredUniform::SetFloat(POGL_FLOAT a)
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 {
+	if (IsFloatEquals(a, b))
+		return;
+
 	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -178,6 +186,9 @@ void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b)
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 {
+	if (IsFloatEquals(a, b, c))
+		return;
+
 	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -189,6 +200,9 @@ void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
 
 void POGLDeferredUniform::SetFloat(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d)
 {
+	if (IsFloatEquals(a, b, c, d))
+		return;
+
 	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -214,6 +228,9 @@ void POGLDeferredUniform::SetFloat(POGL_FLOAT* ptr, POGL_UINT32 count)
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a)
 {
+	if (IsDoubleEquals(a))
+		return;
+
 	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
 	cmd->name = &mName;
@@ -223,6 +240,9 @@ void POGLDeferredUniform::SetDouble(POGL_DOUBLE a)
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 {
+	if (IsDoubleEquals(a, b))
+		return;
+
 	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
 	cmd->name = &mName;
@@ -233,6 +253,9 @@ void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b)
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 {
+	if (IsDoubleEquals(a, b, c))
+		return;
+
 	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
 	cmd->name = &mName;
@@ -244,6 +267,9 @@ void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
 
 void POGLDeferredUniform::SetDouble(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d)
 {
+	if (IsDoubleEquals(a, b, c, d))
+		return;
+
 	POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetDouble_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_DOUBLE_COMMAND_DATA));
 	cmd->name = &mName;
@@ -277,35 +303,17 @@ void POGLDeferredUniform::SetMatrix(const POGL_MAT4& mat4)
 
 void POGLDeferredUniform::SetVector2(const POGL_VECTOR2& vec)
 {
-	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
-		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
-	cmd->name = &mName;
-	cmd->values[0] = vec.x;
-	cmd->values[1] = vec.y;
-	cmd->count = 2;
+	POGLDeferredUniform::SetFloat(vec.x, vec.y);
 }
 
 void POGLDeferredUniform::SetVector3(const POGL_VECTOR3& vec)
 {
-	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
-		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
-	cmd->name = &mName;
-	cmd->values[0] = vec.x;
-	cmd->values[1] = vec.y;
-	cmd->values[2] = vec.z;
-	cmd->count = 3;
+	POGLDeferredUniform::SetFloat(vec.x, vec.y, vec.z);
 }
 
 void POGLDeferredUniform::SetVector4(const POGL_VECTOR4& vec)
 {
-	POGL_UNIFORM_SET_FLOAT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_FLOAT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetFloat_Command, &POGLNothing_Release,
-		sizeof(POGL_UNIFORM_SET_FLOAT_COMMAND_DATA));
-	cmd->name = &mName;
-	cmd->values[0] = vec.x;
-	cmd->values[1] = vec.y;
-	cmd->values[2] = vec.z;
-	cmd->values[3] = vec.w;
-	cmd->count = 4;
+	POGLDeferredUniform::SetFloat(vec.x, vec.y, vec.z, vec.w);
 }
 
 void POGLDeferredUniform::SetSize(const POGL_SIZE& size)
@@ -439,9 +447,101 @@ bool POGLDeferredUniform::IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 
 	return false;
 }
 
+bool POGLDeferredUniform::IsFloatEquals(POGL_FLOAT a)
+{
+	if (mAssigned && FLT_EQ(mFloats[0], a))
+		return true;
+
+	mFloats[0] = a;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsFloatEquals(POGL_FLOAT a, POGL_FLOAT b)
+{
+	if (mAssigned && FLT_EQ(mFloats[0], a) && FLT_EQ(mFloats[1], b))
+		return true;
+
+	mFloats[0] = a;
+	mFloats[1] = b;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsFloatEquals(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c)
+{
+	if (mAssigned && FLT_EQ(mFloats[0], a) && FLT_EQ(mFloats[1], b) && FLT_EQ(mFloats[2], c))
+		return true;
+
+	mFloats[0] = a;
+	mFloats[1] = b;
+	mFloats[2] = c;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsFloatEquals(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d)
+{
+	if (mAssigned && FLT_EQ(mFloats[0], a) && FLT_EQ(mFloats[1], b) && FLT_EQ(mFloats[2], c) && FLT_EQ(mFloats[3], d))
+		return true;
+
+	mFloats[0] = a;
+	mFloats[1] = b;
+	mFloats[2] = c;
+	mFloats[3] = d;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsDoubleEquals(POGL_DOUBLE a)
+{
+	if (mAssigned && DBL_EQ(mDoubles[0], a))
+		return true;
+
+	mDoubles[0] = a;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsDoubleEquals(POGL_DOUBLE a, POGL_DOUBLE b)
+{
+	if (mAssigned && DBL_EQ(mDoubles[0], a) && DBL_EQ(mDoubles[1], b))
+		return true;
+
+	mDoubles[0] = a;
+	mDoubles[1] = b;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsDoubleEquals(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c)
+{
+	if (mAssigned && DBL_EQ(mDoubles[0], a) && DBL_EQ(mDoubles[1], b) && DBL_EQ(mDoubles[2], c))
+		return true;
+
+	mDoubles[0] = a;
+	mDoubles[1] = b;
+	mDoubles[2] = c;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsDoubleEquals(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d)
+{
+	if (mAssigned && DBL_EQ(mDoubles[0], a) && DBL_EQ(mDoubles[1], b) && DBL_EQ(mDoubles[2], c) && DBL_EQ(mDoubles[3], d))
+		return true;
+
+	mDoubles[0] = a;
+	mDoubles[1] = b;
+	mDoubles[2] = c;
+	mDoubles[3] = d;
+	mAssigned = true;
+	return false;
+}
+
 bool POGLDeferredUniform::IsTextureEquals(IPOGLTexture* texture)
 {
-	if (mAssigned & mTexture == texture)
+	if (mAssigned && mTexture == texture)
 		return true;
 
 	if (mTexture != nullptr)

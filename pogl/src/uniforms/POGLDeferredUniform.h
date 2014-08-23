@@ -60,6 +60,14 @@ private:
 	bool IsIntEquals(POGL_UINT32 a, POGL_UINT32 b);
 	bool IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c);
 	bool IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d);
+	bool IsFloatEquals(POGL_FLOAT a);
+	bool IsFloatEquals(POGL_FLOAT a, POGL_FLOAT b);
+	bool IsFloatEquals(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c);
+	bool IsFloatEquals(POGL_FLOAT a, POGL_FLOAT b, POGL_FLOAT c, POGL_FLOAT d);
+	bool IsDoubleEquals(POGL_DOUBLE a);
+	bool IsDoubleEquals(POGL_DOUBLE a, POGL_DOUBLE b);
+	bool IsDoubleEquals(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c);
+	bool IsDoubleEquals(POGL_DOUBLE a, POGL_DOUBLE b, POGL_DOUBLE c, POGL_DOUBLE d);
 	bool IsTextureEquals(IPOGLTexture* texture);
 
 private:
@@ -67,6 +75,9 @@ private:
 	POGLDeferredRenderContext* mRenderContext;
 
 	POGL_UINT32 mInts[4];
+	POGL_FLOAT mFloats[4];
+	POGL_DOUBLE mDoubles[4];
+
 	POGL_UINT32 mCount;
 
 	IPOGLTexture* mTexture;
