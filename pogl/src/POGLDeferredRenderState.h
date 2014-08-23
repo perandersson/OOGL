@@ -5,6 +5,7 @@
 
 class POGLDeferredRenderContext;
 class POGLDeferredUniform;
+class POGLProgram;
 class POGLDeferredRenderState : public IPOGLRenderState
 {
 	typedef std::hash_map<POGL_STRING, POGLDeferredUniform*> Uniforms;
@@ -17,6 +18,11 @@ public:
 		\brief Unset this RenderState's internal state values. 
 	*/
 	void Flush();
+
+	/*!
+		\brief Flush program specific properties
+	*/
+	void FlushProgram(POGLProgram* program);
 
 // IPOGLInterface
 public:

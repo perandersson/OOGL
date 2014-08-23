@@ -4,16 +4,30 @@
 #include "POGLDeferredCommands.h"
 
 POGLDeferredUniform::POGLDeferredUniform(const POGL_STRING& name, POGLDeferredRenderContext* context)
-: mName(name), mRenderContext(context)
+: mName(name), mRenderContext(context), mAssigned(false), mTexture(nullptr)
 {
+	mInts[0] = mInts[1] = mInts[2] = mInts[3] = UINT_MAX;
+	mCount = 0;
 }
 
 POGLDeferredUniform::~POGLDeferredUniform()
 {
 }
 
+void POGLDeferredUniform::Flush()
+{
+	mAssigned = false;
+	if (mTexture != nullptr) {
+		mTexture->Release();
+		mTexture = nullptr;
+	}
+}
+
 void POGLDeferredUniform::SetInt32(POGL_INT32 a)
 {
+	if (IsIntEquals(a))
+		return;
+
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -23,6 +37,9 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a)
 
 void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b)
 {
+	if (IsIntEquals(a, b))
+		return;
+
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -33,6 +50,9 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b)
 
 void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 {
+	if (IsIntEquals(a, b, c))
+		return;
+
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -44,6 +64,9 @@ void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c)
 
 void POGLDeferredUniform::SetInt32(POGL_INT32 a, POGL_INT32 b, POGL_INT32 c, POGL_INT32 d)
 {
+	if (IsIntEquals(a, b, c, d))
+		return;
+
 	POGL_UNIFORM_SET_INT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_INT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_INT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -69,6 +92,9 @@ void POGLDeferredUniform::SetInt32(POGL_INT32* ptr, POGL_UINT32 count)
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a)
 {
+	if (IsIntEquals(a))
+		return;
+
 	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -78,6 +104,9 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32 a)
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 {
+	if (IsIntEquals(a, b))
+		return;
+
 	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -88,6 +117,9 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b)
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 {
+	if (IsIntEquals(a, b, c))
+		return;
+
 	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -99,6 +131,9 @@ void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
 
 void POGLDeferredUniform::SetUInt32(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
 {
+	if (IsIntEquals(a, b, c, d))
+		return;
+
 	POGL_UNIFORM_SET_UINT_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_UINT_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetUInt_Command, &POGLNothing_Release,
 		sizeof(POGL_UNIFORM_SET_UINT_COMMAND_DATA));
 	cmd->name = &mName;
@@ -296,6 +331,9 @@ IPOGLSamplerState* POGLDeferredUniform::GetSamplerState()
 
 void POGLDeferredUniform::SetTexture(IPOGLTexture* texture)
 {
+	if (IsTextureEquals(texture))
+		return;
+
 	POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA* cmd = (POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA*)mRenderContext->AddCommand(&POGLUniformSetTexture_Command, &POGLUniformSetTexture_Release,
 		sizeof(POGL_UNIFORM_SET_TEXTURE_COMMAND_DATA));
 	cmd->name = &mName;
@@ -353,4 +391,63 @@ void POGLDeferredUniform::SetCompareMode(POGLCompareMode::Enum compareMode)
 		sizeof(POGL_UNIFORM_SETCOMPAREMODE_COMMAND_DATA));
 	cmd->name = &mName;
 	cmd->compareMode = compareMode;
+}
+
+bool POGLDeferredUniform::IsIntEquals(POGL_UINT32 a)
+{
+	if (mAssigned && mInts[0] == a)
+		return true;
+
+	mInts[0] = a;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsIntEquals(POGL_UINT32 a, POGL_UINT32 b)
+{
+	if (mAssigned && mInts[0] == a && mInts[1] == b)
+		return true;
+
+	mInts[0] = a;
+	mInts[1] = b;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c)
+{
+	if (mAssigned && mInts[0] == a && mInts[1] == b && mInts[2] == c)
+		return true;
+
+	mInts[0] = a;
+	mInts[1] = b;
+	mInts[2] = c;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d)
+{
+	if (mAssigned && mInts[0] == a && mInts[1] == b && mInts[2] == c && mInts[3] == d)
+		return true;
+
+	mInts[0] = a;
+	mInts[1] = b;
+	mInts[2] = c;
+	mInts[3] = d;
+	mAssigned = true;
+	return false;
+}
+
+bool POGLDeferredUniform::IsTextureEquals(IPOGLTexture* texture)
+{
+	if (mAssigned & mTexture == texture)
+		return true;
+
+	if (mTexture != nullptr)
+		mTexture->Release();
+	mTexture = texture;
+	if (mTexture != nullptr)
+		mTexture->AddRef();
+	return false;
 }

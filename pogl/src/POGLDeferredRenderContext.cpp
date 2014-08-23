@@ -310,6 +310,7 @@ IPOGLRenderState* POGLDeferredRenderContext::Apply(IPOGLProgram* program)
 	cmd->program->AddRef();
 
 	mRenderState->AddRef();
+	mRenderState->FlushProgram(cmd->program);
 	return mRenderState;
 }
 

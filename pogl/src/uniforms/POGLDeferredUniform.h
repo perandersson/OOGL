@@ -8,6 +8,8 @@ public:
 	POGLDeferredUniform(const POGL_STRING& name, POGLDeferredRenderContext* context);
 	virtual ~POGLDeferredUniform();
 
+	void Flush();
+
 public:
 	void SetInt32(POGL_INT32 a);
 	void SetInt32(POGL_INT32 a, POGL_INT32 b);
@@ -54,6 +56,21 @@ public:
 	void SetCompareMode(POGLCompareMode::Enum compareMode);
 
 private:
+	bool IsIntEquals(POGL_UINT32 a);
+	bool IsIntEquals(POGL_UINT32 a, POGL_UINT32 b);
+	bool IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c);
+	bool IsIntEquals(POGL_UINT32 a, POGL_UINT32 b, POGL_UINT32 c, POGL_UINT32 d);
+	bool IsTextureEquals(IPOGLTexture* texture);
+
+private:
 	POGL_STRING mName;
 	POGLDeferredRenderContext* mRenderContext;
+
+	POGL_UINT32 mInts[4];
+	POGL_UINT32 mCount;
+
+	IPOGLTexture* mTexture;
+
+
+	bool mAssigned;
 };

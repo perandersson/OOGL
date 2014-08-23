@@ -4,6 +4,7 @@
 #include "POGLFramebuffer.h"
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
+#include "POGLProgram.h"
 #include "uniforms/POGLDeferredUniform.h"
 
 POGLDeferredRenderState::POGLDeferredRenderState(POGLDeferredRenderContext* context)
@@ -37,6 +38,15 @@ void POGLDeferredRenderState::Flush()
 	mFrontFace.Unset();
 	mCullFace.Unset();
 	mViewport.Unset();
+}
+
+void POGLDeferredRenderState::FlushProgram(POGLProgram* program)
+{
+	auto it = mUniforms.begin();
+	auto end = mUniforms.end();
+	for (; it != end; ++it) {
+		it->second->Flush();
+	}
 }
 
 void POGLDeferredRenderState::AddRef()
