@@ -48,28 +48,28 @@ public:
 
 		\param texture
 	*/
-	void SetTextureResource(POGLTextureResource* texture);
+	void ForceSetTextureResource(POGLTextureResource* texture);
 
 	/*!
 		\brief Set the currently bound vertex buffer
 
 		\param vertexBuffer
 	*/
-	void SetVertexBuffer(POGLVertexBuffer* vertexBuffer);
+	void ForceSetVertexBuffer(POGLVertexBuffer* vertexBuffer);
 	
 	/*!
 		\brief Set the currently bound vertex buffer
 
 		\param vertexBuffer
 	*/
-	void SetIndexBuffer(POGLIndexBuffer* indexBuffer);
+	void ForceSetIndexBuffer(POGLIndexBuffer* indexBuffer);
 
 	/*!
 		\brief Set the currently bound framebuffer
 
 		\param framebuffer
 	*/
-	void SetFramebuffer(POGLFramebuffer* framebuffer);
+	void ForceSetFramebuffer(POGLFramebuffer* framebuffer);
 
 	/*!
 		\brief Retrieves the next active texture for this render state.

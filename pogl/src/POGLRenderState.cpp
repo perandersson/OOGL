@@ -509,7 +509,7 @@ void POGLRenderState::BindTextureResource(POGLTextureResource* resource, POGL_UI
 	CHECK_GL("Could not bind texture");
 }
 
-void POGLRenderState::SetTextureResource(POGLTextureResource* texture)
+void POGLRenderState::ForceSetTextureResource(POGLTextureResource* texture)
 {
 	// Release the previous bound texture if it exists
 	if (mTextures[mActiveTextureIndex] != nullptr)
@@ -521,7 +521,7 @@ void POGLRenderState::SetTextureResource(POGLTextureResource* texture)
 	texture->AddRef();
 }
 
-void POGLRenderState::SetVertexBuffer(POGLVertexBuffer* vertexBuffer)
+void POGLRenderState::ForceSetVertexBuffer(POGLVertexBuffer* vertexBuffer)
 {
 	if (mVertexBuffer != nullptr)
 		mVertexBuffer->Release();
@@ -531,7 +531,7 @@ void POGLRenderState::SetVertexBuffer(POGLVertexBuffer* vertexBuffer)
 	mVertexBufferUID = vertexBuffer->GetUID();
 }
 
-void POGLRenderState::SetIndexBuffer(POGLIndexBuffer* indexBuffer)
+void POGLRenderState::ForceSetIndexBuffer(POGLIndexBuffer* indexBuffer)
 {
 	if (mIndexBuffer != nullptr)
 		mIndexBuffer->Release();
@@ -541,7 +541,7 @@ void POGLRenderState::SetIndexBuffer(POGLIndexBuffer* indexBuffer)
 	mIndexBufferUID = indexBuffer->GetUID();
 }
 
-void POGLRenderState::SetFramebuffer(POGLFramebuffer* framebuffer)
+void POGLRenderState::ForceSetFramebuffer(POGLFramebuffer* framebuffer)
 {
 	if (mFramebuffer != nullptr)
 		mFramebuffer->Release();

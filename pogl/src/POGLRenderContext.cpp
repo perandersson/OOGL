@@ -101,7 +101,7 @@ IPOGLTexture2D* POGLRenderContext::CreateTexture2D(const POGL_SIZE& size, POGLTe
 
 	POGLTexture2D* texture = new POGLTexture2D(size, format);
 	texture->PostConstruct(textureID);
-	mRenderState->SetTextureResource((POGLTextureResource*)texture->GetResourcePtr());
+	mRenderState->ForceSetTextureResource((POGLTextureResource*)texture->GetResourcePtr());
 	return texture;
 }
 
@@ -200,7 +200,7 @@ IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POG
 	// Make sure to mark this buffer as the current vertex buffer
 	//
 
-	mRenderState->SetVertexBuffer(vb);
+	mRenderState->ForceSetVertexBuffer(vb);
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -254,7 +254,7 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 	// Make sure to mark this buffer as the current index buffer
 	//
 
-	mRenderState->SetIndexBuffer(ib);
+	mRenderState->ForceSetIndexBuffer(ib);
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)

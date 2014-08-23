@@ -46,7 +46,7 @@ void POGLCreateVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRend
 	// Set the vertex buffer as the "current buffer" on the render state (because the GenVertexArrayObjectID will bind the vertex array object for us)
 	//
 
-	state->SetVertexBuffer(cmd->vertexBuffer);
+	state->ForceSetVertexBuffer(cmd->vertexBuffer);
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -67,16 +67,17 @@ void POGLCreateIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRende
 	cmd->indexBuffer->PostConstruct(bufferID);
 
 	//
-	// Set the vertex buffer as the "current buffer" on the render state
-	//
-
-	state->BindIndexBuffer(cmd->indexBuffer);
-
-	//
 	// Map the data if needed
 	//
 
 	if (cmd->memoryOffset != -1) {
+
+		//
+		// Set the vertex buffer as the "current buffer" on the render state
+		//
+
+		state->BindIndexBuffer(cmd->indexBuffer);
+
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cmd->dataSize, 0, cmd->indexBuffer->GetBufferUsage());
 		void* map = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
@@ -125,7 +126,7 @@ void POGLCreateTexture2D_Command(POGLDeferredRenderContext* context, POGLRenderS
 		THROW_EXCEPTION(POGLResourceException, "Could not create 2D texture. Reason: 0x%x", status);
 	}
 
-	state->SetTextureResource((POGLTextureResource*)cmd->texture->GetResourcePtr());
+	state->ForceSetTextureResource((POGLTextureResource*)cmd->texture->GetResourcePtr());
 }
 
 void POGLCreateTexture2D_Release(POGL_HANDLE command)
@@ -385,7 +386,7 @@ void POGLResizeTexture2D_Command(POGLDeferredRenderContext* context, POGLRenderS
 
 	POGLTextureResource* resource = cmd->texture->GetResourcePtr();
 	glBindTexture(GL_TEXTURE_2D, resource->GetTextureID());
-	state->SetTextureResource(resource);
+	state->ForceSetTextureResource(resource);
 
 	const POGLTextureFormat::Enum format = resource->GetTextureFormat();
 	const GLenum _format = POGLEnum::ConvertToTextureFormatEnum(format);
