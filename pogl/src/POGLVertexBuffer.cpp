@@ -3,6 +3,7 @@
 #include "POGLIndexBuffer.h"
 #include "POGLFactory.h"
 #include "POGLRenderState.h"
+#include "POGLBufferResource.h"
 #include "POGLEnum.h"
 
 namespace {
@@ -13,8 +14,11 @@ namespace {
 }
 
 POGLVertexBuffer::POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage)
-: mRefCount(1), mUID(0), mBufferID(0), mCount(count), mVAOID(0), mLayout(layout), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage)
+: mRefCount(1), mUID(0), mBufferID(0), mCount(count), mVAOID(0), mLayout(layout), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage), mResourcePtr(nullptr)
 {
+	const POGL_UINT32 memorySize = count * layout->vertexSize;
+	mResourcePtr = new POGLBufferResource(memorySize, GL_ARRAY_BUFFER, bufferUsage);
+
 }
 
 POGLVertexBuffer::~POGLVertexBuffer()
@@ -29,9 +33,9 @@ void POGLVertexBuffer::AddRef()
 void POGLVertexBuffer::Release()
 {
 	if (--mRefCount == 0) {
-		if (mBufferID != 0) {
-			glDeleteBuffers(1, &mBufferID);
-			mBufferID = 0;
+		if (mResourcePtr != nullptr) {
+			mResourcePtr->Release();
+			mResourcePtr = nullptr;
 		}
 		if (mVAOID != 0) {
 			glDeleteVertexArrays(1, &mVAOID);
@@ -58,28 +62,17 @@ POGL_UINT32 POGLVertexBuffer::GetCount() const
 
 void* POGLVertexBuffer::Map(POGLResourceMapType::Enum e)
 {
-	if (e == POGLResourceMapType::WRITE)
-		return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return mResourcePtr->Map(e);
 }
 
 void* POGLVertexBuffer::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	if (e == POGLResourceMapType::WRITE) {
-		const POGL_UINT32 memorySize = mCount * mLayout->vertexSize;
-		if (offset + length > memorySize)
-			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
-
-		return glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	}
-
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return mResourcePtr->Map(offset, length, e);
 }
 
 void POGLVertexBuffer::Unmap()
 {
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	return mResourcePtr->Unmap();
 }
 
 void POGLVertexBuffer::Draw()
@@ -97,24 +90,30 @@ void POGLVertexBuffer::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 	glDrawArrays(mPrimitiveType, offset, count);
 }
 
+void POGLVertexBuffer::DrawIndexed(POGLIndexBuffer* indexBuffer)
+{
+	indexBuffer->DrawIndexed(mPrimitiveType);
+}
+
+void POGLVertexBuffer::DrawIndexed(POGLIndexBuffer* indexBuffer, POGL_UINT32 count)
+{
+	indexBuffer->DrawIndexed(mPrimitiveType, count);
+}
+
+void POGLVertexBuffer::DrawIndexed(POGLIndexBuffer* indexBuffer, POGL_UINT32 count, POGL_UINT32 offset)
+{
+	indexBuffer->DrawIndexed(mPrimitiveType, count, offset);
+}
+
 void POGLVertexBuffer::PostConstruct(POGLRenderState* renderState)
 {
-	glGenBuffers(1, &mBufferID);
-	GLenum error = glGetError();
-	if (mBufferID == 0 || error != GL_NO_ERROR)
-		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
-
 	glGenVertexArrays(1, &mVAOID);
-	error = glGetError();
+	const GLenum error = glGetError();
 	if (mVAOID == 0 || error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Could not generate vertex array object ID. Reason: 0x%x", error);
 
 	glBindVertexArray(mVAOID);
-	glBindBuffer(GL_ARRAY_BUFFER, mBufferID);
-
-	// Initialize the buffer size
-	const POGL_UINT32 memorySize = mCount * mLayout->vertexSize;
-	glBufferData(GL_ARRAY_BUFFER, memorySize, 0, mBufferUsage);
+	mResourcePtr->PostConstruct(renderState);
 
 	//
 	// Define how the vertex attributes are located

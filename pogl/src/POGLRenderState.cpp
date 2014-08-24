@@ -231,7 +231,7 @@ void POGLRenderState::DrawIndexed()
 		mApplyCurrentProgramState = false;
 	}
 
-	mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType());
+	mVertexBuffer->DrawIndexed(mIndexBuffer);
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 
@@ -248,7 +248,7 @@ void POGLRenderState::DrawIndexed(POGL_UINT32 count)
 		mApplyCurrentProgramState = false;
 	}
 
-	mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count);
+	mVertexBuffer->DrawIndexed(mIndexBuffer, count);
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 
@@ -265,7 +265,7 @@ void POGLRenderState::DrawIndexed(POGL_UINT32 count, POGL_UINT32 offset)
 		mApplyCurrentProgramState = false;
 	}
 
-	mIndexBuffer->Draw(mVertexBuffer->GetPrimitiveType(), count, offset);
+	mVertexBuffer->DrawIndexed(mIndexBuffer, count, offset);
 	CHECK_GL("Cannot draw vertex- and index buffer");
 }
 

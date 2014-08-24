@@ -2,6 +2,7 @@
 #include "config.h"
 
 class POGLRenderState;
+class POGLBufferResource;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
@@ -23,10 +24,8 @@ public:
 	/*!
 		\brief Retrieves the OpenGL Buffer ID for this object
 	*/
-	inline GLuint GetBufferID() const {
-		return mBufferID;
-	}
-
+	GLuint GetBufferID() const;
+	
 	/*!
 		\brief Retrieves how this buffer is used internally by OpenGL
 	*/
@@ -56,9 +55,9 @@ public:
 	void* Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	void Unmap();
 
-	void Draw(GLenum primitiveType);
-	void Draw(GLenum primitiveType, POGL_UINT32 count);
-	void Draw(GLenum primitiveType, POGL_UINT32 count, POGL_UINT32 offset);
+	void DrawIndexed(GLenum primitiveType);
+	void DrawIndexed(GLenum primitiveType, POGL_UINT32 count);
+	void DrawIndexed(GLenum primitiveType, POGL_UINT32 count, POGL_UINT32 offset);
 
 // IPOGLInterface
 public:
@@ -76,9 +75,9 @@ public:
 private:
 	REF_COUNTER mRefCount;
 	POGL_UID mUID;
-	GLuint mBufferID;
 	POGL_UINT32 mNumIndices;
 	POGL_UINT32 mTypeSize;
 	GLenum mElementType;
 	GLenum mBufferUsage;
+	POGLBufferResource* mResourcePtr;
 };

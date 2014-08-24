@@ -3,6 +3,7 @@
 
 class POGLRenderState;
 class POGLIndexBuffer;
+class POGLBufferResource;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
 public:
@@ -10,10 +11,9 @@ public:
 	~POGLVertexBuffer();
 	
 	/*!
-		\brief Set buffer-, count and vertex array object after the construction is complete.
+		\brief Initializes the OpenGL specific functionality for this buffer.
 
-		This method is called if this object is created in another thread and we want, after the command queue has been executed, to put the
-		values into this buffer.
+		\param renderState
 	*/
 	void PostConstruct(POGLRenderState* renderState);
 
@@ -25,31 +25,10 @@ public:
 	}
 	
 	/*!
-		\brief Retrieves the OpenGL Buffer ID for this object
-	*/
-	inline GLuint GetBufferID() const {
-		return mBufferID;
-	}
-	
-	/*!
 		\brief Retrieves the OpenGL Vertex Array Object ID for this object
 	*/
 	inline GLuint GetVAOID() const {
 		return mVAOID;
-	}
-
-	/*!
-		\brief How this buffer is used internally
-	*/
-	inline GLenum GetBufferUsage() const {
-		return mBufferUsage;
-	}
-
-	/*!
-		\brief Retrieves the primitive type 
-	*/
-	inline GLenum GetPrimitiveType() const {
-		return mPrimitiveType;
 	}
 
 	void* Map(POGLResourceMapType::Enum e);
@@ -59,6 +38,10 @@ public:
 	void Draw();
 	void Draw(POGL_UINT32 count);
 	void Draw(POGL_UINT32 count, POGL_UINT32 offset);
+
+	void DrawIndexed(POGLIndexBuffer* indexBuffer);
+	void DrawIndexed(POGLIndexBuffer* indexBuffer, POGL_UINT32 count);
+	void DrawIndexed(POGLIndexBuffer* indexBuffer, POGL_UINT32 count, POGL_UINT32 offset);
 	
 // IPOGLInterface
 public:
@@ -83,4 +66,5 @@ private:
 	const POGL_VERTEX_LAYOUT* mLayout;
 	GLenum mPrimitiveType;
 	GLenum mBufferUsage;
+	POGLBufferResource* mResourcePtr;
 };
