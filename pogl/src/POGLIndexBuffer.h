@@ -27,6 +27,10 @@ public:
 		return mBufferID;
 	}
 	
+	inline POGL_UINT32 GetMemorySize() const {
+		return mTypeSize * mNumIndices;
+	}
+
 	void* Map(POGLResourceMapType::Enum e);
 	void* Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	void Unmap();

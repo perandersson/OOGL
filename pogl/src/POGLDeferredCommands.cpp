@@ -139,9 +139,9 @@ void POGLMapVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderS
 {
 	POGL_MAPVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPVERTEXBUFFER_COMMAND_DATA*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
-	void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+	void* map = cmd->vertexBuffer->Map(POGLResourceMapType::WRITE);
 	memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	cmd->vertexBuffer->Unmap();
 }
 
 void POGLMapVertexBuffer_Release(POGL_HANDLE command)
@@ -154,15 +154,45 @@ void POGLMapRangeVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRe
 {
 	POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA*)command;
 	state->BindVertexBuffer(cmd->vertexBuffer);
-	void* map = glMapBufferRange(GL_ARRAY_BUFFER, cmd->offset, cmd->length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+	void* map = cmd->vertexBuffer->Map(cmd->offset, cmd->length, POGLResourceMapType::WRITE);
 	memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->length);
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+	cmd->vertexBuffer->Unmap();
 }
 
 void POGLMapRangeVertexBuffer_Release(POGL_HANDLE command)
 {
 	POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA*)command;
 	cmd->vertexBuffer->Release();
+}
+
+void POGLMapIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_MAPINDEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPINDEXBUFFER_COMMAND_DATA*)command;
+	state->BindIndexBuffer(cmd->indexBuffer);
+	void* map = cmd->indexBuffer->Map(POGLResourceMapType::WRITE);
+	memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
+	cmd->indexBuffer->Unmap();
+}
+
+void POGLMapIndexBuffer_Release(POGL_HANDLE command)
+{
+	POGL_MAPINDEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPINDEXBUFFER_COMMAND_DATA*)command;
+	cmd->indexBuffer->Release();
+}
+
+void POGLMapRangeIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
+{
+	POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA*)command;
+	state->BindIndexBuffer(cmd->indexBuffer);
+	void* map = cmd->indexBuffer->Map(cmd->offset, cmd->length, POGLResourceMapType::WRITE);
+	memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->length);
+	cmd->indexBuffer->Unmap();
+}
+
+void POGLMapRangeIndexBuffer_Release(POGL_HANDLE command)
+{
+	POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA*)command;
+	cmd->indexBuffer->Release();
 }
 
 void POGLClear_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)

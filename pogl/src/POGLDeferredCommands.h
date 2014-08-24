@@ -148,6 +148,37 @@ struct POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA
 extern void POGLMapRangeVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
 extern void POGLMapRangeVertexBuffer_Release(POGL_HANDLE command);
 
+struct POGL_MAPINDEXBUFFER_COMMAND_DATA
+{
+	// The vertex buffer we want to map
+	POGLIndexBuffer* indexBuffer;
+
+	// The offset where the data begins
+	POGL_UINT32 memoryOffset;
+
+	// The size (in bytes) of the mapped data
+	POGL_UINT32 dataSize;
+};
+extern void POGLMapIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLMapIndexBuffer_Release(POGL_HANDLE command);
+
+struct POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA
+{
+	// The vertex buffer we want to map
+	POGLIndexBuffer* indexBuffer;
+
+	// The offset where the data begins
+	POGL_UINT32 memoryOffset;
+
+	// The offset, in bytes, where we should put the new data (in the vertex buffer)
+	POGL_UINT32 offset;
+
+	// The size, in bytes
+	POGL_UINT32 length;
+};
+extern void POGLMapRangeIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command);
+extern void POGLMapRangeIndexBuffer_Release(POGL_HANDLE command);
+
 struct POGL_CLEAR_COMMAND_DATA
 {
 	// Clear buffer bits

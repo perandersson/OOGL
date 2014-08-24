@@ -327,6 +327,17 @@ void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGLResourceMapTyp
 		mMapping = true;
 		return GetMapPointer(cmd->memoryOffset);
 	}
+	else if (type == POGLResourceType::INDEXBUFFER) {
+		POGLIndexBuffer* ib = static_cast<POGLIndexBuffer*>(resource);
+		POGL_MAPINDEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPINDEXBUFFER_COMMAND_DATA*)AddCommand(&POGLMapIndexBuffer_Command, &POGLMapIndexBuffer_Release,
+			sizeof(POGL_MAPINDEXBUFFER_COMMAND_DATA));
+		cmd->dataSize = ib->GetMemorySize();
+		cmd->memoryOffset = GetMapOffset(cmd->dataSize);
+		cmd->indexBuffer = ib;
+		cmd->indexBuffer->AddRef();
+		mMapping = true;
+		return GetMapPointer(cmd->memoryOffset);
+	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
@@ -347,9 +358,25 @@ void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 			sizeof(POGL_MAPRANGEVERTEXBUFFER_COMMAND_DATA));
 		cmd->offset = offset;
 		cmd->length = length;
-		cmd->memoryOffset = GetMapOffset(memorySize);
+		cmd->memoryOffset = GetMapOffset(length);
 		cmd->vertexBuffer = vb;
 		cmd->vertexBuffer->AddRef();
+		mMapping = true;
+		return GetMapPointer(cmd->memoryOffset);
+	}
+	else if (type == POGLResourceType::INDEXBUFFER) {
+		POGLIndexBuffer* ib = static_cast<POGLIndexBuffer*>(resource);
+		const POGL_UINT32 memorySize = ib->GetMemorySize();
+		if (offset + length > memorySize)
+			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
+
+		POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA*)AddCommand(&POGLMapRangeIndexBuffer_Command, &POGLMapRangeIndexBuffer_Release,
+			sizeof(POGL_MAPRANGEINDEXBUFFER_COMMAND_DATA));
+		cmd->offset = offset;
+		cmd->length = length;
+		cmd->memoryOffset = GetMapOffset(length);
+		cmd->indexBuffer = ib;
+		cmd->indexBuffer->AddRef();
 		mMapping = true;
 		return GetMapPointer(cmd->memoryOffset);
 	}
