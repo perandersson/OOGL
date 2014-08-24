@@ -2,11 +2,11 @@
 #include "IPOGLBufferResource.h"
 
 class POGLRenderState;
-class POGLDefaultBufferResource : public IPOGLBufferResource
+class POGLAMDBufferResource : public IPOGLBufferResource
 {
 public:
-	POGLDefaultBufferResource(POGL_UINT32 memorySize, GLenum target, GLenum bufferUsage);
-	virtual ~POGLDefaultBufferResource();
+	POGLAMDBufferResource(POGL_UINT32 memorySize, GLenum target, POGLBufferUsage::Enum bufferUsage);
+	virtual ~POGLAMDBufferResource();
 	
 	/*!
 		\brief Retrieves the internal OpenGL buffer ID
@@ -34,5 +34,10 @@ private:
 	GLuint mBufferID;
 	POGL_UINT32 mMemorySize;
 	GLenum mTarget;
-	GLenum mBufferUsage;
+	POGLBufferUsage::Enum mBufferUsage;
+
+	char* mPinnedMemory;
+	char* mPinnedMemoryAligned;
+
+	GLsync mLock;
 };

@@ -51,6 +51,16 @@ void POGLDefaultBufferResource::Unmap()
 	glUnmapBuffer(mTarget);
 }
 
+void POGLDefaultBufferResource::Lock()
+{
+
+}
+
+void POGLDefaultBufferResource::Unlock()
+{
+
+}
+
 GLuint POGLDefaultBufferResource::PostConstruct(POGLRenderState* renderState)
 {
 	glGenBuffers(1, &mBufferID);

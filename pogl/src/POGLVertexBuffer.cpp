@@ -76,32 +76,44 @@ void POGLVertexBuffer::Unmap()
 
 void POGLVertexBuffer::Draw()
 {
+	mBufferResource->Lock();
 	glDrawArrays(mPrimitiveType, 0, mCount);
+	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::Draw(POGL_UINT32 count)
 {
+	mBufferResource->Lock();
 	glDrawArrays(mPrimitiveType, 0, count);
+	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 {
+	mBufferResource->Lock();
 	glDrawArrays(mPrimitiveType, offset, count);
+	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::DrawIndexed(POGLIndexBuffer* indexBuffer)
 {
+	mBufferResource->Lock();
 	indexBuffer->DrawIndexed(mPrimitiveType);
+	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::DrawIndexed(POGLIndexBuffer* indexBuffer, POGL_UINT32 count)
 {
+	mBufferResource->Lock();
 	indexBuffer->DrawIndexed(mPrimitiveType, count);
+	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::DrawIndexed(POGLIndexBuffer* indexBuffer, POGL_UINT32 count, POGL_UINT32 offset)
 {
+	mBufferResource->Lock();
 	indexBuffer->DrawIndexed(mPrimitiveType, count, offset);
+	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::PostConstruct(POGLRenderState* renderState)

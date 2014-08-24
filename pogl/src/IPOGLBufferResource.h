@@ -39,4 +39,8 @@ public:
 		\brief Unmaps this buffer
 	*/
 	virtual void Unmap() = 0;
+
+	virtual void Lock() = 0;
+
+	virtual void Unlock() = 0;
 };

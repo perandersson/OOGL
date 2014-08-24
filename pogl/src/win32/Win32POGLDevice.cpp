@@ -2,7 +2,7 @@
 #include "Win32POGLDevice.h"
 #include "POGLDeferredRenderContext.h"
 #include "providers/POGLDefaultBufferResourceProvider.h"
-//#include "providers/POGLAMDPinnedBufferResourceProvider.h"
+#include "providers/POGLAMDBufferResourceProvider.h"
 #include <algorithm>
 
 /* Memory Leak Detection */
@@ -163,13 +163,13 @@ void Win32POGLDevice::Initialize()
 	}
 
 	// Prepare the resource providers
-	//bool amdPinnedMemory = POGLExtensionAvailable(POGL_TOCHAR("GL_AMD_pinned_memory"));
-	//if (amdPinnedMemory) {
-	//	mBufferResourceProvider = new POGLAMDPinnedBufferResourceProvider();
-	//}
-	//else {
+	bool amdPinnedMemory = POGLExtensionAvailable(POGL_TOCHAR("GL_AMD_pinned_memory"));
+	if (amdPinnedMemory) {
+		mBufferResourceProvider = new POGLAMDBufferResourceProvider();
+	}
+	else {
 		mBufferResourceProvider = new POGLDefaultBufferResourceProvider();
-	//}
+	}
 	mRenderContext->InitializeRenderState();
 }
 
