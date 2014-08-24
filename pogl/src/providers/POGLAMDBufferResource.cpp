@@ -57,7 +57,9 @@ void* POGLAMDBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLRes
 
 void POGLAMDBufferResource::Unmap()
 {
-	//mLock = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	//GLsync oldLock = mLock;
+	//mLock = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);	
+	//glDeleteSync(oldLock);
 }
 
 void POGLAMDBufferResource::Lock()
