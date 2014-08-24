@@ -181,18 +181,18 @@ IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POG
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
 	//
-	// Create the object
+	// Create the object and fill it with data
 	//
 
 	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, usage);
 	vb->PostConstruct(mRenderState);
 	
-	// 
-	// Fill the buffer with data
-	//
+	if (memory != nullptr) {
+		void* dst = vb->Map(0, memorySize, POGLResourceMapType::WRITE);
+		memcpy(dst, memory, memorySize);
+		vb->Unmap();
+	}
 
-	glBufferData(GL_ARRAY_BUFFER, memorySize, memory, usage);
-	
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
@@ -232,12 +232,11 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
 	ib->PostConstruct(mRenderState);
 
-	// 
-	// Fill the buffer with data
-	//
-
-	if (memory != nullptr)
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
+	if (memory != nullptr) {
+		void* dst = ib->Map(0, memorySize, POGLResourceMapType::WRITE);
+		memcpy(dst, memory, memorySize);
+		ib->Unmap();
+	}
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -276,9 +275,9 @@ void* POGLRenderContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum 
 {
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
-		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
-		mRenderState->BindVertexBuffer(vb);
-		return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+		POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(resource);
+		mRenderState->BindVertexBuffer(impl);
+		return impl->Map(e);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
@@ -288,13 +287,9 @@ void* POGLRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 {
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
-		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
-		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
-		if (offset + length > memorySize)
-			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
-
-		mRenderState->BindVertexBuffer(vb);
-		return glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+		POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(resource);
+		mRenderState->BindVertexBuffer(impl);
+		return impl->Map(offset, length, e);
 	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
@@ -304,7 +299,8 @@ void POGLRenderContext::Unmap(IPOGLResource* resource)
 {
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
-		glUnmapBuffer(GL_ARRAY_BUFFER);
+		POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(resource);
+		impl->Unmap();
 		return;
 	}
 

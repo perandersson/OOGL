@@ -56,6 +56,32 @@ POGL_UINT32 POGLVertexBuffer::GetCount() const
 	return mCount;
 }
 
+void* POGLVertexBuffer::Map(POGLResourceMapType::Enum e)
+{
+	if (e == POGLResourceMapType::WRITE)
+		return glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void* POGLVertexBuffer::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
+{
+	if (e == POGLResourceMapType::WRITE) {
+		const POGL_UINT32 memorySize = mCount * mLayout->vertexSize;
+		if (offset + length > memorySize)
+			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
+
+		return glMapBufferRange(GL_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+	}
+
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLVertexBuffer::Unmap()
+{
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+}
+
 void POGLVertexBuffer::Draw()
 {
 	glDrawArrays(mPrimitiveType, 0, mCount);
@@ -85,6 +111,10 @@ void POGLVertexBuffer::PostConstruct(POGLRenderState* renderState)
 
 	glBindVertexArray(mVAOID);
 	glBindBuffer(GL_ARRAY_BUFFER, mBufferID);
+
+	// Initialize the buffer size
+	const POGL_UINT32 memorySize = mCount * mLayout->vertexSize;
+	glBufferData(GL_ARRAY_BUFFER, memorySize, 0, mBufferUsage);
 
 	//
 	// Define how the vertex attributes are located
@@ -126,5 +156,7 @@ void POGLVertexBuffer::PostConstruct(POGLRenderState* renderState)
 	}
 
 	mUID = GenVertexBufferUID();
+
+	// Ensure that the vertex buffer is bound
 	renderState->ForceSetVertexBuffer(this);
 }

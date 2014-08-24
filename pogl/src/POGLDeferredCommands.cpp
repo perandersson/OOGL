@@ -24,15 +24,10 @@ void POGLCreateVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRend
 	POGL_CREATEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEVERTEXBUFFER_COMMAND_DATA*)command;
 	cmd->vertexBuffer->PostConstruct(state);
 
-	//
-	// Map the data if needed
-	//
-
 	if (cmd->memoryOffset != -1) {
-		glBufferData(GL_ARRAY_BUFFER, cmd->dataSize, 0, cmd->vertexBuffer->GetBufferUsage());
-		void* map = glMapBufferRange(GL_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
-		glUnmapBuffer(GL_ARRAY_BUFFER);
+		void* dst = cmd->vertexBuffer->Map(0, cmd->dataSize, POGLResourceMapType::WRITE);
+		memcpy(dst, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
+		cmd->vertexBuffer->Unmap();
 	}
 
 	const GLenum error = glGetError();
@@ -51,15 +46,10 @@ void POGLCreateIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRende
 	POGL_CREATEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEINDEXBUFFER_COMMAND_DATA*)command;
 	cmd->indexBuffer->PostConstruct(state);
 
-	//
-	// Map the data if needed
-	//
-
 	if (cmd->memoryOffset != -1) {
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cmd->dataSize, 0, cmd->indexBuffer->GetBufferUsage());
-		void* map = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
-		glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+		void* dst = cmd->indexBuffer->Map(0, cmd->dataSize, POGLResourceMapType::WRITE);
+		memcpy(dst, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
+		cmd->indexBuffer->Unmap();
 	}
 
 	const GLenum error = glGetError();

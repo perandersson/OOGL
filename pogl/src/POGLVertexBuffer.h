@@ -52,6 +52,10 @@ public:
 		return mPrimitiveType;
 	}
 
+	void* Map(POGLResourceMapType::Enum e);
+	void* Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
+	void Unmap();
+
 	void Draw();
 	void Draw(POGL_UINT32 count);
 	void Draw(POGL_UINT32 count, POGL_UINT32 offset);

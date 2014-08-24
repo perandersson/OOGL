@@ -28,6 +28,12 @@ void POGLIndexBuffer::PostConstruct(POGLRenderState* renderState)
 
 	mUID = GenIndexBufferUID();
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferID);
+
+	// Initialize the buffer size
+	const POGL_UINT32 memorySize = mTypeSize * mNumIndices;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, 0, mBufferUsage);
+
+	// Ensure that the index buffer is bound
 	renderState->ForceSetIndexBuffer(this);
 }
 
@@ -55,6 +61,32 @@ POGLResourceType::Enum POGLIndexBuffer::GetType() const
 POGL_UINT32 POGLIndexBuffer::GetCount() const
 {
 	return mNumIndices;
+}
+
+void* POGLIndexBuffer::Map(POGLResourceMapType::Enum e)
+{
+	if (e == POGLResourceMapType::WRITE)
+		return glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void* POGLIndexBuffer::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
+{
+	if (e == POGLResourceMapType::WRITE) {
+		const POGL_UINT32 memorySize = mTypeSize * mNumIndices;
+		if (offset + length > memorySize)
+			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the index buffer size is: %d", offset, length, memorySize);
+
+		return glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
+	}
+
+	THROW_NOT_IMPLEMENTED_EXCEPTION();
+}
+
+void POGLIndexBuffer::Unmap()
+{
+	glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
 }
 
 void POGLIndexBuffer::Draw(GLenum primitiveType)
