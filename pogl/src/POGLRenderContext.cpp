@@ -277,6 +277,11 @@ void* POGLRenderContext::Map(IPOGLResource* resource, POGLResourceMapType::Enum 
 		mRenderState->BindVertexBuffer(impl);
 		return impl->Map(e);
 	}
+	else if (type == POGLResourceType::INDEXBUFFER) {
+		POGLIndexBuffer* impl = static_cast<POGLIndexBuffer*>(resource);
+		mRenderState->BindIndexBuffer(impl);
+		return impl->Map(e);
+	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
@@ -289,6 +294,11 @@ void* POGLRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset, POGL_U
 		mRenderState->BindVertexBuffer(impl);
 		return impl->Map(offset, length, e);
 	}
+	else if (type == POGLResourceType::INDEXBUFFER) {
+		POGLIndexBuffer* impl = static_cast<POGLIndexBuffer*>(resource);
+		mRenderState->BindIndexBuffer(impl);
+		return impl->Map(offset, length, e);
+	}
 
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
@@ -298,6 +308,11 @@ void POGLRenderContext::Unmap(IPOGLResource* resource)
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* impl = static_cast<POGLVertexBuffer*>(resource);
+		impl->Unmap();
+		return;
+	}
+	else if (type == POGLResourceType::INDEXBUFFER) {
+		POGLIndexBuffer* impl = static_cast<POGLIndexBuffer*>(resource);
 		impl->Unmap();
 		return;
 	}
