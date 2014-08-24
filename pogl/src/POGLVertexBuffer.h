@@ -1,5 +1,5 @@
 #pragma once
-#include "config.h"
+#include "IPOGLBufferResourceProvider.h"
 
 class POGLRenderState;
 class POGLIndexBuffer;
@@ -7,7 +7,7 @@ class POGLBufferResource;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
 public:
-	POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage);
+	POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, POGLBufferUsage::Enum bufferUsage, IPOGLBufferResourceProvider* provider);
 	~POGLVertexBuffer();
 	
 	/*!
@@ -65,6 +65,5 @@ private:
 	GLuint mVAOID;
 	const POGL_VERTEX_LAYOUT* mLayout;
 	GLenum mPrimitiveType;
-	GLenum mBufferUsage;
-	POGLBufferResource* mResourcePtr;
+	IPOGLBufferResource* mBufferResource;
 };

@@ -3,11 +3,12 @@
 #include <mutex>
 #include <condition_variable>
 
+class POGLDevice;
 class POGLDeferredRenderState;
 class POGLDeferredRenderContext : public IPOGLDeferredRenderContext
 {
 public:
-	POGLDeferredRenderContext(IPOGLDevice* device);
+	POGLDeferredRenderContext(POGLDevice* device);
 	virtual ~POGLDeferredRenderContext();
 	
 	/*!
@@ -82,7 +83,7 @@ public:
 
 protected:
 	REF_COUNTER mRefCount;
-	IPOGLDevice* mDevice;
+	POGLDevice* mDevice;
 	POGLDeferredRenderState* mRenderState;
 
 	// 

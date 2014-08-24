@@ -1,7 +1,7 @@
 #include "MemCheck.h"
 #include "POGLIndexBuffer.h"
 #include "POGLRenderState.h"
-#include "POGLBufferResource.h"
+#include "providers/POGLDefaultBufferResource.h"
 
 namespace {
 	std::atomic<POGL_UINT32> uid;
@@ -10,11 +10,11 @@ namespace {
 	}
 }
 
-POGLIndexBuffer::POGLIndexBuffer(POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum elementType, GLenum bufferUsage)
-: mRefCount(1), mUID(0), mTypeSize(typeSize), mNumIndices(numIndices), mElementType(elementType), mBufferUsage(bufferUsage), mResourcePtr(nullptr)
+POGLIndexBuffer::POGLIndexBuffer(POGL_UINT32 typeSize, POGL_UINT32 numIndices, GLenum elementType, POGLBufferUsage::Enum bufferUsage, IPOGLBufferResourceProvider* provider)
+: mRefCount(1), mUID(0), mTypeSize(typeSize), mNumIndices(numIndices), mElementType(elementType), mBufferID(0), mBufferResource(nullptr)
 {
 	const POGL_UINT32 memorySize = typeSize * numIndices;
-	mResourcePtr = new POGLBufferResource(memorySize, GL_ELEMENT_ARRAY_BUFFER, bufferUsage);
+	mBufferResource = provider->CreateBuffer(memorySize, GL_ELEMENT_ARRAY_BUFFER, bufferUsage);
 }
 
 POGLIndexBuffer::~POGLIndexBuffer()
@@ -23,7 +23,7 @@ POGLIndexBuffer::~POGLIndexBuffer()
 
 void POGLIndexBuffer::PostConstruct(POGLRenderState* renderState)
 {
-	mResourcePtr->PostConstruct(renderState);
+	mBufferID = mBufferResource->PostConstruct(renderState);
 	mUID = GenIndexBufferUID();
 
 	// Ensure that the index buffer is bound
@@ -38,17 +38,12 @@ void POGLIndexBuffer::AddRef()
 void POGLIndexBuffer::Release()
 {
 	if (--mRefCount == 0) {
-		if (mResourcePtr != nullptr) {
-			mResourcePtr->Release();
-			mResourcePtr = nullptr;
+		if (mBufferResource != nullptr) {
+			mBufferResource->Release();
+			mBufferResource = nullptr;
 		}
 		delete this;
 	}
-}
-
-GLuint POGLIndexBuffer::GetBufferID() const
-{
-	return mResourcePtr->GetBufferID();
 }
 
 POGLResourceType::Enum POGLIndexBuffer::GetType() const
@@ -63,17 +58,17 @@ POGL_UINT32 POGLIndexBuffer::GetCount() const
 
 void* POGLIndexBuffer::Map(POGLResourceMapType::Enum e)
 {
-	return mResourcePtr->Map(e);
+	return mBufferResource->Map(e);
 }
 
 void* POGLIndexBuffer::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	return mResourcePtr->Map(offset, length, e);
+	return mBufferResource->Map(offset, length, e);
 }
 
 void POGLIndexBuffer::Unmap()
 {
-	return mResourcePtr->Unmap();
+	return mBufferResource->Unmap();
 }
 
 void POGLIndexBuffer::DrawIndexed(GLenum primitiveType)

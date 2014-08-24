@@ -3,7 +3,7 @@
 #include "Win32POGLDevice.h"
 #include <vector>
 
-Win32POGLRenderContext::Win32POGLRenderContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext)
+Win32POGLRenderContext::Win32POGLRenderContext(POGLDevice* device, HDC deviceContext, HGLRC renderContext)
 : POGLRenderContext(device), mRefCount(0), mDeviceContext(deviceContext), mRenderContext(renderContext)
 {
 

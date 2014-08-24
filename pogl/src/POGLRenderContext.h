@@ -4,10 +4,11 @@
 class POGLRenderState;
 class POGLVertexBuffer;
 class POGLIndexBuffer;
+class POGLDevice;
 class POGLAPI POGLRenderContext : public IPOGLRenderContext
 {
 public:
-	POGLRenderContext(IPOGLDevice* device);
+	POGLRenderContext(POGLDevice* device);
 	~POGLRenderContext();
 
 	/*!
@@ -52,6 +53,6 @@ public:
 	void InitializeRenderState();
 
 protected:
-	IPOGLDevice* mDevice;
+	POGLDevice* mDevice;
 	POGLRenderState* mRenderState;
 };

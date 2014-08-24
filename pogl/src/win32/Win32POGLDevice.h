@@ -15,6 +15,10 @@ public:
 		Initializes this device
 	*/
 	void Initialize();
+
+// POGLDevice
+public:
+	virtual IPOGLBufferResourceProvider* GetBufferResourceProvider();
 	
 // IPOGLInterface
 public:
@@ -38,6 +42,7 @@ private:
 	bool mReleasing;
 	HWND mHWND;
 	HDC mDC;
-	
+
+	IPOGLBufferResourceProvider* mBufferResourceProvider;
 	Win32POGLRenderContext* mRenderContext;
 };

@@ -13,7 +13,7 @@
 #include "POGLProgram.h"
 #include <algorithm>
 
-POGLRenderContext::POGLRenderContext(IPOGLDevice* device)
+POGLRenderContext::POGLRenderContext(POGLDevice* device)
 : mRenderState(nullptr), mDevice(device)
 {
 }
@@ -177,14 +177,13 @@ IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POG
 		THROW_EXCEPTION(POGLStateException, "You cannot create a vertex buffer without a layout");
 
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
-	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
 	//
 	// Create the object and fill it with data
 	//
 
-	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, usage);
+	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage, mDevice->GetBufferResourceProvider());
 	vb->PostConstruct(mRenderState);
 	
 	if (memory != nullptr) {
@@ -226,10 +225,9 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 
 	const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(type);
 	const POGL_UINT32 numIndices = memorySize / typeSize;
-	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum indiceType = POGLEnum::Convert(type);
 
-	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
+	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, bufferUsage, mDevice->GetBufferResourceProvider());
 	ib->PostConstruct(mRenderState);
 
 	if (memory != nullptr) {

@@ -1,6 +1,8 @@
 #include "MemCheck.h"
 #include "Win32POGLDevice.h"
 #include "POGLDeferredRenderContext.h"
+#include "providers/POGLDefaultBufferResourceProvider.h"
+//#include "providers/POGLAMDPinnedBufferResourceProvider.h"
 #include <algorithm>
 
 /* Memory Leak Detection */
@@ -18,7 +20,7 @@ void POGLEnableMemoryLeakDetection()
 
 Win32POGLDevice::Win32POGLDevice(const POGL_DEVICE_INFO* info)
 : POGLDevice(info), mRefCount(1), mReleasing(false),
-mHWND(nullptr), mDC(nullptr), mRenderContext(nullptr)
+mHWND(nullptr), mDC(nullptr), mRenderContext(nullptr), mBufferResourceProvider(nullptr)
 {
 
 }
@@ -43,6 +45,11 @@ void Win32POGLDevice::Release()
 			mRenderContext = nullptr;
 		}
 		
+		if (mBufferResourceProvider != nullptr) {
+			delete mBufferResourceProvider;
+			mBufferResourceProvider = nullptr;
+		}
+
 		if (mDC != nullptr && mHWND != nullptr) {
 			ReleaseDC(mHWND, mDC);
 			mDC = nullptr;
@@ -155,7 +162,21 @@ void Win32POGLDevice::Initialize()
 		THROW_EXCEPTION(POGLInitializationException, "Could not load OpenGL extensions");
 	}
 
+	// Prepare the resource providers
+	//bool amdPinnedMemory = POGLExtensionAvailable(POGL_TOCHAR("GL_AMD_pinned_memory"));
+	//if (amdPinnedMemory) {
+	//	mBufferResourceProvider = new POGLAMDPinnedBufferResourceProvider();
+	//}
+	//else {
+		mBufferResourceProvider = new POGLDefaultBufferResourceProvider();
+	//}
 	mRenderContext->InitializeRenderState();
+}
+
+
+IPOGLBufferResourceProvider* Win32POGLDevice::GetBufferResourceProvider()
+{
+	return mBufferResourceProvider;
 }
 
 Win32POGLRenderContext* Win32POGLDevice::CreateRenderContext()

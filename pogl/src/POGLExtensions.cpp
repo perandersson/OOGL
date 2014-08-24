@@ -82,6 +82,7 @@ PFNGLFRAMEBUFFERTEXTUREPROC _poglFramebufferTexture = nullptr;
 PFNGLCHECKFRAMEBUFFERSTATUSPROC _poglCheckFramebufferStatus = nullptr;
 PFNGLDRAWBUFFERSPROC _poglDrawBuffers = nullptr;
 PFNGLCOPYBUFFERSUBDATAPROC _poglCopyBufferSubData = nullptr;
+PFNGLGETSTRINGIPROC _poglGetStringi = nullptr;
 #ifdef WIN32
 PFNWGLCREATECONTEXTATTRIBSARBPROC _powglCreateContextAttribsARB = nullptr;
 #endif
@@ -156,8 +157,22 @@ bool POGLLoadExtensions()
 	POGL_SET_EXTENSION_FUNC(PFNGLCHECKFRAMEBUFFERSTATUSPROC, glCheckFramebufferStatus);
 	POGL_SET_EXTENSION_FUNC(PFNGLDRAWBUFFERSPROC, glDrawBuffers);
 	POGL_SET_EXTENSION_FUNC(PFNGLCOPYBUFFERSUBDATAPROC, glCopyBufferSubData);
+	POGL_SET_EXTENSION_FUNC(PFNGLGETSTRINGIPROC, glGetStringi);
+	
 #ifdef WIN32
 	POGL_SET_EXTENSION_FUNC(PFNWGLCREATECONTEXTATTRIBSARBPROC, wglCreateContextAttribsARB);
 #endif
 	return true;
+}
+
+bool POGLExtensionAvailable(const POGL_CHAR* ext)
+{
+	GLint n = 0;
+	glGetIntegerv(GL_NUM_EXTENSIONS, &n);
+	for (GLint i = 0; i < n; ++i) {
+		const GLubyte* str = glGetStringi(GL_EXTENSIONS, i);
+		if (strcmp((const char*)str, ext) == 0)
+			return true;
+	}
+	return false;
 }

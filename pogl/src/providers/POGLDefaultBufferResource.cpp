@@ -1,21 +1,21 @@
 #include "MemCheck.h"
-#include "POGLBufferResource.h"
+#include "POGLDefaultBufferResource.h"
 
-POGLBufferResource::POGLBufferResource(POGL_UINT32 memorySize, GLenum target, GLenum bufferUsage)
+POGLDefaultBufferResource::POGLDefaultBufferResource(POGL_UINT32 memorySize, GLenum target, GLenum bufferUsage)
 : mRefCount(1), mBufferID(0), mMemorySize(memorySize), mTarget(target), mBufferUsage(bufferUsage)
 {
 }
 
-POGLBufferResource::~POGLBufferResource()
+POGLDefaultBufferResource::~POGLDefaultBufferResource()
 {
 }
 
-void POGLBufferResource::AddRef()
+void POGLDefaultBufferResource::AddRef()
 {
 	mRefCount++;
 }
 
-void POGLBufferResource::Release()
+void POGLDefaultBufferResource::Release()
 {
 	if (--mRefCount == 0) {
 		if (mBufferID != 0) {
@@ -26,7 +26,7 @@ void POGLBufferResource::Release()
 	}
 }
 
-void* POGLBufferResource::Map(POGLResourceMapType::Enum e)
+void* POGLDefaultBufferResource::Map(POGLResourceMapType::Enum e)
 {
 	if (e == POGLResourceMapType::WRITE)
 		return glMapBuffer(mTarget, GL_WRITE_ONLY);
@@ -34,7 +34,7 @@ void* POGLBufferResource::Map(POGLResourceMapType::Enum e)
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void* POGLBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
+void* POGLDefaultBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
 	if (e == POGLResourceMapType::WRITE) {
 		if (offset + length > mMemorySize)
@@ -46,12 +46,12 @@ void* POGLBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResour
 	THROW_NOT_IMPLEMENTED_EXCEPTION();
 }
 
-void POGLBufferResource::Unmap()
+void POGLDefaultBufferResource::Unmap()
 {
 	glUnmapBuffer(mTarget);
 }
 
-void POGLBufferResource::PostConstruct(POGLRenderState* renderState)
+GLuint POGLDefaultBufferResource::PostConstruct(POGLRenderState* renderState)
 {
 	glGenBuffers(1, &mBufferID);
 	const GLenum error = glGetError();
@@ -60,7 +60,11 @@ void POGLBufferResource::PostConstruct(POGLRenderState* renderState)
 
 	// Bind the buffer
 	glBindBuffer(mTarget, mBufferID);
+	CHECK_GL("Could not bind buffer");
 
 	// Initialize the buffer size
 	glBufferData(mTarget, mMemorySize, 0, mBufferUsage);
+	CHECK_GL("Could not initialize buffer data");
+
+	return mBufferID;
 }

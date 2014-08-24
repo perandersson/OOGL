@@ -4,7 +4,7 @@
 class POGLAPI Win32POGLRenderContext : public POGLRenderContext
 {
 public:
-	Win32POGLRenderContext(IPOGLDevice* device, HDC deviceContext, HGLRC renderContext);
+	Win32POGLRenderContext(POGLDevice* device, HDC deviceContext, HGLRC renderContext);
 	~Win32POGLRenderContext();
 
 	/*!

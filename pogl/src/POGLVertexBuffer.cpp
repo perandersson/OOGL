@@ -3,7 +3,6 @@
 #include "POGLIndexBuffer.h"
 #include "POGLFactory.h"
 #include "POGLRenderState.h"
-#include "POGLBufferResource.h"
 #include "POGLEnum.h"
 
 namespace {
@@ -13,11 +12,11 @@ namespace {
 	}
 }
 
-POGLVertexBuffer::POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage)
-: mRefCount(1), mUID(0), mBufferID(0), mCount(count), mVAOID(0), mLayout(layout), mPrimitiveType(primitiveType), mBufferUsage(bufferUsage), mResourcePtr(nullptr)
+POGLVertexBuffer::POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, POGLBufferUsage::Enum bufferUsage, IPOGLBufferResourceProvider* provider)
+: mRefCount(1), mUID(0), mBufferID(0), mCount(count), mVAOID(0), mLayout(layout), mPrimitiveType(primitiveType), mBufferResource(nullptr)
 {
 	const POGL_UINT32 memorySize = count * layout->vertexSize;
-	mResourcePtr = new POGLBufferResource(memorySize, GL_ARRAY_BUFFER, bufferUsage);
+	mBufferResource = provider->CreateBuffer(memorySize, GL_ARRAY_BUFFER, bufferUsage);
 
 }
 
@@ -33,9 +32,9 @@ void POGLVertexBuffer::AddRef()
 void POGLVertexBuffer::Release()
 {
 	if (--mRefCount == 0) {
-		if (mResourcePtr != nullptr) {
-			mResourcePtr->Release();
-			mResourcePtr = nullptr;
+		if (mBufferResource != nullptr) {
+			mBufferResource->Release();
+			mBufferResource = nullptr;
 		}
 		if (mVAOID != 0) {
 			glDeleteVertexArrays(1, &mVAOID);
@@ -62,17 +61,17 @@ POGL_UINT32 POGLVertexBuffer::GetCount() const
 
 void* POGLVertexBuffer::Map(POGLResourceMapType::Enum e)
 {
-	return mResourcePtr->Map(e);
+	return mBufferResource->Map(e);
 }
 
 void* POGLVertexBuffer::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	return mResourcePtr->Map(offset, length, e);
+	return mBufferResource->Map(offset, length, e);
 }
 
 void POGLVertexBuffer::Unmap()
 {
-	return mResourcePtr->Unmap();
+	return mBufferResource->Unmap();
 }
 
 void POGLVertexBuffer::Draw()
@@ -113,7 +112,7 @@ void POGLVertexBuffer::PostConstruct(POGLRenderState* renderState)
 		THROW_EXCEPTION(POGLResourceException, "Could not generate vertex array object ID. Reason: 0x%x", error);
 
 	glBindVertexArray(mVAOID);
-	mResourcePtr->PostConstruct(renderState);
+	mBufferResource->PostConstruct(renderState);
 
 	//
 	// Define how the vertex attributes are located

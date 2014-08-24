@@ -89,6 +89,7 @@ extern PFNGLFRAMEBUFFERTEXTUREPROC _poglFramebufferTexture;
 extern PFNGLCHECKFRAMEBUFFERSTATUSPROC _poglCheckFramebufferStatus;
 extern PFNGLDRAWBUFFERSPROC _poglDrawBuffers;
 extern PFNGLCOPYBUFFERSUBDATAPROC _poglCopyBufferSubData;
+extern PFNGLGETSTRINGIPROC _poglGetStringi;
 
 #define glGenBuffers _poglGenBuffers
 #define glDeleteBuffers _poglDeleteBuffers
@@ -158,6 +159,7 @@ extern PFNGLCOPYBUFFERSUBDATAPROC _poglCopyBufferSubData;
 #define glCheckFramebufferStatus _poglCheckFramebufferStatus
 #define glDrawBuffers _poglDrawBuffers
 #define glCopyBufferSubData _poglCopyBufferSubData
+#define glGetStringi _poglGetStringi
 
 #ifdef WIN32
 extern PFNWGLCREATECONTEXTATTRIBSARBPROC _powglCreateContextAttribsARB;
@@ -169,3 +171,8 @@ extern PFNWGLCREATECONTEXTATTRIBSARBPROC _powglCreateContextAttribsARB;
 	\brief Load the neccessary extensions used by the POGL framework
 */
 extern bool POGLLoadExtensions();
+
+/*
+	\brief Check to see if an extension is available
+*/
+extern bool POGLExtensionAvailable(const POGL_CHAR* ext);

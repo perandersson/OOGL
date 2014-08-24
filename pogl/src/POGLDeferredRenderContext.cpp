@@ -11,8 +11,9 @@
 #include "POGLShader.h"
 #include "POGLProgram.h"
 #include "POGLIndexBuffer.h"
+#include "POGLDevice.h"
 
-POGLDeferredRenderContext::POGLDeferredRenderContext(IPOGLDevice* device)
+POGLDeferredRenderContext::POGLDeferredRenderContext(POGLDevice* device)
 : mRefCount(1), mDevice(device), mRenderState(nullptr),
 mMemoryPool(nullptr), mMemoryPoolOffset(0), mMemoryPoolSize(0),
 mFlushedCommands(nullptr), mFlushedCommandsSize(0),
@@ -218,10 +219,9 @@ IPOGLVertexBuffer* POGLDeferredRenderContext::CreateVertexBuffer(const void* mem
 		THROW_EXCEPTION(POGLStateException, "You cannot create a vertex buffer without a layout");
 
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
-	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
 
-	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, usage);
+	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, bufferUsage, mDevice->GetBufferResourceProvider());
 	POGL_CREATEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEVERTEXBUFFER_COMMAND_DATA*)AddCommand(&POGLCreateVertexBuffer_Command, &POGLCreateVertexBuffer_Release,
 		sizeof(POGL_CREATEVERTEXBUFFER_COMMAND_DATA));
 	cmd->vertexBuffer = vb;
@@ -262,10 +262,9 @@ IPOGLIndexBuffer* POGLDeferredRenderContext::CreateIndexBuffer(const void* memor
 
 	const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(type);
 	const POGL_UINT32 numIndices = memorySize / typeSize;
-	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum indiceType = POGLEnum::Convert(type);
 
-	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
+	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, bufferUsage, mDevice->GetBufferResourceProvider());
 	POGL_CREATEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEINDEXBUFFER_COMMAND_DATA*)AddCommand(&POGLCreateIndexBuffer_Command, &POGLCreateIndexBuffer_Release,
 		sizeof(POGL_CREATEINDEXBUFFER_COMMAND_DATA));
 	cmd->indexBuffer = ib;
