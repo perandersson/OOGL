@@ -179,28 +179,20 @@ IPOGLVertexBuffer* POGLRenderContext::CreateVertexBuffer(const void* memory, POG
 	const POGL_UINT32 numVertices = memorySize / layout->vertexSize;
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum type = POGLEnum::Convert(primitiveType);
-	const GLuint bufferID = POGLFactory::GenBufferID();
-	const GLuint vaoID = POGLFactory::GenVertexArrayObjectID(bufferID, layout);
 
 	//
 	// Create the object
 	//
 
 	POGLVertexBuffer* vb = new POGLVertexBuffer(numVertices, layout, type, usage);
-	vb->PostConstruct(bufferID, vaoID);
+	vb->PostConstruct(mRenderState);
 	
 	// 
 	// Fill the buffer with data
 	//
 
 	glBufferData(GL_ARRAY_BUFFER, memorySize, memory, usage);
-
-	//
-	// Make sure to mark this buffer as the current vertex buffer
-	//
-
-	mRenderState->ForceSetVertexBuffer(vb);
-
+	
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
 		THROW_EXCEPTION(POGLResourceException, "Failed to create a vertex buffer. Reason: 0x%x", error);
@@ -234,27 +226,18 @@ IPOGLIndexBuffer* POGLRenderContext::CreateIndexBuffer(const void* memory, POGL_
 
 	const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(type);
 	const POGL_UINT32 numIndices = memorySize / typeSize;
-	const GLuint bufferID = POGLFactory::GenBufferID();
 	const GLenum usage = POGLEnum::Convert(bufferUsage);
 	const GLenum indiceType = POGLEnum::Convert(type);
 
 	POGLIndexBuffer* ib = new POGLIndexBuffer(typeSize, numIndices, indiceType, usage);
-	ib->PostConstruct(bufferID);
+	ib->PostConstruct(mRenderState);
 
 	// 
 	// Fill the buffer with data
 	//
 
-	if (memory != nullptr) {
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferID);
+	if (memory != nullptr)
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, memorySize, memory, usage);
-
-		//
-		// Make sure to mark this buffer as the current index buffer
-		//
-
-		mRenderState->ForceSetIndexBuffer(ib);
-	}
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)

@@ -1,6 +1,7 @@
 #pragma once
 #include "config.h"
 
+class POGLRenderState;
 class POGLIndexBuffer : public IPOGLIndexBuffer
 {
 public:
@@ -10,7 +11,7 @@ public:
 	/*!
 		\brief Method called after this buffer's construction is completed
 	*/
-	void PostConstruct(GLuint bufferID);
+	void PostConstruct(POGLRenderState* renderState);
 	
 	/*!
 		\brief Retrieves a unique ID for this object

@@ -22,14 +22,7 @@ void POGLNothing_Command(POGLDeferredRenderContext*, POGLRenderState*, POGL_HAND
 void POGLCreateVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_CREATEVERTEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEVERTEXBUFFER_COMMAND_DATA*)command;
-
-	//
-	// Generate buffers and attach the vertex buffers layout to it
-	//
-
-	const GLuint bufferID = POGLFactory::GenBufferID();
-	const GLuint vaoID = POGLFactory::GenVertexArrayObjectID(bufferID, cmd->vertexBuffer->GetLayout());
-	cmd->vertexBuffer->PostConstruct(bufferID, vaoID);
+	cmd->vertexBuffer->PostConstruct(state);
 
 	//
 	// Map the data if needed
@@ -41,12 +34,6 @@ void POGLCreateVertexBuffer_Command(POGLDeferredRenderContext* context, POGLRend
 		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);
 		glUnmapBuffer(GL_ARRAY_BUFFER);
 	}
-
-	//
-	// Set the vertex buffer as the "current buffer" on the render state (because the GenVertexArrayObjectID will bind the vertex array object for us)
-	//
-
-	state->ForceSetVertexBuffer(cmd->vertexBuffer);
 
 	const GLenum error = glGetError();
 	if (error != GL_NO_ERROR)
@@ -62,22 +49,13 @@ void POGLCreateVertexBuffer_Release(POGL_HANDLE command)
 void POGLCreateIndexBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_CREATEINDEXBUFFER_COMMAND_DATA* cmd = (POGL_CREATEINDEXBUFFER_COMMAND_DATA*)command;
-
-	const GLuint bufferID = POGLFactory::GenBufferID();
-	cmd->indexBuffer->PostConstruct(bufferID);
+	cmd->indexBuffer->PostConstruct(state);
 
 	//
 	// Map the data if needed
 	//
 
 	if (cmd->memoryOffset != -1) {
-
-		//
-		// Set the vertex buffer as the "current buffer" on the render state
-		//
-
-		state->BindIndexBuffer(cmd->indexBuffer);
-
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, cmd->dataSize, 0, cmd->indexBuffer->GetBufferUsage());
 		void* map = glMapBufferRange(GL_ELEMENT_ARRAY_BUFFER, 0, cmd->dataSize, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
 		memcpy(map, context->GetMapPointer(cmd->memoryOffset), cmd->dataSize);

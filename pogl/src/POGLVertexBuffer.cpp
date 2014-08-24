@@ -1,6 +1,9 @@
 #include "MemCheck.h"
 #include "POGLVertexBuffer.h"
 #include "POGLIndexBuffer.h"
+#include "POGLFactory.h"
+#include "POGLRenderState.h"
+#include "POGLEnum.h"
 
 namespace {
 	std::atomic<POGL_UINT32> uid;
@@ -68,9 +71,60 @@ void POGLVertexBuffer::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 	glDrawArrays(mPrimitiveType, offset, count);
 }
 
-void POGLVertexBuffer::PostConstruct(GLuint bufferID, GLuint vaoID)
+void POGLVertexBuffer::PostConstruct(POGLRenderState* renderState)
 {
-	mBufferID = bufferID;
-	mVAOID = vaoID;
+	glGenBuffers(1, &mBufferID);
+	GLenum error = glGetError();
+	if (mBufferID == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
+
+	glGenVertexArrays(1, &mVAOID);
+	error = glGetError();
+	if (mVAOID == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate vertex array object ID. Reason: 0x%x", error);
+
+	glBindVertexArray(mVAOID);
+	glBindBuffer(GL_ARRAY_BUFFER, mBufferID);
+
+	//
+	// Define how the vertex attributes are located
+	//
+
+	POGL_UINT32 offset = 0;
+	for (POGL_UINT32 i = 0; i < MAX_VERTEX_LAYOUT_FIELD_SIZE; ++i) {
+		const POGL_VERTEX_LAYOUT_FIELD& field = mLayout->fields[i];
+		if (field.fieldSize == 0) {
+			continue;
+		}
+
+		// Enable vertex attribute location if neccessary
+		glEnableVertexAttribArray(i);
+		CHECK_GL("Could not enable vertex attrib location for the vertex array object");
+
+		const POGL_UINT32 typeSize = POGLEnum::VertexTypeSize(field.type);
+		const GLint numElementsInField = field.fieldSize / typeSize;
+		const auto type = field.type;
+		switch (type) {
+		case POGLVertexType::BYTE:
+		case POGLVertexType::UNSIGNED_BYTE:
+		case POGLVertexType::SHORT:
+		case POGLVertexType::UNSIGNED_SHORT:
+		case POGLVertexType::INT:
+		case POGLVertexType::UNSIGNED_INT:
+			glVertexAttribIPointer(i, numElementsInField, POGLEnum::Convert(type), mLayout->vertexSize, OFFSET(offset));
+			break;
+		case POGLVertexType::FLOAT:
+			glVertexAttribPointer(i, numElementsInField, POGLEnum::Convert(type), field.normalize ? GL_TRUE : GL_FALSE, mLayout->vertexSize, OFFSET(offset));
+			break;
+		case POGLVertexType::DOUBLE:
+			glVertexAttribLPointer(i, numElementsInField, POGLEnum::Convert(type), mLayout->vertexSize, OFFSET(offset));
+			break;
+		}
+
+		CHECK_GL("Could not set vertex attrib location for the vertex array object");
+		offset += field.fieldSize;
+	}
+
 	mUID = GenVertexBufferUID();
+	renderState->ForceSetVertexBuffer(this);
 }

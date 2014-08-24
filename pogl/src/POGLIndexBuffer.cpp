@@ -1,5 +1,6 @@
 #include "MemCheck.h"
 #include "POGLIndexBuffer.h"
+#include "POGLRenderState.h"
 
 namespace {
 	std::atomic<POGL_UINT32> uid;
@@ -18,10 +19,16 @@ POGLIndexBuffer::~POGLIndexBuffer()
 {
 }
 
-void POGLIndexBuffer::PostConstruct(GLuint bufferID)
+void POGLIndexBuffer::PostConstruct(POGLRenderState* renderState)
 {
-	mBufferID = bufferID;
+	glGenBuffers(1, &mBufferID);
+	const GLenum error = glGetError();
+	if (mBufferID == 0 || error != GL_NO_ERROR)
+		THROW_EXCEPTION(POGLResourceException, "Could not generate buffer ID. Reason: 0x%x", error);
+
 	mUID = GenIndexBufferUID();
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mBufferID);
+	renderState->ForceSetIndexBuffer(this);
 }
 
 void POGLIndexBuffer::AddRef()

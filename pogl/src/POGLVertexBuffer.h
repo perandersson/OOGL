@@ -1,6 +1,7 @@
 #pragma once
 #include "config.h"
 
+class POGLRenderState;
 class POGLIndexBuffer;
 class POGLVertexBuffer : public IPOGLVertexBuffer
 {
@@ -8,6 +9,14 @@ public:
 	POGLVertexBuffer(POGL_UINT32 count, const POGL_VERTEX_LAYOUT* layout, GLenum primitiveType, GLenum bufferUsage);
 	~POGLVertexBuffer();
 	
+	/*!
+		\brief Set buffer-, count and vertex array object after the construction is complete.
+
+		This method is called if this object is created in another thread and we want, after the command queue has been executed, to put the
+		values into this buffer.
+	*/
+	void PostConstruct(POGLRenderState* renderState);
+
 	/*!
 		\brief Retrieves a unique ID for this vertex buffer
 	*/
@@ -47,14 +56,6 @@ public:
 	void Draw(POGL_UINT32 count);
 	void Draw(POGL_UINT32 count, POGL_UINT32 offset);
 	
-	/*!
-		\brief Set buffer-, count and vertex array object after the construction is complete.
-
-		This method is called if this object is created in another thread and we want, after the command queue has been executed, to put the
-		values into this buffer.
-	*/
-	void PostConstruct(GLuint bufferID, GLuint vaoID);
-
 // IPOGLInterface
 public:
 	virtual void AddRef();
