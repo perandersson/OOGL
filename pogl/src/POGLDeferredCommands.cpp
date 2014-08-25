@@ -355,20 +355,7 @@ void POGLApplyProgram_Release(POGL_HANDLE command)
 void POGLCreateFrameBuffer_Command(POGLDeferredRenderContext* context, POGLRenderState* state, POGL_HANDLE command)
 {
 	POGL_CREATEFRAMEBUFFER_COMMAND_DATA* cmd = (POGL_CREATEFRAMEBUFFER_COMMAND_DATA*)command;
-
-	IPOGLTexture* textures[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-	const POGL_UINT32 size = cmd->framebuffer->GetNumDrawBuffers();
-	for (POGL_UINT32 i = 0; i < size; ++i) {
-		IPOGLTexture* texture = cmd->framebuffer->GetTexture(i);
-		textures[i] = texture;
-		texture->Release();
-	}
-
-	IPOGLTexture* depthStencilTexture = cmd->framebuffer->GetDepthStencilTexture();
-	GLuint frameBufferID = POGLFactory::GenFramebufferObjectID(textures, size, depthStencilTexture);
-	cmd->framebuffer->PostConstruct(frameBufferID);
-	depthStencilTexture->Release();
-	
+	cmd->framebuffer->PostConstruct();
 	state->SetFramebuffer(cmd->framebuffer);
 }
 

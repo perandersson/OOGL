@@ -32,7 +32,7 @@ public:
 	/*!
 		\brief Post-construct this framebuffer
 	*/
-	void PostConstruct(GLuint framebufferID);
+	void PostConstruct();
 
 // IPOGLInterface
 public:

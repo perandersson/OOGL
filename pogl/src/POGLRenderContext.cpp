@@ -142,12 +142,6 @@ IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, 
 IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, POGL_UINT32 count, IPOGLTexture* depthStencilTexture)
 {
 	//
-	// Generate a framebuffer ID
-	//
-
-	const GLuint framebufferID = POGLFactory::GenFramebufferObjectID(textures, count, depthStencilTexture);
-
-	//
 	// Convert the textures array into a std::vector
 	//
 
@@ -163,7 +157,7 @@ IPOGLFramebuffer* POGLRenderContext::CreateFramebuffer(IPOGLTexture** textures, 
 	//
 
 	POGLFramebuffer* framebuffer = new POGLFramebuffer(texturesVector, depthStencilTexture);
-	framebuffer->PostConstruct(framebufferID);
+	framebuffer->PostConstruct();
 	mRenderState->SetFramebuffer(framebuffer);
 	return framebuffer;
 }
