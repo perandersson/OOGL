@@ -4,6 +4,9 @@
 #include <atomic>
 #include <vector>
 #include <cmath>
+#include <chrono>
+using namespace std::chrono;
+
 #include "POGLExampleWindow.h"
 
 IPOGLProgram* LoadLinearDepthProgram(IPOGLRenderContext* context)
@@ -206,8 +209,6 @@ int main()
 
 				deferredContext->Flush();
 
-				// Sleep for 16 milliseconds (force 60fps). The texture containing the position do not need to be updated more often
-				std::this_thread::sleep_for(std::chrono::milliseconds(16));
 				if (running)
 					condition.wait(lock);
 			}
@@ -215,10 +216,16 @@ int main()
 
 		context->SetViewport(POGL_RECT(0, 0, 1024, 768));
 
+		static const POGL_INT32 TOP_FPS = 1000 / 60; // Generate the linear depth map at max 60 FPS
+		POGL_INT32 totalMillis = 0;
+		auto start = high_resolution_clock::now();
+		auto end = start;
 		while (POGLProcessEvents()) {
-
-			deferredContext->ExecuteCommands(context);
-			condition.notify_one();
+			if (totalMillis <= 0) {
+				totalMillis = TOP_FPS;
+				deferredContext->ExecuteCommands(context);
+				condition.notify_one();
+			}
 
 			//
 			// Draw the result onto the linear depth to the screen
@@ -240,6 +247,10 @@ int main()
 			//
 
 			device->EndFrame();
+
+			end = high_resolution_clock::now();
+			totalMillis -= duration_cast<duration<POGL_UINT32, std::milli>>(end - start).count();
+			start = end;
 		}
 		running = false;
 		condition.notify_one();

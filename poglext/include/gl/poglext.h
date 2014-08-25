@@ -50,4 +50,9 @@ extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* c
 */
 extern POGLAPI IPOGLVertexBuffer* POGLXCreateSphere(IPOGLRenderContext* context, POGL_FLOAT R, POGL_UINT32 Q, POGL_UINT32 H, POGL_FLOAT K, POGL_UINT32 Z, POGLBufferUsage::Enum usage);
 
+/*!
+	\brief
+*/
+extern POGLAPI IPOGLVertexBuffer* POGLXCreateCone(IPOGLRenderContext* context, const POGL_VECTOR3& A, const POGL_VECTOR3& D, POGL_FLOAT H, POGL_FLOAT R, POGL_UINT32 resolution, POGLBufferUsage::Enum usage);
+
 #endif

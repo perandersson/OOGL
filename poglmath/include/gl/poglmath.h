@@ -1,6 +1,6 @@
 #pragma once
-#ifndef _POGLEXT_H_
-#define _POGLEXT_H_
+#ifndef _POGLMATH_H_
+#define _POGLMATH_H_
 
 #ifndef _POGL_H_
 #error "You must include pogl.h before poglmath.h"
@@ -47,9 +47,17 @@ extern POGLAPI void POGLVec3Invert(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec
 extern POGLAPI void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3* _out_Vec3);
 
 /*!
-	\brief Invert the supplied vector and put the result into the out vector
+	\brief Calculate the cross product between the first- and second vector.
+*/
+extern POGLAPI POGL_VECTOR3 POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2);
+
+/*!
 */
 extern POGLAPI void POGLVec3Perp(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec3);
+
+/*!
+*/
+extern POGLAPI POGL_VECTOR3 POGLVec3Perp(const POGL_VECTOR3& v);
 
 /*
 	\brief Retrieves the angle in degrees between v1 and v2
@@ -134,6 +142,11 @@ struct POGL_VECTOR3X : POGL_VECTOR3
 				This vector and the supplied vector must be normalized before using this method
 	*/
 	POGL_FLOAT GetAngleRadians(const POGL_VECTOR3& v) const;
+
+	POGL_VECTOR3X operator + (const POGL_VECTOR3X& rhs) const;
+
+	POGL_VECTOR3X operator * (const POGL_FLOAT rhs) const;
+
 };
 _STATIC_ASSERT(sizeof(POGL_VECTOR3) == sizeof(POGL_VECTOR3X));
 

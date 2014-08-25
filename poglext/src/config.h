@@ -2,6 +2,7 @@
 
 #include <gl/pogl.h>
 #include <gl/poglext.h>
+#include <gl/poglmath.h>
 
 #include <atomic>
 

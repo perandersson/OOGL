@@ -28,6 +28,15 @@ void POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2, POGL_VECTOR3*
 	_out_Vec3->z = (v1.x * v2.y - v1.y * v2.x);
 }
 
+POGL_VECTOR3 POGLVec3Cross(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2)
+{
+	return POGL_VECTOR3(
+		v1.y * v2.z - v1.z * v2.y,
+		v1.z * v2.x - v1.x * v2.z,
+		v1.x * v2.y - v1.y * v2.x
+		);
+}
+
 void POGLVec3Invert(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec3)
 {
 	_out_Vec3->x = v.x * -1.f;
@@ -60,6 +69,13 @@ void POGLVec3Perp(const POGL_VECTOR3& v, POGL_VECTOR3* _out_Vec3)
 	}
 
 	POGLVec3Cross(v, axis, _out_Vec3);
+}
+
+POGL_VECTOR3 POGLVec3Perp(const POGL_VECTOR3& v)
+{
+	POGL_VECTOR3 out;
+	POGLVec3Perp(v, &out);
+	return out;
 }
 
 POGL_FLOAT POGLVec3AngleInDegree(const POGL_VECTOR3& v1, const POGL_VECTOR3& v2)
@@ -131,4 +147,14 @@ POGL_FLOAT POGL_VECTOR3X::GetAngleDegree(const POGL_VECTOR3& v) const
 POGL_FLOAT POGL_VECTOR3X::GetAngleRadians(const POGL_VECTOR3& v) const
 {
 	return POGLVec3AngleInRadians(*this, v);
+}
+
+POGL_VECTOR3X POGL_VECTOR3X::operator + (const POGL_VECTOR3X& rhs) const
+{
+	return POGL_VECTOR3X(x + rhs.x, y + rhs.y, z + rhs.z);
+}
+
+POGL_VECTOR3X POGL_VECTOR3X::operator * (const POGL_FLOAT rhs) const
+{
+	return POGL_VECTOR3X(x * rhs, y * rhs, z * rhs);
 }

@@ -4,6 +4,9 @@
 #include <atomic>
 #include <vector>
 #include <cmath>
+#include <chrono>
+using namespace std::chrono;
+
 #include "POGLExampleWindow.h"
 
 IPOGLProgram* LoadLinearDepthProgram(IPOGLRenderContext* context)
@@ -160,46 +163,55 @@ int main()
 
 		context->SetViewport(POGL_RECT(0, 0, 1024, 768));
 
+		static const POGL_INT32 TOP_FPS = 1000 / 60; // Generate the linear depth map at max 60 FPS
+		POGL_INT32 totalMillis = 0;
+		auto start = high_resolution_clock::now();
+		auto end = start;
 		while (POGLProcessEvents()) {
-			
+
 			//
 			// Generate the linear depth value
 			//
 
-			IPOGLRenderState* state = context->Apply(linearDepthProgram);
-			state->SetFramebuffer(framebuffer);
+			// Set the maximum FPS limit to 60 FPS
+			if (totalMillis <= 0) {
+				totalMillis = TOP_FPS;
+				IPOGLRenderState* state = context->Apply(linearDepthProgram);
+				state->SetFramebuffer(framebuffer);
 
-			state->SetVertexBuffer(cubeVertexBuffer);
-			state->SetIndexBuffer(cubeIndexBuffer);
-			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
+				state->SetVertexBuffer(cubeVertexBuffer);
+				state->SetIndexBuffer(cubeIndexBuffer);
+				state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 
-			//
-			// Retrieve the ModelMatrix for the currently bound program
-			//
+				//
+				// Retrieve the ModelMatrix for the currently bound program
+				//
 
-			IPOGLUniform* modelMatrixUniform = state->FindUniformByName("ModelMatrix");
+				IPOGLUniform* modelMatrixUniform = state->FindUniformByName("ModelMatrix");
 
-			//
-			// Draw 400 cubes over the screen
-			//
-			
-			static const POGL_FLOAT OFFSET = -30.0f;
-			for (POGL_UINT32 x = 0; x < 20; ++x) {
-				for (POGL_UINT32 z = 0; z < 20; ++z) {
-					POGL_MAT4 modelMatrix;
-					POGLMat4Translate(POGL_VECTOR3(x * 3.0f + OFFSET, 0.0f, z * 3.0f + OFFSET), &modelMatrix);
-					modelMatrixUniform->SetMatrix(modelMatrix);
-					state->DrawIndexed();
+				//
+				// Draw 400 cubes over the screen
+				//
+
+				static const POGL_FLOAT OFFSET = -30.0f;
+				for (POGL_UINT32 x = 0; x < 20; ++x) {
+					for (POGL_UINT32 z = 0; z < 20; ++z) {
+						POGL_MAT4 modelMatrix;
+						POGLMat4Translate(POGL_VECTOR3(x * 3.0f + OFFSET, 0.0f, z * 3.0f + OFFSET), &modelMatrix);
+						modelMatrixUniform->SetMatrix(modelMatrix);
+						state->DrawIndexed();
+					}
 				}
-			}
 
-			state->Release();
+				state->Release();
+
+			}
 
 			//
 			// Draw the result onto the linear depth to the screen
 			//
 
-			state = context->Apply(resultProgram);
+			IPOGLRenderState* state = context->Apply(resultProgram);
 			state->SetFramebuffer(nullptr);
 			
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
@@ -215,6 +227,10 @@ int main()
 			//
 
 			device->EndFrame();
+
+			end = high_resolution_clock::now();
+			totalMillis -= duration_cast<duration<POGL_UINT32, std::milli>>(end - start).count();
+			start = end;
 		}
 
 		linearDepthTexture->Release();
