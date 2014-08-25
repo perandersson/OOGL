@@ -37,7 +37,6 @@ private:
 	POGLBufferUsage::Enum mBufferUsage;
 
 	char* mPinnedMemory;
-	char* mPinnedMemoryAligned;
 
 	GLsync mLock;
 };

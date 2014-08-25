@@ -28,22 +28,25 @@ void POGLDefaultBufferResource::Release()
 
 void* POGLDefaultBufferResource::Map(POGLResourceMapType::Enum e)
 {
-	if (e == POGLResourceMapType::WRITE)
-		return glMapBuffer(mTarget, GL_WRITE_ONLY);
+	GLenum access = GL_WRITE_ONLY;
+	if (e == POGLResourceMapType::READ)
+		access = GL_READ_ONLY;
 
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return glMapBuffer(mTarget, access);
 }
 
 void* POGLDefaultBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	if (e == POGLResourceMapType::WRITE) {
-		if (offset + length > mMemorySize)
-			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the buffer size is: %d", offset, length, mMemorySize);
+	if (offset + length > mMemorySize)
+		THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the buffer size is: %d", offset, length, mMemorySize);
+	
+	GLenum access = GL_MAP_UNSYNCHRONIZED_BIT;
+	if (e == POGLResourceMapType::READ)
+		access |= GL_MAP_READ_BIT;
+	else if (e == POGLResourceMapType::WRITE)
+		access |= GL_MAP_WRITE_BIT;
 
-		return glMapBufferRange(mTarget, offset, length, GL_MAP_WRITE_BIT | GL_MAP_UNSYNCHRONIZED_BIT);
-	}
-
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return glMapBufferRange(mTarget, offset, length, access);
 }
 
 void POGLDefaultBufferResource::Unmap()

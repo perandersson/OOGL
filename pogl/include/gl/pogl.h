@@ -482,14 +482,12 @@ struct POGLAPI POGLCullFace
 struct POGLAPI POGLResourceMapType
 {
 	enum Enum {
-		/* Open a reading stream */
-		//READ = 0,
+		/* Our intentions is to read data to the resource */
+		READ = 0,
 
 		/* Our intentions is to write data to the resource */
-		WRITE = 0,
+		WRITE,
 
-		/* Open the stream for reading and writing */
-		//READ_AND_WRITE,
 		COUNT
 	};
 };

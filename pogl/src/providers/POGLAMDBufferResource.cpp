@@ -3,10 +3,9 @@
 #include "../POGLEnum.h"
 
 POGLAMDBufferResource::POGLAMDBufferResource(POGL_UINT32 memorySize, GLenum target, POGLBufferUsage::Enum bufferUsage)
-: mRefCount(1), mBufferID(0), mMemorySize(memorySize), mTarget(target), mBufferUsage(bufferUsage), mPinnedMemory(nullptr), mPinnedMemoryAligned(nullptr)
+: mRefCount(1), mBufferID(0), mMemorySize(memorySize), mTarget(target), mBufferUsage(bufferUsage), mPinnedMemory(nullptr)
 {
 	mPinnedMemory = (char*)malloc(memorySize);
-	mPinnedMemoryAligned = reinterpret_cast <char*>(unsigned(mPinnedMemory + 0xfff) &(~0xfff));
 }
 
 POGLAMDBufferResource::~POGLAMDBufferResource()
@@ -36,23 +35,15 @@ void POGLAMDBufferResource::Release()
 
 void* POGLAMDBufferResource::Map(POGLResourceMapType::Enum e)
 {
-	if (e == POGLResourceMapType::WRITE)
-		return mPinnedMemory;
-
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return mPinnedMemory;
 }
 
 void* POGLAMDBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e)
 {
-	if (e == POGLResourceMapType::WRITE) {
-		if (offset + length > mMemorySize)
-			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the buffer size is: %d", offset, length, mMemorySize);
+	if (offset + length > mMemorySize)
+		THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the buffer size is: %d", offset, length, mMemorySize);
 
-		char* ptr = mPinnedMemory + offset;
-		return ptr;
-	}
-
-	THROW_NOT_IMPLEMENTED_EXCEPTION();
+	return mPinnedMemory + offset;
 }
 
 void POGLAMDBufferResource::Unmap()
