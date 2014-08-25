@@ -15,11 +15,6 @@ public:
 	static GLuint GenTextureID();
 
 	/*!
-		\brief Generate a new framebuffer ID
-	*/
-	static GLuint GenFramebufferID();
-
-	/*!
 		\brief Creates a shader OpenGL ID based on the supplied parameters
 	*/
 	static GLuint CreateShader(const POGL_CHAR* memory, POGL_UINT32 size, POGLShaderType::Enum type);
