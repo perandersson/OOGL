@@ -73,7 +73,7 @@ int main()
 			//
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			texture0 = POGLXLoadBMPImageFromFile(deferredContext, "texture0.bmp");
+			texture0 = POGLXLoadTGAImageFromFile(deferredContext, "texture0.tga");
 
 			//
 			// Use flush instead of FlushAndWait. We are allowed to use Flush because we have a limited set of commands
@@ -88,7 +88,7 @@ int main()
 			//
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			texture1 = POGLXLoadBMPImageFromFile(deferredContext, "texture1.bmp");
+			texture1 = POGLXLoadTGAImageFromFile(deferredContext, "texture1.tga");
 
 			//
 			// Flush
@@ -101,7 +101,7 @@ int main()
 			//
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			texture2 = POGLXLoadBMPImageFromFile(deferredContext, "texture2.bmp");
+			texture2 = POGLXLoadTGAImageFromFile(deferredContext, "texture2.tga");
 
 			//
 			// Flush
@@ -114,7 +114,7 @@ int main()
 			//
 
 			std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-			texture3 = POGLXLoadBMPImageFromFile(deferredContext, "texture3.bmp");
+			texture3 = POGLXLoadTGAImageFromFile(deferredContext, "texture3.tga");
 
 			//
 			// Flush

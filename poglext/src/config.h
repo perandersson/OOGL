@@ -50,3 +50,19 @@ typedef std::ifstream POGL_ISTREAM;
 typedef std::stringstream POGL_STRINGSTREAM;
 #define open_file fopen
 #endif
+
+/*!
+	\brief Custom delete struct used with std::shared_ptr to delete arrays
+
+	Example:
+	{@code
+		std::shared_ptr<char> bytes(new char[10], TPOGLDeleteArray<char>());
+	}
+*/
+template<typename T>
+struct TPOGLDeleteArray
+{
+	void operator()(T const * p) {
+		delete[] p;
+	}
+};

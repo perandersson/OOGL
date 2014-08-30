@@ -2,23 +2,6 @@
 #include <memory>
 #include <algorithm>
 
-////////////////////////
-/*!
-	\brief Custom delete struct used with std::shared_ptr to delete arrays
-
-	Example:
-	{@code
-	std::shared_ptr<byte> bytes(new byte[10], TDeleteArray<byte>());
-	}
-	*/
-template<typename T>
-struct TDeleteArray
-{
-	void operator()(T const * p) {
-		delete[] p;
-	}
-};
-
 IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLRenderContext* context, const POGL_CHAR* fileName)
 {
 	assert_not_null(context);
@@ -30,16 +13,16 @@ IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLRenderContext* context, const POG
 		THROW_EXCEPTION(POGLResourceException, "File not found: %s", fileName);
 
 	fseek(file, 0L, SEEK_END);
-	POGL_UINT32 sz = ftell(file);
+	const POGL_UINT32 sz = ftell(file);
 	fseek(file, 0L, SEEK_SET);
 
-	std::shared_ptr<POGL_CHAR> bytes(new POGL_CHAR[sz], TDeleteArray<POGL_CHAR>());
+	std::shared_ptr<POGL_BYTE> bytes(new POGL_BYTE[sz], TPOGLDeleteArray<POGL_BYTE>());
 	fread(bytes.get(), 1, sz, file);
 	fclose(file);
 	return POGLXLoadBMPImageFromMemory(context, bytes.get(), sz);
 }
 
-IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* context, const POGL_CHAR* bytes, POGL_UINT32 size)
+IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* context, const POGL_BYTE* bytes, POGL_UINT32 size)
 {
 	assert_not_null(context);
 	assert_not_null(bytes);

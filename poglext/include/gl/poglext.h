@@ -16,6 +16,16 @@
 extern POGLAPI IPOGLTexture2D* POGLXLoadTGAImageFromFile(IPOGLRenderContext* context, const POGL_CHAR* fileName);
 
 /*!
+	\brief Load the supplied TGA fileName into a 2D texture and returns it
+
+	\param context
+	\param fileName
+	\return
+*/
+extern POGLAPI IPOGLTexture2D* POGLXLoadTGAImageFromMemory(IPOGLRenderContext* context, const POGL_BYTE* bytes, POGL_UINT32 size);
+
+
+/*!
 	\brief Load the supplied BMP fileName into a 2D texture and returns it
 
 	\param context
@@ -32,7 +42,7 @@ extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromFile(IPOGLRenderContext* con
 	\param size
 	\return
 */
-extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* context, const POGL_CHAR* bytes, POGL_UINT32 size);
+extern POGLAPI IPOGLTexture2D* POGLXLoadBMPImageFromMemory(IPOGLRenderContext* context, const POGL_BYTE* bytes, POGL_UINT32 size);
 
 /*!
 	\brief Create a IPOGLVertexBuffer instance containing the vertices needed to draw a sphere
