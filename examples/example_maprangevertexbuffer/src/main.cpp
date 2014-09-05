@@ -40,16 +40,24 @@ int main()
 		//
 		// Create vertex buffer for circle geometry
 		//
+		// Create a swap-buffer like behaviour to prevent our locks from being hit as much
+		//
 
 		std::vector<POGL_POSITION_VERTEX> vertices;
-		vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(0, 0, 0)));
-		for (POGL_UINT32 i = 0; i < CIRCLE_PTS; ++i) {
-			const POGL_FLOAT x = 0.1f * cosf(i * 0.0174532925f);
-			const POGL_FLOAT y = 0.1f * sinf(i * 0.0174532925f);
-			vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(x, y, 0)));
+		const POGL_UINT32 NUM_INTERNAL_COPIES = 3;
+		for (int i = 0; i < NUM_INTERNAL_COPIES; ++i) {
+			vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(0, 0, 0)));
+			for (POGL_UINT32 i = 0; i < CIRCLE_PTS; ++i) {
+				const POGL_FLOAT x = 0.1f * cosf(i * 0.0174532925f);
+				const POGL_FLOAT y = 0.1f * sinf(i * 0.0174532925f);
+				vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(x, y, 0)));
+			}
 		}
 		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::DYNAMIC);
 		
+		const POGL_UINT32 ONE_COPY_SIZE = vertices.size() / NUM_INTERNAL_COPIES;
+		POGL_UINT32 currentCopyIndex = 1;
+		POGL_UINT32 drawCopyIndex = 0;
 		POGL_FLOAT totalTimeFlt = 0.0f;
 		while (POGLProcessEvents()) {
 			totalTimeFlt += POGLGetTimeSinceLastTick();
@@ -59,7 +67,7 @@ int main()
 			//
 
 			{
-				const POGL_UINT32 offset = 1;
+				const POGL_UINT32 offset = (currentCopyIndex * ONE_COPY_SIZE) + 1;
 				const POGL_UINT32 length = CIRCLE_PTS / 2;
 
 				//
@@ -99,8 +107,8 @@ int main()
 			//
 
 			{
-				const POGL_UINT32 offset = 1 + CIRCLE_PTS / 2;
-				const POGL_UINT32 length = (1 + CIRCLE_PTS) - offset;
+				const POGL_UINT32 offset = (currentCopyIndex * ONE_COPY_SIZE) + (1 + CIRCLE_PTS / 2);
+				const POGL_UINT32 length = (1 + CIRCLE_PTS) - (1 + CIRCLE_PTS / 2);
 
 				//
 				// Map a memory location where the new vertex buffer data can be put into
@@ -127,7 +135,9 @@ int main()
 				//
 
 				context->Unmap(vertexBuffer);
-
+				currentCopyIndex++;
+				if (currentCopyIndex >= NUM_INTERNAL_COPIES)
+					currentCopyIndex = 0;
 			}
 
 			//
@@ -137,7 +147,10 @@ int main()
 			IPOGLRenderState* state = context->Apply(program);
 			state->Clear(POGLClearType::COLOR | POGLClearType::DEPTH);
 			state->SetVertexBuffer(vertexBuffer);
-			state->Draw();
+			state->Draw(ONE_COPY_SIZE, drawCopyIndex * ONE_COPY_SIZE);
+			drawCopyIndex++;
+			if (drawCopyIndex >= NUM_INTERNAL_COPIES)
+				drawCopyIndex = 0;
 			state->Release();
 
 			//

@@ -1,5 +1,6 @@
 #pragma once
 #include "IPOGLBufferResource.h"
+#include "POGLBufferResourceLock.h"
 
 class POGLRenderState;
 class POGLDefaultBufferResource : public IPOGLBufferResource
@@ -22,6 +23,7 @@ public:
 	virtual void* Map(POGL_UINT32 offset, POGL_UINT32 length, POGLResourceMapType::Enum e);
 	virtual void Unmap();
 	virtual void Lock();
+	virtual void Lock(POGL_UINT32 offset, POGL_UINT32 length);
 	virtual void Unlock();
 
 // IPOGLInterface
@@ -35,4 +37,6 @@ private:
 	POGL_UINT32 mMemorySize;
 	GLenum mTarget;
 	GLenum mBufferUsage;
+
+	POGLBufferResourceLock mLock;
 };

@@ -24,7 +24,6 @@ void POGLAMDBufferResource::Release()
 			glDeleteBuffers(1, &mBufferID);
 			mBufferID = 0;
 		}
-		//glClientWaitSync(mLock, GL_SYNC_FLUSH_COMMANDS_BIT, ~0ull);
 		if (mPinnedMemory != nullptr) {
 			free(mPinnedMemory);
 			mPinnedMemory = nullptr;
@@ -35,6 +34,7 @@ void POGLAMDBufferResource::Release()
 
 void* POGLAMDBufferResource::Map(POGLResourceMapType::Enum e)
 {
+	mLock.WaitClientAndClear();
 	return mPinnedMemory;
 }
 
@@ -43,23 +43,27 @@ void* POGLAMDBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POGLRes
 	if (offset + length > mMemorySize)
 		THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the buffer size is: %d", offset, length, mMemorySize);
 
+	mLock.WaitClientAndClear(offset, length);
 	return mPinnedMemory + offset;
 }
 
 void POGLAMDBufferResource::Unmap()
 {
-	//GLsync oldLock = mLock;
-	//mLock = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);	
-	//glDeleteSync(oldLock);
 }
 
 void POGLAMDBufferResource::Lock()
 {
-	//glClientWaitSync(mLock, GL_SYNC_FLUSH_COMMANDS_BIT, ~0ull);
+	mLock.PrepareFence();
+}
+
+void POGLAMDBufferResource::Lock(POGL_UINT32 offset, POGL_UINT32 length)
+{
+	mLock.PrepareFence(offset, length);
 }
 
 void POGLAMDBufferResource::Unlock()
 {
+	mLock.AddFences();
 }
 
 GLuint POGLAMDBufferResource::PostConstruct(POGLRenderState* renderState)
@@ -80,8 +84,10 @@ GLuint POGLAMDBufferResource::PostConstruct(POGLRenderState* renderState)
 	glBindBuffer(mTarget, mBufferID);
 	CHECK_GL("Could not bind buffer");
 
-	//mLock = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
-	//glClientWaitSync(mLock, GL_SYNC_FLUSH_COMMANDS_BIT, ~0ull);
+	// Lock and wait
+	GLsync lock = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+	glClientWaitSync(lock, GL_SYNC_FLUSH_COMMANDS_BIT, ~0ull);
+	glDeleteSync(lock);
 
 	return mBufferID;
 }

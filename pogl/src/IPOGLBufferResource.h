@@ -42,5 +42,7 @@ public:
 
 	virtual void Lock() = 0;
 
+	virtual void Lock(POGL_UINT32 offset, POGL_UINT32 length) = 0;
+
 	virtual void Unlock() = 0;
 };

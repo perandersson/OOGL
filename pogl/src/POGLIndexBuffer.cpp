@@ -80,14 +80,14 @@ void POGLIndexBuffer::DrawIndexed(GLenum primitiveType)
 
 void POGLIndexBuffer::DrawIndexed(GLenum primitiveType, POGL_UINT32 count)
 {
-	mBufferResource->Lock();
+	mBufferResource->Lock(0, count * mTypeSize);
 	glDrawElements(primitiveType, count, mElementType, NULL);
 	mBufferResource->Unlock();
 }
 
 void POGLIndexBuffer::DrawIndexed(GLenum primitiveType, POGL_UINT32 count, POGL_UINT32 offset)
 {
-	mBufferResource->Lock();
+	mBufferResource->Lock(offset * mTypeSize, count * mTypeSize);
 	const GLvoid* indices = (const GLvoid*)(offset * mTypeSize);
 	glDrawElements(primitiveType, count, mElementType, indices);
 	mBufferResource->Unlock();

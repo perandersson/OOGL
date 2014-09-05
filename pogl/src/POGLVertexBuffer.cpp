@@ -83,14 +83,14 @@ void POGLVertexBuffer::Draw()
 
 void POGLVertexBuffer::Draw(POGL_UINT32 count)
 {
-	mBufferResource->Lock();
+	mBufferResource->Lock(0, count * mLayout->vertexSize);
 	glDrawArrays(mPrimitiveType, 0, count);
 	mBufferResource->Unlock();
 }
 
 void POGLVertexBuffer::Draw(POGL_UINT32 count, POGL_UINT32 offset)
 {
-	mBufferResource->Lock();
+	mBufferResource->Lock(offset * mLayout->vertexSize, count * mLayout->vertexSize);
 	glDrawArrays(mPrimitiveType, offset, count);
 	mBufferResource->Unlock();
 }

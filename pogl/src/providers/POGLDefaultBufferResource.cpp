@@ -32,6 +32,7 @@ void* POGLDefaultBufferResource::Map(POGLResourceMapType::Enum e)
 	if (e == POGLResourceMapType::READ)
 		access = GL_READ_ONLY;
 
+	mLock.PrepareFence();
 	return glMapBuffer(mTarget, access);
 }
 
@@ -46,17 +47,24 @@ void* POGLDefaultBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POG
 	else if (e == POGLResourceMapType::WRITE)
 		access |= GL_MAP_WRITE_BIT;
 
+	mLock.PrepareFence(offset, length);
 	return glMapBufferRange(mTarget, offset, length, access);
 }
 
 void POGLDefaultBufferResource::Unmap()
 {
 	glUnmapBuffer(mTarget);
+	mLock.AddFences();
 }
 
 void POGLDefaultBufferResource::Lock()
 {
+	mLock.WaitAndClear();
+}
 
+void POGLDefaultBufferResource::Lock(POGL_UINT32 offset, POGL_UINT32 length)
+{
+	mLock.WaitAndClear(offset, length);
 }
 
 void POGLDefaultBufferResource::Unlock()
