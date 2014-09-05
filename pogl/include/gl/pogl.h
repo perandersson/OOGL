@@ -103,7 +103,7 @@ typedef uint32_t POGL_UINT32;
 typedef int64_t POGL_INT64;
 typedef uint64_t POGL_UINT64;
 typedef void* POGL_HANDLE;
-typedef char POGL_BYTE;
+typedef unsigned char POGL_BYTE;
 typedef float POGL_FLOAT;
 typedef double POGL_DOUBLE;
 
@@ -724,8 +724,8 @@ struct POGLAPI POGL_DEVICE_INFO
 	POGL_UINT8 colorBits;
 
 	/* How many bits used for the depth buffer */
-	POGL_UINT8 depthBits;
-
+	POGL_UINT8 depthBits; 
+	
 	/* The device pixel format */
 	POGLPixelFormat::Enum pixelFormat;
 

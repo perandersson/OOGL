@@ -1,8 +1,9 @@
 #pragma once
 #include "../IPOGLBufferResourceProvider.h"
+#include "POGLDefaultBufferResourceProvider.h"
 
 class POGLRenderState;
-class POGLAMDBufferResourceProvider : public IPOGLBufferResourceProvider
+class POGLAMDBufferResourceProvider : public POGLDefaultBufferResourceProvider
 {
 public:
 	POGLAMDBufferResourceProvider();

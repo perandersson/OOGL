@@ -5,6 +5,7 @@
 #include "POGLEnum.h"
 
 POGLAMDBufferResourceProvider::POGLAMDBufferResourceProvider()
+: POGLDefaultBufferResourceProvider()
 {
 }
 
@@ -17,5 +18,5 @@ IPOGLBufferResource* POGLAMDBufferResourceProvider::CreateBuffer(POGL_UINT32 mem
 	if (bufferUsage == POGLBufferUsage::DYNAMIC)
 		return new POGLAMDBufferResource(memorySize, target, bufferUsage);
 
-	return new POGLDefaultBufferResource(memorySize, target, POGLEnum::Convert(bufferUsage));
+	return POGLDefaultBufferResourceProvider::CreateBuffer(memorySize, target, bufferUsage);
 }
