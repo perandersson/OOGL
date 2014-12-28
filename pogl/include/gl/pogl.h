@@ -246,8 +246,14 @@ struct POGLAPI POGLPrimitiveType
 struct POGLAPI POGLBufferUsage
 {
 	enum Enum {
-		STATIC = 0,
+		/* The buffer object is handled as an immutable resource. */
+		IMMUTABLE = 0,
+
+		/* The buffer object is dynamic, i.e. it's changed sometimes or is small*/
 		DYNAMIC,
+
+		/* Buffers that we stream data continously from the CPU */
+		STREAM,
 
 		/* Number of enums available */
 		COUNT
@@ -1685,6 +1691,11 @@ public:
 		\brief Retrieves the number of vertices located in this buffer
 	*/
 	virtual POGL_UINT32 GetCount() const = 0;
+
+	/*!
+		\brief Retrieves the memory size of this vertex buffer
+	*/
+	virtual POGL_UINT32 GetMemorySize() const = 0;
 };
 
 /*!

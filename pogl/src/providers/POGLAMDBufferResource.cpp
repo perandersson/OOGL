@@ -77,7 +77,7 @@ GLuint POGLAMDBufferResource::PostConstruct(POGLRenderState* renderState)
 
 	glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, mBufferID);
 	glBufferData(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, mMemorySize, mPinnedMemory, usage);
-	glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, 0);
+	//glBindBuffer(GL_EXTERNAL_VIRTUAL_MEMORY_BUFFER_AMD, 0);
 	CHECK_GL("Could not initialize buffer data");
 
 	// Bind the buffer

@@ -53,7 +53,7 @@ int main()
 			POGL_POSITION_VERTEX(POGL_VECTOR3(0.0f, 0.5f, 0.0f)),
 			POGL_POSITION_VERTEX(POGL_VECTOR3(0.5f, -0.5f, 0.0f))
 		};
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		//
 		// Create a fullscreen quad
@@ -65,13 +65,13 @@ int main()
 			POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3(0.5f, 0.5f, 0.0f), POGL_VECTOR2(1.0f, 1.0f)),
 			POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3(0.5f, -0.5f, 0.0f), POGL_VECTOR2(1.0f, 0.0f))
 		};
-		IPOGLVertexBuffer* fullscreenVB = context->CreateVertexBuffer(FULLSCREEN_VERTICES, sizeof(FULLSCREEN_VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* fullscreenVB = context->CreateVertexBuffer(FULLSCREEN_VERTICES, sizeof(FULLSCREEN_VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		const POGL_UINT8 INDICES[] = {
 			0, 1, 2,
 			2, 3, 0
 		};
-		IPOGLIndexBuffer* fullscreenIB = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::STATIC);
+		IPOGLIndexBuffer* fullscreenIB = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::IMMUTABLE);
 
 		//
 		// Create a deferred device context and use that to create the textures and framebuffers

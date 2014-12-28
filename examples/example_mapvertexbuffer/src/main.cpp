@@ -48,7 +48,7 @@ int main()
 			const POGL_FLOAT y = 0.1f * sinf(i * 0.0174532925f);
 			vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(x, y, 0)));
 		}
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::DYNAMIC);
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::IMMUTABLE);
 		
 		POGL_FLOAT totalTimeFlt = 0.0f;
 		while (POGLProcessEvents()) {
@@ -64,7 +64,11 @@ int main()
 			// Make sure to not update the midpoint
 			//
 
-			POGL_POSITION_VERTEX* ptr = vertices + 1;
+			POGL_POSITION_VERTEX* ptr = vertices;
+			ptr->position.x = 0.0f;
+			ptr->position.y = 0.0f;
+			ptr->position.z = 0.0f;
+			ptr++;
 
 			//
 			// Update the buffer data

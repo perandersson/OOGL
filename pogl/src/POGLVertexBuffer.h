@@ -56,6 +56,7 @@ public:
 public:
 	virtual const POGL_VERTEX_LAYOUT* GetLayout() const;
 	virtual POGL_UINT32 GetCount() const;
+	virtual POGL_UINT32 GetMemorySize() const;
 
 private:
 	REF_COUNTER mRefCount;

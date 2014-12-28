@@ -124,7 +124,7 @@ int main()
 		// Create a vertex buffer resource based using the custom vertex structure
 		//
 
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), &CustomVertexLayout, POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), &CustomVertexLayout, POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		while (POGLProcessEvents()) {
 			IPOGLRenderState* state = context->Apply(program);

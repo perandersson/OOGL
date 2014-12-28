@@ -13,5 +13,5 @@ POGLDefaultBufferResourceProvider::~POGLDefaultBufferResourceProvider()
 
 IPOGLBufferResource* POGLDefaultBufferResourceProvider::CreateBuffer(POGL_UINT32 memorySize, GLenum target, POGLBufferUsage::Enum bufferUsage)
 {
-	return new POGLDefaultBufferResource(memorySize, target, POGLEnum::Convert(bufferUsage));
+	return new POGLDefaultBufferResource(memorySize, target, bufferUsage);
 }

@@ -6,7 +6,7 @@ class POGLRenderState;
 class POGLDefaultBufferResource : public IPOGLBufferResource
 {
 public:
-	POGLDefaultBufferResource(POGL_UINT32 memorySize, GLenum target, GLenum bufferUsage);
+	POGLDefaultBufferResource(POGL_UINT32 memorySize, GLenum target, POGLBufferUsage::Enum bufferUsage);
 	virtual ~POGLDefaultBufferResource();
 	
 	/*!
@@ -36,7 +36,7 @@ private:
 	GLuint mBufferID;
 	POGL_UINT32 mMemorySize;
 	GLenum mTarget;
-	GLenum mBufferUsage;
+	POGLBufferUsage::Enum mBufferUsage;
 
 	POGLBufferResourceLock mLock;
 };

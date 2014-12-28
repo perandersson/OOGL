@@ -103,7 +103,7 @@ int main()
 		// You are free to use any layout locations that you want if you create your own vertex types.
 		//
 
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		//
 		// Poll the opened window's events. This is NOT part of the POGL library

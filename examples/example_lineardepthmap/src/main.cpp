@@ -46,7 +46,7 @@ void CreateCubeBuffers(IPOGLRenderContext* context, IPOGLVertexBuffer** _out_ver
 		POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, -1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
 		POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, -1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f))
 	};
-	*_out_vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+	*_out_vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 	const POGL_UINT32 INDICES[] = {
 		// front
@@ -68,7 +68,7 @@ void CreateCubeBuffers(IPOGLRenderContext* context, IPOGLVertexBuffer** _out_ver
 		1, 5, 6,
 		6, 2, 1
 	};
-	*_out_indexBuffer = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::STATIC);
+	*_out_indexBuffer = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::IMMUTABLE);
 }
 
 void CreateFullscreenQuad(IPOGLRenderContext* context, IPOGLVertexBuffer** _out_vertexBuffer, IPOGLIndexBuffer** _out_indexBuffer)
@@ -79,13 +79,13 @@ void CreateFullscreenQuad(IPOGLRenderContext* context, IPOGLVertexBuffer** _out_
 		POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3(1.0f, 1.0f, 0.0f), POGL_VECTOR2(1.0f, 1.0f)),
 		POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3(1.0f, -1.0f, 0.0f), POGL_VECTOR2(1.0f, 0.0f))
 	};
-	*_out_vertexBuffer = context->CreateVertexBuffer(FULLSCREEN_VERTICES, sizeof(FULLSCREEN_VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+	*_out_vertexBuffer = context->CreateVertexBuffer(FULLSCREEN_VERTICES, sizeof(FULLSCREEN_VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 	const POGL_UINT8 INDICES[] = {
 		0, 1, 2,
 		2, 3, 0
 	};
-	*_out_indexBuffer = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::STATIC);
+	*_out_indexBuffer = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::IMMUTABLE);
 }
 
 int main()

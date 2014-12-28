@@ -59,6 +59,11 @@ POGL_UINT32 POGLVertexBuffer::GetCount() const
 	return mCount;
 }
 
+POGL_UINT32 POGLVertexBuffer::GetMemorySize() const
+{
+	return mCount * mLayout->vertexSize;
+}
+
 void* POGLVertexBuffer::Map(POGLResourceMapType::Enum e)
 {
 	return mBufferResource->Map(e);

@@ -1,7 +1,8 @@
 #include "MemCheck.h"
 #include "POGLDefaultBufferResource.h"
+#include "POGLEnum.h"
 
-POGLDefaultBufferResource::POGLDefaultBufferResource(POGL_UINT32 memorySize, GLenum target, GLenum bufferUsage)
+POGLDefaultBufferResource::POGLDefaultBufferResource(POGL_UINT32 memorySize, GLenum target, POGLBufferUsage::Enum bufferUsage)
 : mRefCount(1), mBufferID(0), mMemorySize(memorySize), mTarget(target), mBufferUsage(bufferUsage)
 {
 }
@@ -32,7 +33,13 @@ void* POGLDefaultBufferResource::Map(POGLResourceMapType::Enum e)
 	if (e == POGLResourceMapType::READ)
 		access = GL_READ_ONLY;
 
-	mLock.PrepareFence();
+	if (mBufferUsage == POGLBufferUsage::IMMUTABLE) {
+		glBufferData(mTarget, mMemorySize, 0, POGLEnum::Convert(mBufferUsage));
+		CHECK_GL("Could not initialize buffer data");
+	}
+	else {
+		mLock.PrepareFence();
+	}
 	return glMapBuffer(mTarget, access);
 }
 
@@ -47,24 +54,34 @@ void* POGLDefaultBufferResource::Map(POGL_UINT32 offset, POGL_UINT32 length, POG
 	else if (e == POGLResourceMapType::WRITE)
 		access |= GL_MAP_WRITE_BIT;
 
-	mLock.PrepareFence(offset, length);
+	if (mBufferUsage != POGLBufferUsage::IMMUTABLE) {
+		mLock.PrepareFence(offset, length);
+	}
+
 	return glMapBufferRange(mTarget, offset, length, access);
 }
 
 void POGLDefaultBufferResource::Unmap()
 {
 	glUnmapBuffer(mTarget);
-	mLock.AddFences();
+
+	if (mBufferUsage != POGLBufferUsage::IMMUTABLE) {
+		mLock.AddFences();
+	}
 }
 
 void POGLDefaultBufferResource::Lock()
 {
-	mLock.WaitAndClear();
+	if (mBufferUsage != POGLBufferUsage::IMMUTABLE) {
+		mLock.WaitAndClear();
+	}
 }
 
 void POGLDefaultBufferResource::Lock(POGL_UINT32 offset, POGL_UINT32 length)
 {
-	mLock.WaitAndClear(offset, length);
+	if (mBufferUsage != POGLBufferUsage::IMMUTABLE) {
+		mLock.WaitAndClear(offset, length);
+	}
 }
 
 void POGLDefaultBufferResource::Unlock()
@@ -84,7 +101,7 @@ GLuint POGLDefaultBufferResource::PostConstruct(POGLRenderState* renderState)
 	CHECK_GL("Could not bind buffer");
 
 	// Initialize the buffer size
-	glBufferData(mTarget, mMemorySize, 0, mBufferUsage);
+	glBufferData(mTarget, mMemorySize, 0, POGLEnum::Convert(mBufferUsage));
 	CHECK_GL("Could not initialize buffer data");
 
 	return mBufferID;

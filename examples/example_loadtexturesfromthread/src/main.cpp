@@ -46,7 +46,7 @@ int main()
 			POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, 0.0f), POGL_VECTOR2(1.0f, 1.0f)),
 			POGL_POSITION_TEXCOORD_VERTEX(POGL_VECTOR3(-1.0f, -1.0f, 0.0f), POGL_VECTOR2(1.0f, 0.0f))
 		};
-		IPOGLVertexBuffer* fullscreenVB = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* fullscreenVB = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		//
 		// Create an index buffer usable when drawing the vertex buffers above
@@ -56,7 +56,7 @@ int main()
 			0, 1, 2,
 			2, 3, 0
 		};
-		IPOGLIndexBuffer* fullscreenIB = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::STATIC);
+		IPOGLIndexBuffer* fullscreenIB = context->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_BYTE, POGLBufferUsage::IMMUTABLE);
 
 		//
 		// Create a thread with the purpose of loading the four textures. 

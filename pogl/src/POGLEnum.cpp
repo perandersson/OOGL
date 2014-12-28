@@ -79,7 +79,8 @@ GLenum POGLEnum::Convert(POGLBufferUsage::Enum e)
 {
 	static GLenum values[POGLBufferUsage::COUNT] = {
 		GL_STATIC_DRAW,
-		GL_DYNAMIC_DRAW
+		GL_DYNAMIC_DRAW,
+		GL_STREAM_DRAW
 	};
 
 	return values[(POGL_UINT32)e];

@@ -53,7 +53,7 @@ int main()
 					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(1.0f, 1.0f, -1.0f), POGL_COLOR4(0.0f, 0.0f, 1.0f, 1.0f)),
 					POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-1.0f, 1.0f, -1.0f), POGL_COLOR4(1.0f, 1.0f, 1.0f, 1.0f))
 				};
-				IPOGLVertexBuffer* vertexBuffer = deferredContext->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+				IPOGLVertexBuffer* vertexBuffer = deferredContext->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 				//
 				// Create the index buffer for the cube
@@ -79,7 +79,7 @@ int main()
 					1, 5, 6,
 					6, 2, 1
 				};
-				IPOGLIndexBuffer* indexBuffer = deferredContext->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::STATIC);
+				IPOGLIndexBuffer* indexBuffer = deferredContext->CreateIndexBuffer(INDICES, sizeof(INDICES), POGLVertexType::UNSIGNED_INT, POGLBufferUsage::IMMUTABLE);
 
 				// 
 				// Create the shaders in this thread and use it as if it was created in the main thread

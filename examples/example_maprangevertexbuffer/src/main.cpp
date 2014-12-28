@@ -53,7 +53,7 @@ int main()
 				vertices.push_back(POGL_POSITION_VERTEX(POGL_VECTOR3(x, y, 0)));
 			}
 		}
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::DYNAMIC);
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(&vertices[0], vertices.size() * sizeof(POGL_POSITION_VERTEX), POGLPrimitiveType::TRIANGLE_FAN, POGLBufferUsage::STREAM);
 		
 		const POGL_UINT32 ONE_COPY_SIZE = vertices.size() / NUM_INTERNAL_COPIES;
 		POGL_UINT32 currentCopyIndex = 1;

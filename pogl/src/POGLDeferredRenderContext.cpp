@@ -350,7 +350,7 @@ void* POGLDeferredRenderContext::Map(IPOGLResource* resource, POGL_UINT32 offset
 	auto type = resource->GetType();
 	if (type == POGLResourceType::VERTEXBUFFER) {
 		POGLVertexBuffer* vb = static_cast<POGLVertexBuffer*>(resource);
-		const POGL_UINT32 memorySize = vb->GetCount() * vb->GetLayout()->vertexSize;
+		const POGL_UINT32 memorySize = vb->GetMemorySize();
 		if (offset + length > memorySize)
 			THROW_EXCEPTION(POGLStateException, "You cannot map with offset: %d and length: %d when the vertex buffer size is: %d", offset, length, memorySize);
 		

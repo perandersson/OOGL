@@ -36,14 +36,14 @@ int main()
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(0.0f, 0.5f, 0.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(0.5f, -0.5f, 0.0f), POGL_COLOR4(1.0f, 0.0f, 0.0f, 1.0f))
 		};
-		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* vertexBuffer = context->CreateVertexBuffer(VERTICES, sizeof(VERTICES), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		const POGL_POSITION_COLOR_VERTEX VERTICES_INV[] = {
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(0.5f, 0.5f, 0.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(0.0f, -0.5f, 0.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f)),
 			POGL_POSITION_COLOR_VERTEX(POGL_VECTOR3(-0.5f, 0.5f, 0.0f), POGL_COLOR4(0.0f, 1.0f, 0.0f, 1.0f))
 		};
-		IPOGLVertexBuffer* vertexBufferInv = context->CreateVertexBuffer(VERTICES_INV, sizeof(VERTICES_INV), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::STATIC);
+		IPOGLVertexBuffer* vertexBufferInv = context->CreateVertexBuffer(VERTICES_INV, sizeof(VERTICES_INV), POGLPrimitiveType::TRIANGLE, POGLBufferUsage::IMMUTABLE);
 
 		//
 		// Setup program properties. This can be done on the associated RenderState as well, but we do it on the program since 
